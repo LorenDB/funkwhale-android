@@ -8,7 +8,7 @@ plugins {
   id("kotlin-android-extensions")
 
   id("org.jlleitschuh.gradle.ktlint") version "8.1.0"
-  id("com.gladed.androidgitversion") version "0.4.10"
+  id("com.gladed.androidgitversion") version "0.4.14"
   id("com.github.triplet.play") version "2.4.2"
 }
 
@@ -45,7 +45,9 @@ android {
 
     ndkVersion = "21.3.6528147"
 
-    versionCode = androidGitVersion.code()
+    androidGitVersion.code().let {
+      versionCode = if (it == 0) 1 else it
+    }
     versionName = androidGitVersion.name()
   }
 
@@ -135,7 +137,7 @@ dependencies {
   implementation("com.github.PaulWoitaschek.ExoPlayer-Extensions:extension-opus:2.11.4") {
     isTransitive = false
   }
-  implementation("com.github.PaulWoitaschek.ExoPlayer-Extensions:extension-flac:2.11.4" ){
+  implementation("com.github.PaulWoitaschek.ExoPlayer-Extensions:extension-flac:2.11.4") {
     isTransitive = false
   }
 
