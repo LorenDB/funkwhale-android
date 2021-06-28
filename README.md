@@ -1,22 +1,21 @@
-# Otter for Funkwhale
+# Funkwhale for Android
 
-![](https://img.shields.io/github/license/apognu/otter?style=flat-square)
-[![](https://img.shields.io/github/workflow/status/apognu/otter/Continuous%20develop%20build?label=develop&style=flat-square)](https://github.com/apognu/otter/actions?query=workflow%3A%22Continuous+develop+build%22)
-[![](https://img.shields.io/badge/Play%20Store-otter-informational?style=flat-square)](https://play.google.com/store/apps/details?id=com.github.apognu.otter)
-[![](https://img.shields.io/badge/IzzySoft-otter-informational?style=flat-square)](https://apt.izzysoft.de/fdroid/index/apk/com.github.apognu.otter)
-[![](https://img.shields.io/badge/APK-otter-informational?style=flat-square)](https://github.com/apognu/otter/releases) [![](https://translate.funkwhale.audio/widgets/otter/-/android/svg-badge.svg)](https://translate.funkwhale.audio/projects/otter/android/)
+![](https://img.shields.io/github/license/apognu/otter?style=flat)
+[![pipeline status](https://dev.funkwhale.audio/funkwhale/funkwhale-android/badges/develop/pipeline.svg)](https://dev.funkwhale.audio/funkwhale/funkwhale-android/-/commits/develop)
+[![](https://translate.funkwhale.audio/widgets/otter/-/android/svg-badge.svg)](https://translate.funkwhale.audio/projects/otter/android/)
 
-Otter is a native Android music player for [Funkwhale](https://funkwhale.audio), native to both Android (developed in Kotlin) and to Funkwhale (uses its native API instead of Subsonic).
+This is based on the amazing [Otter](https://github.com/apognu/otter) made by
+[apognu](https://github.com/apognu). This project wouldn't be possible without his groundwork!
 
-You can get help and discuss Otter on Matrix on [#otter:matrix.org](https://matrix.to/#/#otter:matrix.org).
+This is the official and native Android music player for [Funkwhale](https://funkwhale.audio), native to both Android (developed in Kotlin) and to Funkwhale (uses its native API instead of Subsonic).
 
-![Otter graphic](https://github.com/apognu/otter/raw/develop/app/src/main/play/listings/en-US/graphics/feature-graphic/1.png)
+You can get help and discuss Funkwhale on Matrix on [#funkwhale-android:matrix.org](https://matrix.to/#/#funkwhale-android:matrix.org).
 
 ## State
 
-A beta version of the app can be downloaded on [Google Play](https://play.google.com/store/apps/details?id=com.github.apognu.otter), on [IzzySoft](https://apt.izzysoft.de/fdroid/index/apk/com.github.apognu.otter) (F-Droid-compatible repository) or through [GitHub releases](https://github.com/apognu/otter/releases). Please bear with it, there **will** be bugs, there **will** be crashes and there **will** be performance or UX issues.
+This is work in Progress. Please bear with it, there **will** be bugs, there **will** be crashes and there **will** be performance or UX issues.
 
-Otter's features, as of this writing, are the following:
+Here is the list of Funkwhale for Android features:
 
  * Basic collection browsing (artists, albums and tracks)
  * Playlists listing
@@ -28,11 +27,17 @@ Otter's features, as of this writing, are the following:
  * Radios playback
  * Dark mode! 🎉
 
-Otter will try to behave as you would expect a mobile music player to, meaning integrating with the OS's media controls (including headset controls) or pause on incoming calls. If there is anything you would like it to do, please [open an issue](https://github.com/apognu/otter/issues/new).
+Funkwhale for Android will try to behave as you would expect a mobile music player to. That means it integrates with the OS's media controls (including headset controls) or pause on incoming calls. If there is anything you would like it to do, please [open an issue](https://dev.funkwhale.audio/funkwhale/funkwhale-android/-/issues/new).
 
 ## Screenshots
 
-<img src="https://github.com/apognu/otter/raw/develop/app/src/main/play/listings/en-US/graphics/phone-screenshots/1.png" width="200" /> <img src="https://github.com/apognu/otter/raw/develop/app/src/main/play/listings/en-US/graphics/phone-screenshots/2.png" width="200" /> <img src="https://github.com/apognu/otter/raw/develop/app/src/main/play/listings/en-US/graphics/phone-screenshots/3.png" width="200" /> <img src="https://github.com/apognu/otter/raw/develop/app/src/main/play/listings/en-US/graphics/phone-screenshots/4.png" width="200" /> <img src="https://github.com/apognu/otter/raw/develop/app/src/main/play/listings/en-US/graphics/phone-screenshots/5.png" width="200" /> <img src="https://github.com/apognu/otter/raw/develop/app/src/main/play/listings/en-US/graphics/phone-screenshots/6.png" width="200" /> <img src="https://github.com/apognu/otter/raw/develop/app/src/main/play/listings/en-US/graphics/phone-screenshots/7.png" width="200" />
+<img src="https://dev.funkwhale.audio/funkwhale/funkwhale-android/-/raw/develop/app/src/main/play/listings/en-US/graphics/phone-screenshots/1.png" width="200" /> 
+<img src="https://dev.funkwhale.audio/funkwhale/funkwhale-android/-/raw/develop/app/src/main/play/listings/en-US/graphics/phone-screenshots/2.png" width="200" /> 
+<img src="https://dev.funkwhale.audio/funkwhale/funkwhale-android/-/raw/develop/app/src/main/play/listings/en-US/graphics/phone-screenshots/3.png" width="200" /> 
+<img src="https://dev.funkwhale.audio/funkwhale/funkwhale-android/-/raw/develop/app/src/main/play/listings/en-US/graphics/phone-screenshots/4.png" width="200" /> 
+<img src="https://dev.funkwhale.audio/funkwhale/funkwhale-android/-/raw/develop/app/src/main/play/listings/en-US/graphics/phone-screenshots/5.png" width="200" /> 
+<img src="https://dev.funkwhale.audio/funkwhale/funkwhale-android/-/raw/develop/app/src/main/play/listings/en-US/graphics/phone-screenshots/6.png" width="200" /> 
+<img src="https://dev.funkwhale.audio/funkwhale/funkwhale-android/-/raw/develop/app/src/main/play/listings/en-US/graphics/phone-screenshots/7.png" width="200" />
 
 ## Translation
 
