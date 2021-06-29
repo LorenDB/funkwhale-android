@@ -1,9 +1,5 @@
 # Funkwhale for Android
 
-![](https://img.shields.io/github/license/apognu/otter?style=flat)
-[![pipeline status](https://dev.funkwhale.audio/funkwhale/funkwhale-android/badges/develop/pipeline.svg)](https://dev.funkwhale.audio/funkwhale/funkwhale-android/-/commits/develop)
-[![](https://translate.funkwhale.audio/widgets/otter/-/android/svg-badge.svg)](https://translate.funkwhale.audio/projects/otter/android/)
-
 This is based on the amazing [Otter](https://github.com/apognu/otter) made by
 [apognu](https://github.com/apognu). This project wouldn't be possible without his groundwork!
 
@@ -41,6 +37,6 @@ Funkwhale for Android will try to behave as you would expect a mobile music play
 
 ## Translation
 
-Otter is being translated by the community through [Weblate](https://translate.funkwhale.audio/projects/otter/android/). If you would like to contribute to its localization or add a new language, you can help out there.
+Funkwhale for Android is being translated by the community through [Weblate](https://translate.funkwhale.audio/settings/funkwhale/ffa). If you would like to contribute to its localization or add a new language, you can help out there.
 
-Thanks to the Funkwhale project for hosting us on their instance.
+[![Translation status](https://translate.funkwhale.audio/widgets/funkwhale/-/ffa/multi-auto.svg)](https://translate.funkwhale.audio/engage/funkwhale/)
