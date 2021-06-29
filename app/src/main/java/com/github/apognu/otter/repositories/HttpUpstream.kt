@@ -23,7 +23,7 @@ class HttpUpstream<D : Any, R : OtterResponse<D>>(val behavior: Behavior, privat
     Single, AtOnce, Progressive
   }
 
-  override fun fetch(size: Int): Flow<Repository.Response<D>> = flow {
+  override fun fetch(size: Int): Flow<Repository.Response<D>> = flow<Repository.Response<D>> {
     if (behavior == Behavior.Single && size != 0) return@flow
 
     val page = ceil(size / AppContext.PAGE_SIZE.toDouble()).toInt() + 1

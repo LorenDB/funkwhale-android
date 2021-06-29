@@ -139,9 +139,9 @@ data class Track(
     if (uploads.isEmpty()) return null
 
     return when (PowerPreference.getDefaultFile().getString("media_cache_quality")) {
-      "quality" -> uploads.maxBy { it.bitrate } ?: uploads[0]
-      "size" -> uploads.minBy { it.bitrate } ?: uploads[0]
-      else -> uploads.maxBy { it.bitrate } ?: uploads[0]
+      "quality" -> uploads.maxByOrNull { it.bitrate } ?: uploads[0]
+      "size" -> uploads.minByOrNull { it.bitrate } ?: uploads[0]
+      else -> uploads.maxByOrNull { it.bitrate } ?: uploads[0]
     }
   }
 
