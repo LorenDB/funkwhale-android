@@ -75,12 +75,12 @@
     <string name="artists">Artisti</string>
     <string name="settings_logout">Disconnetti</string>
     <string name="settings_crash_report_copied">L\'ultimo rapporto sull\'arresto anomalo è stato copiato negli appunti</string>
-    <string name="settings_crash_report_description">Verranno raccolti solo i registri di Otter dagli ultimi 5 minuti fino all\'arresto</string>
+    <string name="settings_crash_report_description">Verranno raccolti solo i log degli ultimi 5 minuti prima di un arresto anomalo</string>
     <string name="settings_crash_report_title">Copia i registri degli arresti anomali</string>
     <string name="settings_information_license_description">Licenza MIT</string>
     <string name="settings_information_license_title">Licenza</string>
     <string name="settings_version_title">Versione</string>
-    <string name="settings_information_repository_description">Otter di Antoine POPINEAU (apognu)</string>
+    <string name="settings_information_repository_description">Funkwhale per Android</string>
     <string name="settings_information_repository_title">Repository</string>
     <string name="settings_information">Informazione</string>
     <string name="settings_experiments_restart_content">Si prega di chiudere e riavviare l\'app affinché questa modifica abbia effetto</string>

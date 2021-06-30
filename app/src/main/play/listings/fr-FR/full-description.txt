@@ -4,5 +4,5 @@ Cette application nécessite un compte sur une instance Funkwhale pour fonctionn
 
 Vous pouvez obtenir de l'aide ou participer au développement d'Otter en vous rendant sur notre projet GitHub ou nous rejoindre sur Matrix.
 
-Code source : https://github.com/apognu/otter
+Code source : https://dev.funkwhale.audio/funkwhale/funkwhale-android
 Funkwhale : https://funkwhale.audio

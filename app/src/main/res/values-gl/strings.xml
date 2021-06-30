@@ -115,12 +115,12 @@
     <string name="artists">Artistas</string>
     <string name="settings_logout">Desconectar</string>
     <string name="settings_crash_report_copied">Copiouse ó portapapeis o último informe de fallos</string>
-    <string name="settings_crash_report_description">Só se recollen os rexistros de Otter dos 5 minutos previos ó fallo</string>
+    <string name="settings_crash_report_description">Só se recollerán os rexistros dos últimos 5 minutos antes do fallo</string>
     <string name="settings_crash_report_title">Copiar rexistro de fallos</string>
     <string name="settings_information_license_description">Licenza MIT</string>
     <string name="settings_information_license_title">Licenza</string>
     <string name="settings_version_title">Versión</string>
-    <string name="settings_information_repository_description">Otter por Antonie POPINEAU (apognu)</string>
+    <string name="settings_information_repository_description">Funkwhale para Android</string>
     <string name="settings_information_repository_title">Repositorio</string>
     <string name="settings_information">Información</string>
     <string name="settings_experiments_restart_content">Por favor, pecha e reinicia a app para que este cambio sexa aplicado</string>

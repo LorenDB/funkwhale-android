@@ -57,12 +57,12 @@
     <string name="artists">艺术家</string>
     <string name="settings_logout">登出</string>
     <string name="settings_crash_report_copied">上次崩溃报告已复制到剪贴板</string>
-    <string name="settings_crash_report_description">仅从崩溃前的最后 5 分钟开始，仅包含 Otter 的日志</string>
+    <string name="settings_crash_report_description">只会收集崩溃前最后 5 分钟的日志</string>
     <string name="settings_crash_report_title">复制崩溃日志</string>
     <string name="settings_information_license_description">MIT许可证</string>
     <string name="settings_information_license_title">许可证</string>
     <string name="settings_version_title">版本</string>
-    <string name="settings_information_repository_description">Otter来自Antoine POPINEAU (apognu)</string>
+    <string name="settings_information_repository_description">安卓版放克鲸</string>
     <string name="settings_information_repository_title">代码库</string>
     <string name="settings_information">信息</string>
     <string name="settings_experiments_restart_content">请终止并重新启动应用程序，以便此更改生效</string>

@@ -66,12 +66,12 @@
     <string name="artists">Artistas</string>
     <string name="settings_logout">Cerrar sesión</string>
     <string name="settings_crash_report_copied">El reporte del cierre inesperado se ha copiado a tu portapapeles</string>
-    <string name="settings_crash_report_description">Solo los registros de los últimos 5 minutos hasta el cierre inesperado de Otter se copiarán</string>
+    <string name="settings_crash_report_description">Solo se recopilarán los registros de los últimos 5 minutos antes de un bloqueo</string>
     <string name="settings_crash_report_title">Copiar registros de error</string>
     <string name="settings_information_license_description">licencia MIT</string>
     <string name="settings_information_license_title">Licencia</string>
     <string name="settings_version_title">Versión</string>
-    <string name="settings_information_repository_description">Otter por Antoine POPINEAU (apognu)</string>
+    <string name="settings_information_repository_description">Funkwhale para Android</string>
     <string name="settings_information_repository_title">Repositorio</string>
     <string name="settings_information">Información</string>
     <string name="settings_experiments_restart_content">Por favor fuerza la salida y reinicia la app para que surjan efecto los cambios</string>

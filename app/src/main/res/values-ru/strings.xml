@@ -68,12 +68,12 @@
     <string name="artists">Исполнители</string>
     <string name="settings_logout">Выйти</string>
     <string name="settings_crash_report_copied">Последний отчёт о сбое был скопирован в ваш буфер обмена</string>
-    <string name="settings_crash_report_description">Будут собраны только логи Otter за последние 5 минут до сбоя</string>
+    <string name="settings_crash_report_description">Будут собираться только журналы за последние 5 минут до сбоя</string>
     <string name="settings_crash_report_title">Скопировать журнал сбоев</string>
     <string name="settings_information_license_description">Лицензия MIT</string>
     <string name="settings_information_license_title">Лицензия</string>
     <string name="settings_version_title">Версия</string>
-    <string name="settings_information_repository_description">Otter создан Antoine POPINEAU (apognu)</string>
+    <string name="settings_information_repository_description">Funkwhale для Android </string>
     <string name="settings_information_repository_title">Репозиторий</string>
     <string name="settings_information">Информация</string>
     <string name="settings_experiments_restart_content">Пожалуйста, остановите и запустите приложение что бы изменения применились</string>
