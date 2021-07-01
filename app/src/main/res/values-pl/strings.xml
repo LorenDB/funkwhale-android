@@ -68,9 +68,9 @@
     <string name="playback_play">Odtwórz</string>
     <string name="radios">Radio</string>
     <string name="settings_crash_report_copied">Szczegóły ostatniej awarii zostały skopiowane do schowka</string>
-    <string name="settings_crash_report_description">Zostaną skopiowane tylko działania tego programu z ostatnich 5 minut przed awarią</string>
+    <string name="settings_crash_report_description">Zbierane będą tylko logi z ostatnich 5 minut przed awarią</string>
     <string name="settings_crash_report_title">Skopiuj szczegóły awarii</string>
-    <string name="settings_information_repository_description">Otter stworzony przez Antoine\'a POPINEAU (apognu)</string>
+    <string name="settings_information_repository_description">Funkwhale dla Androida</string>
     <string name="settings_information_repository_title">Repozytorium</string>
     <string name="settings_information">Informacje</string>
     <string name="settings_experiments_restart_content">Do wprowadzenia zmian należy zrestartować program</string>

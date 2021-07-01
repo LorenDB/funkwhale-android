@@ -38,7 +38,7 @@
     <string name="settings_experiments_restart_content">Bitte beende die App und starte sie dann neu, um die Einstellungen zu übernehmen</string>
     <string name="settings_information">Information</string>
     <string name="settings_version_title">Version</string>
-    <string name="settings_information_repository_description">Otter von Antoine POPINEAU (apognu)</string>
+    <string name="settings_information_repository_description">Funkwhale für Android</string>
     <string name="settings_information_repository_title">Repository</string>
     <string name="settings_information_license_title">Lizenz</string>
     <string name="settings_information_license_description">MIT Lizenz</string>
@@ -104,7 +104,7 @@
     <string name="track_info_details_track_copyright">Urheberrecht</string>
     <string name="playback_queue_download">Herunterladen</string>
     <string name="settings_crash_report_copied">Der letzte Absturzbericht wurde in deine Zwischenablage kopiert</string>
-    <string name="settings_crash_report_description">Nur Otters Protokolle der letzten 5 Minuten vor dem Crash werden werden gespeichert</string>
+    <string name="settings_crash_report_description">Es werden nur Logs der letzten 5 Minuten vor einem Absturz gespeichert</string>
     <string name="settings_crash_report_title">Kopiere Absturzberichte</string>
     <string name="radio_favorites_description">Spielen Sie Ihre Lieblingsmusik in einer nicht endenen Glücksschleife.</string>
     <plurals name="downloads_description">

@@ -78,12 +78,12 @@
     <string name="artists">Umjetnici</string>
     <string name="settings_logout">Odjava</string>
     <string name="settings_crash_report_copied">Zadnje izvješće o rušenju je kopirano na međuspremnik</string>
-    <string name="settings_crash_report_description">Samo Otter-ova izvješća zadnjih 5 minuta prije pada će biti spremljena</string>
+    <string name="settings_crash_report_description">Prikupljat će se samo zapisnici zadnjih 5 minuta prije pada</string>
     <string name="settings_crash_report_title">Kopiraj izvješća rušenja</string>
     <string name="settings_information_license_description">MIT licenca</string>
     <string name="settings_information_license_title">Licenca</string>
     <string name="settings_version_title">Verzija</string>
-    <string name="settings_information_repository_description">Otter od Antoine POPINEAU (apognu)</string>
+    <string name="settings_information_repository_description">Funkwhale za Android</string>
     <string name="settings_information_repository_title">Softverski repozitorij</string>
     <string name="settings_information">Informacije</string>
     <string name="settings_experiments_restart_content">Molimo ugasite i ponovno pokrenite aplikaciju kako bi se promjene primjenile</string>
