@@ -1,60 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:tools="http://schemas.android.com/tools"
-  android:layout_width="match_parent"
-  android:layout_height="wrap_content"
-  android:background="?android:attr/selectableItemBackground"
-  android:orientation="horizontal"
-  android:paddingStart="16dp"
-  android:paddingTop="6dp"
-  android:paddingEnd="16dp"
-  android:paddingBottom="6dp"
-  tools:showIn="@layout/activity_downloads">
-
-  <LinearLayout
-    android:layout_width="0dp"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_weight="1"
-    android:orientation="vertical">
+    android:background="?android:attr/selectableItemBackground"
+    android:orientation="horizontal"
+    android:paddingStart="16dp"
+    android:paddingTop="6dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="6dp"
+    tools:showIn="@layout/activity_downloads">
 
-    <TextView
-      android:id="@+id/title"
-      style="@style/AppTheme.ItemTitle"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      tools:text="Track title" />
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
 
-    <TextView
-      android:id="@+id/artist"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      tools:text="Artist name" />
+        <TextView
+            android:id="@+id/title"
+            style="@style/AppTheme.ItemTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="Track title" />
 
-    <ProgressBar
-      android:id="@+id/progress"
-      style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/artist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="Artist name" />
 
-  </LinearLayout>
+        <ProgressBar
+            android:id="@+id/progress"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
-  <ImageButton
-    android:id="@+id/toggle"
-    style="@style/IconButton"
-    android:layout_width="24dp"
-    android:layout_height="24dp"
-    android:layout_marginStart="4dp"
-    android:layout_marginEnd="8dp"
-    android:src="@drawable/pause" />
+    </LinearLayout>
 
-  <ImageButton
-    android:id="@+id/delete"
-    style="@style/IconButton"
-    android:layout_width="24dp"
-    android:layout_height="24dp"
-    android:layout_marginStart="4dp"
-    android:layout_marginEnd="8dp"
-    android:src="@drawable/delete"
-    android:tint="@color/colorAccent" />
+    <ImageButton
+        android:id="@+id/toggle"
+        style="@style/IconButton"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/pause" />
+
+    <ImageButton
+        android:id="@+id/delete"
+        style="@style/IconButton"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/delete"
+        app:tint="@color/colorAccent" />
 
 </LinearLayout>
