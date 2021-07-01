@@ -122,7 +122,8 @@ class MainActivity : AppCompatActivity() {
       CommandBus.send(Command.ToggleState)
     }
 
-    now_playing_details_progress.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+    now_playing_details_progress.setOnSeekBarChangeListener(object :
+      SeekBar.OnSeekBarChangeListener {
       override fun onStopTrackingTouch(view: SeekBar?) {}
 
       override fun onStartTrackingTouch(view: SeekBar?) {}
@@ -135,7 +136,8 @@ class MainActivity : AppCompatActivity() {
     })
 
     landscape_queue?.let {
-      supportFragmentManager.beginTransaction().replace(R.id.landscape_queue, LandscapeQueueFragment()).commit()
+      supportFragmentManager.beginTransaction()
+        .replace(R.id.landscape_queue, LandscapeQueueFragment()).commit()
     }
   }
 
@@ -205,8 +207,7 @@ class MainActivity : AppCompatActivity() {
               menu.findItem(R.id.nav_all_music).isEnabled = false
               menu.findItem(R.id.nav_my_music).isChecked = false
               menu.findItem(R.id.nav_followed).isChecked = false
-
-              PowerPreference.getDefaultFile().set("scope", "all")
+              PowerPreference.getDefaultFile().setString("scope", "all")
               EventBus.send(Event.ListingsChanged)
 
               return false
@@ -234,7 +235,7 @@ class MainActivity : AppCompatActivity() {
             scopes.add("all")
           }
 
-          PowerPreference.getDefaultFile().set("scope", scopes.joinToString(","))
+          PowerPreference.getDefaultFile().setString("scope", scopes.joinToString(","))
           EventBus.send(Event.ListingsChanged)
 
           return false
@@ -254,7 +255,8 @@ class MainActivity : AppCompatActivity() {
       Intent(this, LoginActivity::class.java).apply {
         Otter.get().deleteAllData()
 
-        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        flags =
+          Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
 
         stopService(Intent(this@MainActivity, PlayerService::class.java))
         startActivity(this)
@@ -382,8 +384,8 @@ class MainActivity : AppCompatActivity() {
           is Command.RefreshTrack -> refreshCurrentTrack(command.track)
 
           is Command.AddToPlaylist -> if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
-              AddToPlaylistDialog.show(this@MainActivity, lifecycleScope, command.tracks)
-            }
+            AddToPlaylistDialog.show(this@MainActivity, lifecycleScope, command.tracks)
+          }
         }
       }
     }
@@ -484,14 +486,25 @@ class MainActivity : AppCompatActivity() {
 
       now_playing_details_info?.let { now_playing_details_info ->
         now_playing_details_info.setOnClickListener {
-          PopupMenu(this@MainActivity, now_playing_details_info, Gravity.START, R.attr.actionOverflowMenuStyle, 0).apply {
+          PopupMenu(
+            this@MainActivity,
+            now_playing_details_info,
+            Gravity.START,
+            R.attr.actionOverflowMenuStyle,
+            0
+          ).apply {
             inflate(R.menu.track_info)
 
             setOnMenuItemClickListener {
               when (it.itemId) {
-                R.id.track_info_artist -> ArtistsFragment.openAlbums(this@MainActivity, track.artist, art = track.album?.cover())
+                R.id.track_info_artist -> ArtistsFragment.openAlbums(
+                  this@MainActivity,
+                  track.artist,
+                  art = track.album?.cover()
+                )
                 R.id.track_info_album -> AlbumsFragment.openTracks(this@MainActivity, track.album)
-                R.id.track_info_details -> TrackInfoDetailsFragment.new(track).show(supportFragmentManager, "dialog")
+                R.id.track_info_details -> TrackInfoDetailsFragment.new(track)
+                  .show(supportFragmentManager, "dialog")
               }
 
               now_playing.close()
@@ -548,7 +561,12 @@ class MainActivity : AppCompatActivity() {
         Cache.set(this@MainActivity, "repeat", "0".toByteArray())
 
         now_playing_details_repeat?.setImageResource(R.drawable.repeat)
-        now_playing_details_repeat?.setColorFilter(ContextCompat.getColor(this, R.color.controlForeground))
+        now_playing_details_repeat?.setColorFilter(
+          ContextCompat.getColor(
+            this,
+            R.color.controlForeground
+          )
+        )
         now_playing_details_repeat?.alpha = 0.2f
 
         CommandBus.send(Command.SetRepeatMode(Player.REPEAT_MODE_OFF))
@@ -559,7 +577,12 @@ class MainActivity : AppCompatActivity() {
         Cache.set(this@MainActivity, "repeat", "1".toByteArray())
 
         now_playing_details_repeat?.setImageResource(R.drawable.repeat)
-        now_playing_details_repeat?.setColorFilter(ContextCompat.getColor(this, R.color.controlForeground))
+        now_playing_details_repeat?.setColorFilter(
+          ContextCompat.getColor(
+            this,
+            R.color.controlForeground
+          )
+        )
         now_playing_details_repeat?.alpha = 1.0f
 
         CommandBus.send(Command.SetRepeatMode(Player.REPEAT_MODE_ALL))
@@ -569,7 +592,12 @@ class MainActivity : AppCompatActivity() {
       2 -> {
         Cache.set(this@MainActivity, "repeat", "2".toByteArray())
         now_playing_details_repeat?.setImageResource(R.drawable.repeat_one)
-        now_playing_details_repeat?.setColorFilter(ContextCompat.getColor(this, R.color.controlForeground))
+        now_playing_details_repeat?.setColorFilter(
+          ContextCompat.getColor(
+            this,
+            R.color.controlForeground
+          )
+        )
         now_playing_details_repeat?.alpha = 1.0f
 
         CommandBus.send(Command.SetRepeatMode(Player.REPEAT_MODE_ONE))

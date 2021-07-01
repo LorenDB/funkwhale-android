@@ -130,7 +130,7 @@
         android:background="@drawable/circle"
         android:contentDescription="@string/alt_track_info"
         android:src="@drawable/more"
-        android:tint="@color/controlForeground" />
+        app:tint="@color/controlForeground" />
 
     </FrameLayout>
 
