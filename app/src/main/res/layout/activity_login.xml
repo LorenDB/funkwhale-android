@@ -18,7 +18,7 @@
       android:layout_height="128dp"
       android:layout_marginBottom="32dp"
       android:contentDescription="@string/alt_app_logo"
-      android:src="@drawable/otter"
+      android:src="@drawable/funkwhale"
       app:tint="@android:color/white" />
 
     <TextView

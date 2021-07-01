@@ -45,9 +45,7 @@ android {
 
     ndkVersion = "21.3.6528147"
 
-    androidGitVersion.code().let {
-      versionCode = if (it == 0) 1 else it
-    }
+    versionCode = androidGitVersion.code()
     versionName = androidGitVersion.name()
   }
 

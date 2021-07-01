@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Otter</string>
+    <string name="app_name">Funkwhale</string>
     <string name="login_welcome">Bitte gib die Anmeldedaten deiner Funkwhale-Instanz ein, um auf den Inhalt zuzugreifen</string>
     <string name="login_hostname">Servername</string>
     <string name="login_anonymous">Anonyme Anmeldung</string>

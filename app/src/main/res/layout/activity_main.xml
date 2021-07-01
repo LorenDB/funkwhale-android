@@ -38,7 +38,7 @@
     android:theme="@style/AppTheme.AppBar"
     app:backgroundTint="@color/colorPrimary"
     app:layout_insetEdge="bottom"
-    app:navigationIcon="@drawable/ottershape"
+    app:navigationIcon="@drawable/funkwhaleshape"
     tools:menu="@menu/toolbar" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -54,7 +54,7 @@ class MediaControlsManager(val context: Service, private val scope: CoroutineSco
               .setMediaSession(mediaSession.sessionToken)
               .setShowActionsInCompactView(0, 1, 2)
           )
-          .setSmallIcon(R.drawable.ottershape)
+          .setSmallIcon(R.drawable.funkwhaleshape)
           .run {
             coverUrl?.let {
               try {

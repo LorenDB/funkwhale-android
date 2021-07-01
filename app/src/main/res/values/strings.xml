@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="app_name" translatable="false">Otter</string>
+  <string name="app_name" translatable="false">Funkwhale</string>
   <string name="login_welcome">Please enter the details of your Funkwhale instance to access its content</string>
   <string name="login_hostname">Host name</string>
   <string name="login_cleartext">Allow cleartext traffic (HTTP)</string>

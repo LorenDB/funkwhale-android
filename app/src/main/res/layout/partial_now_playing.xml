@@ -117,7 +117,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:adjustViewBounds="true"
-        android:src="@drawable/ottershape"
+        android:src="@drawable/funkwhaleshape"
         tools:src="@tools:sample/avatars" />
 
       <ImageButton
