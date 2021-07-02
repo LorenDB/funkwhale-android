@@ -12,7 +12,7 @@
   android:transitionGroup="true"
   tools:showIn="@layout/fragment_tracks">
 
-  <com.github.apognu.otter.views.SquareImageView
+  <org.funkwhale.ffa.views.SquareImageView
     android:id="@+id/handle"
     android:layout_width="18dp"
     android:layout_height="wrap_content"
@@ -22,7 +22,7 @@
     android:visibility="gone"
     tools:visibility="visible" />
 
-  <com.github.apognu.otter.views.SquareImageView
+  <org.funkwhale.ffa.views.SquareImageView
     android:id="@+id/cover"
     android:layout_width="48dp"
     android:layout_height="wrap_content"

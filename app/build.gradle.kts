@@ -39,7 +39,7 @@ android {
   compileSdkVersion(29)
 
   defaultConfig {
-    applicationId = "com.github.apognu.otter"
+    applicationId = "org.funkwhale.ffa"
 
     minSdkVersion(23)
     targetSdkVersion(29)

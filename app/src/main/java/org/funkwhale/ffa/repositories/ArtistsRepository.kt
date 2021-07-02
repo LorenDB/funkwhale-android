@@ -1,0 +1,18 @@
+package org.funkwhale.ffa.repositories
+
+import android.content.Context
+import org.funkwhale.ffa.utils.Artist
+import org.funkwhale.ffa.utils.ArtistsCache
+import org.funkwhale.ffa.utils.ArtistsResponse
+import org.funkwhale.ffa.utils.OtterResponse
+import com.github.kittinunf.fuel.gson.gsonDeserializerOf
+import com.google.gson.reflect.TypeToken
+import java.io.BufferedReader
+
+class ArtistsRepository(override val context: Context?) : Repository<Artist, ArtistsCache>() {
+  override val cacheId = "artists"
+  override val upstream = HttpUpstream<Artist, OtterResponse<Artist>>(HttpUpstream.Behavior.Progressive, "/api/v1/artists/?playable=true&ordering=name", object : TypeToken<ArtistsResponse>() {}.type)
+
+  override fun cache(data: List<Artist>) = ArtistsCache(data)
+  override fun uncache(reader: BufferedReader) = gsonDeserializerOf(ArtistsCache::class.java).deserialize(reader)
+}
