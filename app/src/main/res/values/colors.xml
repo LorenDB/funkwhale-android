@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <color name="surface">@android:color/background_light</color>
-  <color name="elevatedSurface">@android:color/background_light</color>
+  <color name="surface">#eeeeee</color>
+  <color name="elevatedSurface">#f6f6f6</color>
 
-  <color name="colorPrimary">#327eae</color>
-  <color name="colorPrimaryDark">#3d3e40</color>
+  <color name="colorPrimary">#476d85</color>
+  <color name="colorPrimaryDark">#646568</color>
   <color name="colorAccent">#d35400</color>
   <color name="colorError">#fdcfbb</color>
 
   <color name="colorSelected">#dadada</color>
-  <color name="colorFavorite">#e17055</color>
+  <color name="colorFavorite">#d35400</color>
 
   <color name="itemTitle">#222222</color>
 
-  <color name="controlForeground">@color/colorPrimary</color>
-  <color name="controlColor">@color/colorPrimary</color>
-  <color name="controlAccent">#22648E</color>
+  <color name="controlForeground">@color/colorPrimaryDark</color>
+  <color name="controlColorText">@color/colorPrimaryDark</color>
+  <color name="controlColorHintText">#5988a6</color>
+  <color name="controlColor">@color/colorAccent</color>
+  <color name="controlAccent">@color/colorAccent</color>
 
   <color name="whiteWhileLight">#ffffff</color>
   <color name="blackWhileLight">#000000</color>

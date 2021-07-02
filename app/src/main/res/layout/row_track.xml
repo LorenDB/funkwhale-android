@@ -1,78 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:tools="http://schemas.android.com/tools"
-  android:layout_width="match_parent"
-  android:layout_height="wrap_content"
-  android:layout_marginHorizontal="8dp"
-  android:layout_marginVertical="6dp"
-  android:background="@drawable/ripple"
-  android:gravity="center_vertical"
-  android:orientation="horizontal"
-  android:padding="8dp"
-  android:transitionGroup="true"
-  tools:showIn="@layout/fragment_tracks">
-
-  <org.funkwhale.ffa.views.SquareImageView
-    android:id="@+id/handle"
-    android:layout_width="18dp"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginEnd="16dp"
-    android:src="@drawable/reorder"
-    android:tint="#787878"
-    android:visibility="gone"
-    tools:visibility="visible" />
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="6dp"
+    android:background="@drawable/ripple"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:transitionGroup="true"
+    tools:showIn="@layout/fragment_tracks">
 
-  <org.funkwhale.ffa.views.SquareImageView
-    android:id="@+id/cover"
-    android:layout_width="48dp"
-    android:layout_height="wrap_content"
-    android:layout_marginEnd="16dp"
-    tools:src="@tools:sample/avatars" />
+    <org.funkwhale.ffa.views.SquareImageView
+        android:id="@+id/handle"
+        android:layout_width="18dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/reorder"
+        android:tint="#787878"
+        android:visibility="gone"
+        tools:visibility="visible" />
 
-  <LinearLayout
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:layout_weight="1"
-    android:orientation="vertical">
+    <org.funkwhale.ffa.views.SquareImageView
+        android:id="@+id/cover"
+        android:layout_width="48dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        tools:src="@tools:sample/avatars" />
 
-    <TextView
-      android:id="@+id/title"
-      style="@style/AppTheme.ItemTitle"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:drawableStart="@drawable/downloaded"
-      android:drawablePadding="8dp"
-      android:drawableTint="@color/controlColor"
-      android:ellipsize="end"
-      android:lines="1"
-      tools:text="Absolution" />
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
 
-    <TextView
-      android:id="@+id/artist"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:ellipsize="end"
-      android:lines="1"
-      tools:text="Muse" />
+        <TextView
+            android:id="@+id/title"
+            style="@style/AppTheme.ItemTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/downloaded"
+            android:drawablePadding="8dp"
+            android:drawableTint="@color/controlColor"
+            android:ellipsize="end"
+            android:lines="1"
+            tools:text="Absolution" />
 
-  </LinearLayout>
+        <TextView
+            android:id="@+id/artist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:lines="1"
+            tools:text="Muse" />
 
-  <ImageButton
-    android:id="@+id/favorite"
-    style="@style/IconButton"
-    android:layout_width="24dp"
-    android:layout_height="24dp"
-    android:layout_marginStart="4dp"
-    android:layout_marginEnd="8dp"
-    android:contentDescription="@string/manage_add_to_favorites"
-    android:src="@drawable/favorite" />
+    </LinearLayout>
 
-  <ImageButton
-    android:id="@+id/actions"
-    style="@style/IconButton"
-    android:layout_width="24dp"
-    android:layout_height="24dp"
-    android:contentDescription="@string/alt_more_options"
-    android:src="@drawable/more" />
+    <ImageButton
+        android:id="@+id/favorite"
+        style="@style/IconButton"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="8dp"
+        android:contentDescription="@string/manage_add_to_favorites"
+        android:src="@drawable/favorite" />
+
+    <ImageButton
+        android:id="@+id/actions"
+        style="@style/IconButton"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:contentDescription="@string/alt_more_options"
+        android:src="@drawable/more" />
 
 </LinearLayout>
