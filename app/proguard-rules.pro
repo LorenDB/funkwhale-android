@@ -1,1 +1,1 @@
--keep class com.github.apognu.otter.** { *; }
+-keep class org.funkwhale.ffa.** { *; }

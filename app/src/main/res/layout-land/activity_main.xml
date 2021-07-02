@@ -29,7 +29,7 @@
 
   </LinearLayout>
 
-  <com.github.apognu.otter.views.NowPlayingView
+  <org.funkwhale.ffa.views.NowPlayingView
     android:id="@+id/now_playing"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
@@ -45,7 +45,7 @@
 
     <include layout="@layout/partial_now_playing" />
 
-  </com.github.apognu.otter.views.NowPlayingView>
+  </org.funkwhale.ffa.views.NowPlayingView>
 
   <com.google.android.material.bottomappbar.BottomAppBar
     android:id="@+id/appbar"
