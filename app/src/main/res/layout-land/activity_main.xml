@@ -53,7 +53,7 @@
     android:layout_height="wrap_content"
     android:layout_gravity="bottom"
     android:theme="@style/AppTheme.AppBar"
-    app:backgroundTint="@color/colorPrimary"
+    app:backgroundTint="@color/colorPrimaryDark"
     app:layout_insetEdge="bottom"
     app:navigationIcon="@drawable/funkwhaleshape"
     tools:menu="@menu/toolbar" />

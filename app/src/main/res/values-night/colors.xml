@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <color name="surface">#121212</color>
-  <color name="elevatedSurface">#191919</color>
+  <color name="surface">#202020</color>
+  <color name="elevatedSurface">#2f2f2f</color>
 
-  <color name="colorPrimary">#283f4e</color>
-  <color name="colorAccent">#3282b8</color>
+  <color name="colorPrimary">#949fa7</color>
+  <color name="colorAccent">#d35400</color>
 
   <color name="colorSelected">#525252</color>
-  <color name="colorFavorite">#eba999</color>
+  <color name="colorFavorite">#b34700</color>
 
   <color name="itemTitle">#abffffff</color>
 
-  <color name="controlForeground">#caffffff</color>
-  <color name="controlColor">#77a8c7</color>
-  <color name="controlAccent">#304A5A</color>
+  <color name="controlForeground">@color/colorPrimary</color>
+  <color name="controlColorText">@color/colorPrimary</color>
+  <color name="controlColorHintText">#dfebf0</color>
+  <color name="controlColor">@color/colorAccent</color>
+  <color name="controlAccent">@color/colorAccent</color>
 
   <color name="whiteWhileLight">#000000</color>
   <color name="blackWhileLight">#ffffff</color>

@@ -11,7 +11,7 @@
     <string name="login_error_hostname_https">Der Zugriff auf den Funkwhale Server sollte über https erfolgen</string>
     <string name="toolbar_search">Suche</string>
     <string name="title_settings">Einstellungen</string>
-    <string name="title_oss_licences">Open Source Lizenz</string>
+    <string name="title_oss_licences">Open Source Lizenzen</string>
     <string name="search_welcome">Gib deine Suchekritieren oben ein und drücke Enter um deine Musikbibliothek zu durchsuchen</string>
     <string name="search_placeholder">Durchsuche Künstler, Alben und Songs</string>
     <string name="search_no_results">Keine Ergebnisse wurden anhand deiner Suchkritieren gefunden</string>
