@@ -1,1 +1,1 @@
-https://dev.funkwhale.audio/funkwhale/funkwhale-android
+https://funkwhale.audio/
