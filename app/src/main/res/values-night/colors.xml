@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <color name="surface">#202020</color>
-  <color name="elevatedSurface">#2f2f2f</color>
+  <color name="surface">#151515</color>
+  <color name="elevatedSurface">#303030</color>
 
   <color name="colorPrimary">#949fa7</color>
+  <color name="colorPrimaryDark">#8a8b8f</color>
+
   <color name="colorAccent">#d35400</color>
 
   <color name="colorSelected">#525252</color>

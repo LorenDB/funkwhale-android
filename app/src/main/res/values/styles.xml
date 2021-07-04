@@ -6,7 +6,7 @@
     <item name="colorPrimary">@color/colorPrimary</item>
     <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
     <item name="colorAccent">@color/colorAccent</item>
-    <item name="android:navigationBarColor">@color/surface</item>
+    <item name="android:navigationBarColor">@color/elevatedSurface</item>
 
     <item name="materialButtonStyle">@style/AppTheme.ButtonStyle</item>
 
@@ -66,8 +66,8 @@
   </style>
 
   <style name="AppTheme.AppBar" parent="ThemeOverlay.MaterialComponents.Toolbar.Primary">
-    <item name="android:drawableTint" tools:targetApi="m">@android:color/white</item>
-    <item name="android:tint">@android:color/white</item>
+    <item name="android:drawableTint" tools:targetApi="m">@color/colorPrimary</item>
+    <item name="android:tint">@color/colorPrimary</item>
 
     <item name="actionBarPopupTheme">@style/AppTheme.PopupMenu</item>
     <item name="popupTheme">@style/AppTheme.PopupMenu</item>
