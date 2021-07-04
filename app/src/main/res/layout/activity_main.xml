@@ -37,7 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:theme="@style/AppTheme.AppBar"
-        app:backgroundTint="@color/surface"
+        app:backgroundTint="@color/elevatedSurface"
         app:layout_insetEdge="bottom"
         app:navigationIcon="@drawable/funkwhaleshape"
         tools:menu="@menu/toolbar" />
