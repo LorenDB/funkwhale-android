@@ -60,8 +60,8 @@
     <ImageButton
         android:id="@+id/favorite"
         style="@style/IconButton"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_marginStart="4dp"
         android:layout_marginEnd="8dp"
         android:contentDescription="@string/manage_add_to_favorites"
@@ -70,8 +70,8 @@
     <ImageButton
         android:id="@+id/actions"
         style="@style/IconButton"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:contentDescription="@string/alt_more_options"
         android:src="@drawable/more" />
 
