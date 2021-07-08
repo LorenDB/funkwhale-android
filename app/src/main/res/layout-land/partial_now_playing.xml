@@ -1,248 +1,251 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:app="http://schemas.android.com/apk/res-auto"
-  xmlns:tools="http://schemas.android.com/tools"
-  android:id="@+id/now_playing_root"
-  android:layout_width="match_parent"
-  android:layout_height="wrap_content"
-  android:background="@color/elevatedSurface"
-  android:orientation="vertical">
-
-  <LinearLayout
-    android:id="@+id/summary"
-    android:layout_width="match_parent"
-    android:layout_height="?attr/actionBarSize"
-    android:orientation="vertical">
-
-    <ProgressBar
-      android:id="@+id/now_playing_progress"
-      style="@android:style/Widget.Material.ProgressBar.Horizontal"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="-6dp"
-      android:layout_marginBottom="-6dp"
-      android:progress="40"
-      android:progressTint="@color/colorPrimary" />
-
-    <LinearLayout
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:gravity="center_vertical"
-      android:orientation="horizontal">
-
-      <FrameLayout
-        android:layout_width="?attr/actionBarSize"
-        android:layout_height="?attr/actionBarSize"
-        android:layout_marginEnd="16dp">
-
-        <org.funkwhale.ffa.views.SquareImageView
-          android:id="@+id/now_playing_cover"
-          android:layout_width="?attr/actionBarSize"
-          android:layout_height="?attr/actionBarSize"
-          tools:src="@tools:sample/avatars" />
-
-        <ProgressBar
-          android:id="@+id/now_playing_buffering"
-          android:layout_width="?attr/actionBarSize"
-          android:layout_height="?attr/actionBarSize"
-          android:indeterminate="true"
-          android:indeterminateTint="@color/controlForeground"
-          android:visibility="gone" />
-
-      </FrameLayout>
-
-      <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_weight="2"
-        android:orientation="vertical">
-
-        <TextView
-          android:id="@+id/now_playing_title"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:textColor="@color/itemTitle"
-          tools:text="Supermassive Black Hole" />
-
-        <TextView
-          android:id="@+id/now_playing_album"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          tools:text="Muse" />
-
-      </LinearLayout>
-
-      <com.google.android.material.button.MaterialButton
-        android:id="@+id/now_playing_toggle"
-        style="@style/AppTheme.OutlinedButton"
-        android:layout_width="?attr/actionBarSize"
-        android:layout_height="match_parent"
-        android:layout_marginEnd="16dp"
-        app:icon="@drawable/play" />
-
-      <ImageButton
-        android:id="@+id/now_playing_next"
-        style="@style/IconButton"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginEnd="16dp"
-        android:contentDescription="@string/control_next"
-        android:src="@drawable/next" />
-
-    </LinearLayout>
-
-  </LinearLayout>
-
-  <LinearLayout
-    android:id="@+id/now_playing_details"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/now_playing_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:paddingStart="32dp"
-    android:paddingTop="16dp"
-    android:paddingEnd="32dp">
+    android:background="@color/elevatedSurface"
+    android:orientation="vertical">
 
     <LinearLayout
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:orientation="horizontal">
-
-      <LinearLayout
+        android:id="@+id/summary"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
+        android:layout_height="?attr/actionBarSize"
         android:orientation="vertical">
 
-        <TextView
-          android:id="@+id/now_playing_details_title"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:textColor="@color/itemTitle"
-          android:textSize="18sp"
-          tools:text="Supermassive Black Hole" />
+        <ProgressBar
+            android:id="@+id/now_playing_progress"
+            style="@android:style/Widget.Material.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-6dp"
+            android:layout_marginBottom="-6dp"
+            android:progress="40"
+            android:progressTint="@color/colorPrimary" />
 
-        <TextView
-          android:id="@+id/now_playing_details_artist"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          tools:text="Muse" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-      </LinearLayout>
+            <FrameLayout
+                android:layout_width="?attr/actionBarSize"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_marginEnd="16dp">
 
-      <ImageButton
-        android:id="@+id/now_playing_details_add_to_playlist"
-        style="@style/IconButton"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_margin="8dp"
-        android:contentDescription="@string/alt_album_cover"
-        android:src="@drawable/add_to_playlist" />
+                <org.funkwhale.ffa.views.SquareImageView
+                    android:id="@+id/now_playing_cover"
+                    android:layout_width="?attr/actionBarSize"
+                    android:layout_height="?attr/actionBarSize"
+                    tools:src="@tools:sample/avatars" />
 
-      <ImageButton
-        android:id="@+id/now_playing_details_favorite"
-        style="@style/IconButton"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_margin="8dp"
-        android:contentDescription="@string/alt_album_cover"
-        android:src="@drawable/favorite" />
+                <ProgressBar
+                    android:id="@+id/now_playing_buffering"
+                    android:layout_width="?attr/actionBarSize"
+                    android:layout_height="?attr/actionBarSize"
+                    android:indeterminate="true"
+                    android:indeterminateTint="@color/controlForeground"
+                    android:visibility="gone" />
 
-      <ImageButton
-        android:id="@+id/now_playing_details_info"
-        style="@style/IconButton"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_margin="8dp"
-        android:contentDescription="@string/alt_track_info"
-        android:src="@drawable/more"
-        app:tint="@color/controlForeground" />
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="2"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/now_playing_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/itemTitle"
+                    tools:text="Supermassive Black Hole" />
+
+                <TextView
+                    android:id="@+id/now_playing_album"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text="Muse" />
+
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/now_playing_toggle"
+                style="@style/AppTheme.OutlinedButton"
+                android:layout_width="?attr/actionBarSize"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="16dp"
+                app:icon="@drawable/play" />
+
+            <ImageButton
+                android:id="@+id/now_playing_next"
+                style="@style/IconButton"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginEnd="16dp"
+                android:contentDescription="@string/control_next"
+                android:src="@drawable/next" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
-    <SeekBar
-      android:id="@+id/now_playing_details_progress"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="16dp"
-      android:max="100"
-      android:progressBackgroundTint="#cacaca"
-      android:progressTint="@color/controlForeground"
-      android:thumbTint="@color/controlForeground" />
-
     <LinearLayout
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:orientation="horizontal">
-
-      <TextView
-        android:id="@+id/now_playing_details_progress_current"
+        android:id="@+id/now_playing_details"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1" />
+        android:orientation="vertical"
+        android:paddingStart="32dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="32dp">
 
-      <TextView
-        android:id="@+id/now_playing_details_progress_duration"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textAlignment="textEnd" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/now_playing_details_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/itemTitle"
+                    android:textSize="18sp"
+                    tools:text="Supermassive Black Hole" />
+
+                <TextView
+                    android:id="@+id/now_playing_details_artist"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text="Muse" />
+
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/now_playing_details_add_to_playlist"
+                style="@style/IconButton"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_margin="8dp"
+                android:contentDescription="@string/alt_album_cover"
+                android:src="@drawable/add_to_playlist" />
+
+            <ImageButton
+                android:id="@+id/now_playing_details_favorite"
+                style="@style/IconButton"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_margin="8dp"
+                android:contentDescription="@string/alt_album_cover"
+                android:src="@drawable/favorite" />
+
+            <ImageButton
+                android:id="@+id/now_playing_details_info"
+                style="@style/IconButton"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_margin="8dp"
+                android:contentDescription="@string/alt_track_info"
+                android:src="@drawable/more"
+                app:tint="@color/controlForeground" />
+
+        </LinearLayout>
+
+        <SeekBar
+            android:id="@+id/now_playing_details_progress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:max="100"
+            android:progressBackgroundTint="#cacaca"
+            android:progressTint="@color/controlForeground"
+            android:thumbOffset="3dp"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            android:thumbTint="@color/controlForeground" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/now_playing_details_progress_current"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/now_playing_details_progress_duration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textAlignment="textEnd" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginBottom="8dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/now_playing_details_previous"
+                style="@style/IconButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="16dp"
+                android:contentDescription="@string/control_previous"
+                android:src="@drawable/previous" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/now_playing_details_toggle"
+                style="@style/AppTheme.OutlinedButton"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                app:cornerRadius="64dp"
+                app:icon="@drawable/play"
+                app:iconSize="32dp" />
+
+            <ImageButton
+                android:id="@+id/now_playing_details_next"
+                style="@style/IconButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:contentDescription="@string/control_next"
+                android:src="@drawable/next" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/now_playing_details_repeat"
+                style="@style/IconButton"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:contentDescription="@string/control_next"
+                android:src="@drawable/repeat" />
+
+        </LinearLayout>
 
     </LinearLayout>
-
-    <LinearLayout
-      android:layout_width="match_parent"
-      android:layout_height="64dp"
-      android:layout_marginBottom="8dp"
-      android:gravity="center"
-      android:orientation="horizontal">
-
-      <ImageButton
-        android:id="@+id/now_playing_details_previous"
-        style="@style/IconButton"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginEnd="16dp"
-        android:contentDescription="@string/control_previous"
-        android:src="@drawable/previous" />
-
-      <com.google.android.material.button.MaterialButton
-        android:id="@+id/now_playing_details_toggle"
-        style="@style/AppTheme.OutlinedButton"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        app:cornerRadius="64dp"
-        app:icon="@drawable/play"
-        app:iconSize="32dp" />
-
-      <ImageButton
-        android:id="@+id/now_playing_details_next"
-        style="@style/IconButton"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="16dp"
-        android:contentDescription="@string/control_next"
-        android:src="@drawable/next" />
-
-    </LinearLayout>
-
-    <LinearLayout
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginBottom="16dp"
-      android:gravity="center"
-      android:orientation="horizontal">
-
-      <ImageButton
-        android:id="@+id/now_playing_details_repeat"
-        style="@style/IconButton"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
-        android:contentDescription="@string/control_next"
-        android:src="@drawable/repeat" />
-
-    </LinearLayout>
-
-  </LinearLayout>
 
 </LinearLayout>
