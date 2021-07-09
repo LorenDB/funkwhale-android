@@ -8,7 +8,12 @@
     android:background="@drawable/ripple"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:padding="8dp"
+    android:paddingStart="2dp"
+    android:paddingLeft="8dp"
+    android:paddingTop="8dp"
+    android:paddingEnd="0dp"
+    android:paddingRight="8dp"
+    android:paddingBottom="8dp"
     android:transitionGroup="true"
     tools:showIn="@layout/fragment_tracks">
 
@@ -61,7 +66,7 @@
         android:id="@+id/favorite"
         style="@style/IconButton"
         android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:layout_marginEnd="8dp"
         android:contentDescription="@string/manage_add_to_favorites"
@@ -71,7 +76,7 @@
         android:id="@+id/actions"
         style="@style/IconButton"
         android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_height="wrap_content"
         android:contentDescription="@string/alt_more_options"
         android:src="@drawable/more" />
 
