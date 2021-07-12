@@ -20,7 +20,7 @@ val props = Properties().apply {
 }
 
 androidGitVersion {
-  codeFormat = "MNNNPPP"
+  codeFormat = "MMNNPPBBB"
   format = "%tag%%-count%%-commit%%-branch%"
 }
 
