@@ -12,7 +12,7 @@
     android:transitionGroup="true"
     tools:showIn="@layout/fragment_artists">
 
-    <org.funkwhale.ffa.views.SquareImageView
+    <audio.funkwhale.ffa.views.SquareImageView
         android:id="@+id/art"
         android:layout_width="48dp"
         android:layout_height="wrap_content"

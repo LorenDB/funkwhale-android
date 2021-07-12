@@ -81,7 +81,7 @@
                 android:orientation="horizontal"
                 app:layout_constraintGuide_percent=".50" />
 
-              <org.funkwhale.ffa.views.SquareImageView
+              <audio.funkwhale.ffa.views.SquareImageView
                 android:id="@+id/cover_top_left"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
@@ -93,7 +93,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:src="@tools:sample/avatars" />
 
-              <org.funkwhale.ffa.views.SquareImageView
+              <audio.funkwhale.ffa.views.SquareImageView
                 android:id="@+id/cover_top_right"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
@@ -105,7 +105,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:src="@tools:sample/avatars" />
 
-              <org.funkwhale.ffa.views.SquareImageView
+              <audio.funkwhale.ffa.views.SquareImageView
                 android:id="@+id/cover_bottom_left"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
@@ -117,7 +117,7 @@
                 app:layout_constraintTop_toTopOf="@id/vertical"
                 tools:src="@tools:sample/avatars" />
 
-              <org.funkwhale.ffa.views.SquareImageView
+              <audio.funkwhale.ffa.views.SquareImageView
                 android:id="@+id/cover_bottom_right"
                 android:layout_width="0dp"
                 android:layout_height="0dp"

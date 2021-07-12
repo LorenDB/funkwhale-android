@@ -1,1 +1,1 @@
--keep class org.funkwhale.ffa.** { *; }
+-keep class audio.funkwhale.ffa.** { *; }

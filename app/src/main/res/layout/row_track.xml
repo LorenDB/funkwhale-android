@@ -17,7 +17,7 @@
     android:transitionGroup="true"
     tools:showIn="@layout/fragment_tracks">
 
-    <org.funkwhale.ffa.views.SquareImageView
+    <audio.funkwhale.ffa.views.SquareImageView
         android:id="@+id/handle"
         android:layout_width="18dp"
         android:layout_height="wrap_content"
@@ -27,7 +27,7 @@
         android:visibility="gone"
         tools:visibility="visible" />
 
-    <org.funkwhale.ffa.views.SquareImageView
+    <audio.funkwhale.ffa.views.SquareImageView
         android:id="@+id/cover"
         android:layout_width="48dp"
         android:layout_height="wrap_content"

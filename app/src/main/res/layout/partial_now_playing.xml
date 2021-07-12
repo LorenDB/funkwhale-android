@@ -35,7 +35,7 @@
                 android:layout_height="?attr/actionBarSize"
                 android:layout_marginEnd="16dp">
 
-                <org.funkwhale.ffa.views.SquareImageView
+                <audio.funkwhale.ffa.views.SquareImageView
                     android:id="@+id/now_playing_cover"
                     android:layout_width="?attr/actionBarSize"
                     android:layout_height="?attr/actionBarSize"
@@ -111,7 +111,7 @@
             android:layout_weight="1"
             android:padding="8dp">
 
-            <org.funkwhale.ffa.views.SquareImageView
+            <audio.funkwhale.ffa.views.SquareImageView
                 android:id="@+id/now_playing_details_cover"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

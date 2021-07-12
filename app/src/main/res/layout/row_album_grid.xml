@@ -9,7 +9,7 @@
   android:transitionGroup="true"
   tools:showIn="@layout/fragment_albums_grid">
 
-  <org.funkwhale.ffa.views.SquareImageView
+  <audio.funkwhale.ffa.views.SquareImageView
     android:id="@+id/cover"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
