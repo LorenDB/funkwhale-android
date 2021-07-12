@@ -38,7 +38,7 @@ android {
   compileSdkVersion(29)
 
   defaultConfig {
-    applicationId = "org.funkwhale.ffa"
+    applicationId = "audio.funkwhale.ffa"
 
     minSdkVersion(23)
     targetSdkVersion(29)
