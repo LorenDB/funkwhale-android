@@ -1,4 +1,3 @@
-
 import org.jetbrains.kotlin.konan.properties.hasProperty
 import java.io.FileInputStream
 import java.util.Properties
@@ -124,9 +123,9 @@ dependencies {
   implementation("com.google.android.material:material:1.4.0")
   implementation("com.android.support.constraint:constraint-layout:2.0.4")
 
-  implementation("com.google.android.exoplayer:exoplayer-core:2.11.5")
-  implementation("com.google.android.exoplayer:exoplayer-ui:2.11.5")
-  implementation("com.google.android.exoplayer:extension-mediasession:2.11.5")
+  implementation("com.google.android.exoplayer:exoplayer-core:2.11.8")
+  implementation("com.google.android.exoplayer:exoplayer-ui:2.11.8")
+  implementation("com.google.android.exoplayer:extension-mediasession:2.11.8")
   implementation("com.github.PaulWoitaschek.ExoPlayer-Extensions:extension-opus:2.11.4") {
     isTransitive = false
   }
