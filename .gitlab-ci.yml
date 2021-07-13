@@ -4,23 +4,39 @@ stages:
 - build
 - deploy
 
-before_script:
-- export GRADLE_USER_HOME=$(pwd)/.gradle
-- chmod +x ./gradlew
 
-cache:
-  key: ${CI_PROJECT_ID}
-  paths:
-  - .gradle/
-
-build:
+.build:
   stage: build
-  script:
+  before_script:
+  - export GRADLE_USER_HOME=$(pwd)/.gradle
+  - chmod +x ./gradlew
   - mkdir -p .android && touch .android/repositories.cfg
-  - ./gradlew assembleDebug
+  script:
+  - echo "Overwrite me"
+
+  cache:
+    key: ${CI_PROJECT_ID}
+    paths:
+    - .gradle/
+
   artifacts:
     paths:
     - app/build/outputs/apk/debug/app-debug.apk
+
+build-develop:
+  extends: .build
+  script:
+  - echo -n $SIGNING_KEY_STORE | base64 -d > app/android.keystore
+  - ./gradlew assembleDebug -Psigning.store=android.keystore -Psigning.store_passphrase=$SIGNING_KEY_PASS -Psigning.key_passphrase=$SIGNING_KEY_PASS
+  only:
+  - develop
+
+build-bleeding-edge:
+  extends: .build
+  script:
+  - ./gradlew assembleDebug
+  except:
+  - develop
 
 deploy-develop:
   stage: deploy

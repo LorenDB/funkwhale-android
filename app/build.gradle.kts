@@ -50,12 +50,21 @@ android {
   }
 
   signingConfigs {
+
     create("release") {
-      if (props.hasProperty("signing.store")) {
-        storeFile = file(props.getProperty("signing.store"))
-        storePassword = props.getProperty("signing.store_passphrase")
-        keyAlias = props.getProperty("signing.alias").toString()
-        keyPassword = props.getProperty("signing.key_passphrase")
+      if (project.hasProperty("signing.store")) {
+        storeFile = file(project.findProperty("signing.store")!!)
+        storePassword = project.findProperty("signing.store_passphrase")!!.toString()
+        keyAlias = "ffa"
+        keyPassword = project.findProperty("signing.key_passphrase")!!.toString()
+      }
+    }
+    getByName("debug") {
+      if (project.hasProperty("signing.store")) {
+        storeFile = file(project.findProperty("signing.store")!!)
+        storePassword = project.findProperty("signing.store_passphrase")!!.toString()
+        keyAlias = "ffa"
+        keyPassword = project.findProperty("signing.key_passphrase")!!.toString()
       }
     }
   }
@@ -65,6 +74,10 @@ android {
       isDebuggable = true
       applicationIdSuffix = ".dev"
 
+      if (project.hasProperty("signing.store")) {
+        signingConfig = signingConfigs.getByName("debug")
+      }
+
       resValue("string", "debug.hostname", props.getProperty("debug.hostname", ""))
       resValue("string", "debug.username", props.getProperty("debug.username", ""))
       resValue("string", "debug.password", props.getProperty("debug.password", ""))
@@ -72,7 +85,7 @@ android {
 
     getByName("release") {
 
-      if (props.hasProperty("signing.store")) {
+      if (project.hasProperty("signing.store")) {
         signingConfig = signingConfigs.getByName("release")
       }
 
