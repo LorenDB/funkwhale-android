@@ -1,5 +1,7 @@
 package audio.funkwhale.ffa.fragments
 
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
@@ -12,12 +14,31 @@ import audio.funkwhale.ffa.adapters.TracksAdapter
 import audio.funkwhale.ffa.repositories.FavoritedRepository
 import audio.funkwhale.ffa.repositories.FavoritesRepository
 import audio.funkwhale.ffa.repositories.TracksRepository
-import audio.funkwhale.ffa.utils.*
+import audio.funkwhale.ffa.utils.Album
+import audio.funkwhale.ffa.utils.Command
+import audio.funkwhale.ffa.utils.CommandBus
+import audio.funkwhale.ffa.utils.Event
+import audio.funkwhale.ffa.utils.EventBus
+import audio.funkwhale.ffa.utils.Request
+import audio.funkwhale.ffa.utils.RequestBus
+import audio.funkwhale.ffa.utils.Response
+import audio.funkwhale.ffa.utils.Track
+import audio.funkwhale.ffa.utils.getMetadata
+import audio.funkwhale.ffa.utils.maybeLoad
+import audio.funkwhale.ffa.utils.maybeNormalizeUrl
+import audio.funkwhale.ffa.utils.toast
+import audio.funkwhale.ffa.utils.wait
 import com.google.android.exoplayer2.offline.Download
 import com.preference.PowerPreference
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
-import kotlinx.android.synthetic.main.fragment_tracks.*
+import kotlinx.android.synthetic.main.fragment_tracks.actions
+import kotlinx.android.synthetic.main.fragment_tracks.artist
+import kotlinx.android.synthetic.main.fragment_tracks.cover
+import kotlinx.android.synthetic.main.fragment_tracks.play
+import kotlinx.android.synthetic.main.fragment_tracks.scroller
+import kotlinx.android.synthetic.main.fragment_tracks.title
+import kotlinx.android.synthetic.main.fragment_tracks.tracks
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.flow.collect
@@ -65,6 +86,35 @@ class TracksFragment : OtterFragment<Track, TracksAdapter>() {
     favoritedRepository = FavoritedRepository(context)
 
     watchEventBus()
+  }
+
+  override fun onDataFetched(data: List<Track>) {
+
+    when {
+      data.all { it.downloaded } -> {
+        title.setCompoundDrawablesWithIntrinsicBounds(R.drawable.downloaded, 0, 0, 0)
+        title.compoundDrawables.forEach {
+          it?.colorFilter =
+            PorterDuffColorFilter(
+              requireContext().getColor(R.color.downloaded),
+              PorterDuff.Mode.SRC_IN
+            )
+        }
+      }
+      data.all { it.cached } -> {
+        title.setCompoundDrawablesWithIntrinsicBounds(R.drawable.downloaded, 0, 0, 0)
+        title.compoundDrawables.forEach {
+          it?.colorFilter =
+            PorterDuffColorFilter(
+              requireContext().getColor(R.color.cached),
+              PorterDuff.Mode.SRC_IN
+            )
+        }
+      }
+      else -> {
+        title.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+      }
+    }
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -136,7 +186,8 @@ class TracksFragment : OtterFragment<Track, TracksAdapter>() {
 
           setOnMenuItemClickListener {
             when (it.itemId) {
-              R.id.play_secondary -> when (PowerPreference.getDefaultFile().getString("play_order")) {
+              R.id.play_secondary -> when (PowerPreference.getDefaultFile()
+                .getString("play_order")) {
                 "in_order" -> CommandBus.send(Command.ReplaceQueue(adapter.data.shuffled()))
                 else -> CommandBus.send(Command.ReplaceQueue(adapter.data))
               }
@@ -196,12 +247,13 @@ class TracksFragment : OtterFragment<Track, TracksAdapter>() {
   private suspend fun refreshDownloadedTrack(download: Download) {
     if (download.state == Download.STATE_COMPLETED) {
       download.getMetadata()?.let { info ->
-        adapter.data.withIndex().associate { it.value to it.index }.filter { it.key.id == info.id }.toList().getOrNull(0)?.let { match ->
-          withContext(Main) {
-            adapter.data[match.second].downloaded = true
-            adapter.notifyItemChanged(match.second)
+        adapter.data.withIndex().associate { it.value to it.index }.filter { it.key.id == info.id }
+          .toList().getOrNull(0)?.let { match ->
+            withContext(Main) {
+              adapter.data[match.second].downloaded = true
+              adapter.notifyItemChanged(match.second)
+            }
           }
-        }
       }
     }
   }
