@@ -11,12 +11,16 @@ import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import audio.funkwhale.ffa.R
+import audio.funkwhale.ffa.databinding.FragmentTrackInfoDetailsBinding
 import audio.funkwhale.ffa.utils.Track
 import audio.funkwhale.ffa.utils.mustNormalizeUrl
 import audio.funkwhale.ffa.utils.toDurationString
-import kotlinx.android.synthetic.main.fragment_track_info_details.*
 
 class TrackInfoDetailsFragment : DialogFragment() {
+
+  private var _binding: FragmentTrackInfoDetailsBinding? = null
+  private val binding get() = _binding!!
+
   companion object {
     fun new(track: Track): TrackInfoDetailsFragment {
       return TrackInfoDetailsFragment().apply {
@@ -27,7 +31,8 @@ class TrackInfoDetailsFragment : DialogFragment() {
           "trackCopyright" to track.copyright,
           "trackLicense" to track.license,
           "trackPosition" to track.position,
-          "trackDuration" to track.bestUpload()?.duration?.toLong()?.let { toDurationString(it, showSeconds = true) },
+          "trackDuration" to track.bestUpload()?.duration?.toLong()
+            ?.let { toDurationString(it, showSeconds = true) },
           "trackBitrate" to track.bestUpload()?.bitrate?.let { "${it / 1000} Kbps" },
           "trackInstance" to track.bestUpload()?.listen_url?.let { Uri.parse(mustNormalizeUrl(it)).authority }
         )
@@ -53,14 +58,29 @@ class TrackInfoDetailsFragment : DialogFragment() {
       properties.add(Pair(R.string.track_info_details_track_copyright, getString("trackCopyright")))
       properties.add(Pair(R.string.track_info_details_track_license, getString("trackLicense")))
       properties.add(Pair(R.string.track_info_details_track_duration, getString("trackDuration")))
-      properties.add(Pair(R.string.track_info_details_track_position, getInt("trackPosition").toString()))
+      properties.add(
+        Pair(
+          R.string.track_info_details_track_position,
+          getInt("trackPosition").toString()
+        )
+      )
       properties.add(Pair(R.string.track_info_details_track_bitrate, getString("trackBitrate")))
       properties.add(Pair(R.string.track_info_details_track_instance, getString("trackInstance")))
     }
   }
 
-  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-    return inflater.inflate(R.layout.fragment_track_info_details, container, false)
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View {
+    _binding = FragmentTrackInfoDetailsBinding.inflate(inflater)
+    return binding.root
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -75,11 +95,17 @@ class TrackInfoDetailsFragment : DialogFragment() {
       val valueTextView = TextView(context).apply {
         text = value ?: "N/A"
         setTextAppearance(R.style.AppTheme_TrackDetailsValue)
-        setPadding(0, 0, 0, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16f, resources.displayMetrics).toInt())
+        setPadding(
+          0,
+          0,
+          0,
+          TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16f, resources.displayMetrics)
+            .toInt()
+        )
       }
 
-      infos.addView(labelTextView)
-      infos.addView(valueTextView)
+      binding.infos.addView(labelTextView)
+      binding.infos.addView(valueTextView)
     }
   }
 }

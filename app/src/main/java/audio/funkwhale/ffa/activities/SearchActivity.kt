@@ -6,15 +6,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.adapters.SearchAdapter
+import audio.funkwhale.ffa.databinding.ActivitySearchBinding
 import audio.funkwhale.ffa.fragments.AddToPlaylistDialog
 import audio.funkwhale.ffa.fragments.AlbumsFragment
 import audio.funkwhale.ffa.fragments.ArtistsFragment
 import audio.funkwhale.ffa.repositories.*
 import audio.funkwhale.ffa.utils.*
 import com.google.android.exoplayer2.offline.Download
-import kotlinx.android.synthetic.main.activity_search.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -25,25 +24,28 @@ import java.util.*
 class SearchActivity : AppCompatActivity() {
   private lateinit var adapter: SearchAdapter
 
-  lateinit var artistsRepository: ArtistsSearchRepository
-  lateinit var albumsRepository: AlbumsSearchRepository
-  lateinit var tracksRepository: TracksSearchRepository
-
-  lateinit var favoritesRepository: FavoritesRepository
+  private lateinit var artistsRepository: ArtistsSearchRepository
+  private lateinit var albumsRepository: AlbumsSearchRepository
+  private lateinit var tracksRepository: TracksSearchRepository
+  private lateinit var favoritesRepository: FavoritesRepository
+  private lateinit var binding: ActivitySearchBinding
 
   var done = 0
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    setContentView(R.layout.activity_search)
+    binding = ActivitySearchBinding.inflate(layoutInflater)
 
-    adapter = SearchAdapter(this, SearchResultClickListener(), FavoriteListener()).also {
-      results.layoutManager = LinearLayoutManager(this)
-      results.adapter = it
-    }
+    setContentView(binding.root)
 
-    search.requestFocus()
+    adapter =
+      SearchAdapter(layoutInflater, this, SearchResultClickListener(), FavoriteListener()).also {
+        binding.results.layoutManager = LinearLayoutManager(this)
+        binding.results.adapter = it
+      }
+
+    binding.search.requestFocus()
   }
 
   override fun onResume() {
@@ -53,7 +55,12 @@ class SearchActivity : AppCompatActivity() {
       CommandBus.get().collect { command ->
         when (command) {
           is Command.AddToPlaylist -> if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
-            AddToPlaylistDialog.show(this@SearchActivity, lifecycleScope, command.tracks)
+            AddToPlaylistDialog.show(
+              layoutInflater,
+              this@SearchActivity,
+              lifecycleScope,
+              command.tracks
+            )
           }
         }
       }
@@ -72,9 +79,10 @@ class SearchActivity : AppCompatActivity() {
     tracksRepository = TracksSearchRepository(this@SearchActivity, "")
     favoritesRepository = FavoritesRepository(this@SearchActivity)
 
-    search.setOnQueryTextListener(object : androidx.appcompat.widget.SearchView.OnQueryTextListener {
+    binding.search.setOnQueryTextListener(object :
+      androidx.appcompat.widget.SearchView.OnQueryTextListener {
       override fun onQueryTextSubmit(rawQuery: String?): Boolean {
-        search.clearFocus()
+        binding.search.clearFocus()
 
         rawQuery?.let {
           done = 0
@@ -85,35 +93,38 @@ class SearchActivity : AppCompatActivity() {
           albumsRepository.query = query.toLowerCase(Locale.ROOT)
           tracksRepository.query = query.toLowerCase(Locale.ROOT)
 
-          search_spinner.visibility = View.VISIBLE
-          search_empty.visibility = View.GONE
-          search_no_results.visibility = View.GONE
+          binding.searchSpinner.visibility = View.VISIBLE
+          binding.searchEmpty.visibility = View.GONE
+          binding.searchNoResults.visibility = View.GONE
 
           adapter.artists.clear()
           adapter.albums.clear()
           adapter.tracks.clear()
           adapter.notifyDataSetChanged()
 
-          artistsRepository.fetch(Repository.Origin.Network.origin).untilNetwork(lifecycleScope) { artists, _, _, _ ->
-            done++
+          artistsRepository.fetch(Repository.Origin.Network.origin)
+            .untilNetwork(lifecycleScope) { artists, _, _, _ ->
+              done++
 
-            adapter.artists.addAll(artists)
-            refresh()
-          }
+              adapter.artists.addAll(artists)
+              refresh()
+            }
 
-          albumsRepository.fetch(Repository.Origin.Network.origin).untilNetwork(lifecycleScope) { albums, _, _, _ ->
-            done++
+          albumsRepository.fetch(Repository.Origin.Network.origin)
+            .untilNetwork(lifecycleScope) { albums, _, _, _ ->
+              done++
 
-            adapter.albums.addAll(albums)
-            refresh()
-          }
+              adapter.albums.addAll(albums)
+              refresh()
+            }
 
-          tracksRepository.fetch(Repository.Origin.Network.origin).untilNetwork(lifecycleScope) { tracks, _, _, _ ->
-            done++
+          tracksRepository.fetch(Repository.Origin.Network.origin)
+            .untilNetwork(lifecycleScope) { tracks, _, _, _ ->
+              done++
 
-            adapter.tracks.addAll(tracks)
-            refresh()
-          }
+              adapter.tracks.addAll(tracks)
+              refresh()
+            }
         }
 
         return true
@@ -127,25 +138,31 @@ class SearchActivity : AppCompatActivity() {
     adapter.notifyDataSetChanged()
 
     if (adapter.artists.size + adapter.albums.size + adapter.tracks.size == 0) {
-      search_no_results.visibility = View.VISIBLE
+      binding.searchNoResults.visibility = View.VISIBLE
     } else {
-      search_no_results.visibility = View.GONE
+      binding.searchNoResults.visibility = View.GONE
     }
 
     if (done == 3) {
-      search_spinner.visibility = View.INVISIBLE
+      binding.searchSpinner.visibility = View.INVISIBLE
     }
   }
 
   private suspend fun refreshDownloadedTrack(download: Download) {
     if (download.state == Download.STATE_COMPLETED) {
       download.getMetadata()?.let { info ->
-        adapter.tracks.withIndex().associate { it.value to it.index }.filter { it.key.id == info.id }.toList().getOrNull(0)?.let { match ->
-          withContext(Dispatchers.Main) {
-            adapter.tracks[match.second].downloaded = true
-            adapter.notifyItemChanged(adapter.getPositionOf(SearchAdapter.ResultType.Track, match.second))
+        adapter.tracks.withIndex().associate { it.value to it.index }
+          .filter { it.key.id == info.id }.toList().getOrNull(0)?.let { match ->
+            withContext(Dispatchers.Main) {
+              adapter.tracks[match.second].downloaded = true
+              adapter.notifyItemChanged(
+                adapter.getPositionOf(
+                  SearchAdapter.ResultType.Track,
+                  match.second
+                )
+              )
+            }
           }
-        }
       }
     }
   }

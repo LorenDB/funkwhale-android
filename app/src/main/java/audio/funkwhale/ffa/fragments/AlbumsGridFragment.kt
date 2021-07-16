@@ -1,7 +1,9 @@
 package audio.funkwhale.ffa.fragments
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -10,22 +12,39 @@ import androidx.transition.Slide
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.activities.MainActivity
 import audio.funkwhale.ffa.adapters.AlbumsGridAdapter
+import audio.funkwhale.ffa.databinding.FragmentAlbumsGridBinding
 import audio.funkwhale.ffa.repositories.AlbumsRepository
 import audio.funkwhale.ffa.utils.Album
 import audio.funkwhale.ffa.utils.AppContext
-import kotlinx.android.synthetic.main.fragment_albums_grid.*
 
-class AlbumsGridFragment : OtterFragment<Album, AlbumsGridAdapter>() {
-  override val viewRes = R.layout.fragment_albums_grid
-  override val recycler: RecyclerView get() = albums
+class AlbumsGridFragment : FFAFragment<Album, AlbumsGridAdapter>() {
+
+  private var _binding: FragmentAlbumsGridBinding? = null
+  private val binding get() = _binding!!
+
+  override val recycler: RecyclerView get() = binding.albums
   override val layoutManager get() = GridLayoutManager(context, 3)
   override val alwaysRefresh = false
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-
-    adapter = AlbumsGridAdapter(context, OnAlbumClickListener())
     repository = AlbumsRepository(context)
+  }
+
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    parent: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View {
+    _binding = FragmentAlbumsGridBinding.inflate(inflater)
+    adapter = AlbumsGridAdapter(inflater, OnAlbumClickListener())
+    swiper = binding.swiper
+    return binding.root
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
   }
 
   inner class OnAlbumClickListener : AlbumsGridAdapter.OnAlbumClickListener {

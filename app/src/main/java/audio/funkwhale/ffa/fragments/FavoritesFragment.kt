@@ -1,33 +1,60 @@
 package audio.funkwhale.ffa.fragments
 
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
-import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.adapters.FavoritesAdapter
+import audio.funkwhale.ffa.databinding.FragmentFavoritesBinding
 import audio.funkwhale.ffa.repositories.FavoritesRepository
 import audio.funkwhale.ffa.repositories.TracksRepository
-import audio.funkwhale.ffa.utils.*
+import audio.funkwhale.ffa.utils.Command
+import audio.funkwhale.ffa.utils.CommandBus
+import audio.funkwhale.ffa.utils.Event
+import audio.funkwhale.ffa.utils.EventBus
+import audio.funkwhale.ffa.utils.Request
+import audio.funkwhale.ffa.utils.RequestBus
+import audio.funkwhale.ffa.utils.Response
+import audio.funkwhale.ffa.utils.Track
+import audio.funkwhale.ffa.utils.getMetadata
+import audio.funkwhale.ffa.utils.wait
 import com.google.android.exoplayer2.offline.Download
-import kotlinx.android.synthetic.main.fragment_favorites.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class FavoritesFragment : OtterFragment<Track, FavoritesAdapter>() {
-  override val viewRes = R.layout.fragment_favorites
-  override val recycler: RecyclerView get() = favorites
+class FavoritesFragment : FFAFragment<Track, FavoritesAdapter>() {
+
+  private var _binding: FragmentFavoritesBinding? = null
+  private val binding get() = _binding!!
+
+  override val recycler: RecyclerView get() = binding.favorites
   override val alwaysRefresh = false
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-
-    adapter = FavoritesAdapter(context, FavoriteListener())
+    adapter = FavoritesAdapter(layoutInflater, context, FavoriteListener())
     repository = FavoritesRepository(context)
-
     watchEventBus()
+  }
+
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View {
+    _binding = FragmentFavoritesBinding.inflate(inflater)
+    swiper = binding.swiper
+    return binding.root
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
   }
 
   override fun onResume() {
@@ -44,7 +71,7 @@ class FavoritesFragment : OtterFragment<Track, FavoritesAdapter>() {
       refreshDownloadedTracks()
     }
 
-    play.setOnClickListener {
+    binding.play.setOnClickListener {
       CommandBus.send(Command.ReplaceQueue(adapter.data.shuffled()))
     }
   }
@@ -83,12 +110,13 @@ class FavoritesFragment : OtterFragment<Track, FavoritesAdapter>() {
   private suspend fun refreshDownloadedTrack(download: Download) {
     if (download.state == Download.STATE_COMPLETED) {
       download.getMetadata()?.let { info ->
-        adapter.data.withIndex().associate { it.value to it.index }.filter { it.key.id == info.id }.toList().getOrNull(0)?.let { match ->
-          withContext(Main) {
-            adapter.data[match.second].downloaded = true
-            adapter.notifyItemChanged(match.second)
+        adapter.data.withIndex().associate { it.value to it.index }.filter { it.key.id == info.id }
+          .toList().getOrNull(0)?.let { match ->
+            withContext(Main) {
+              adapter.data[match.second].downloaded = true
+              adapter.notifyItemChanged(match.second)
+            }
           }
-        }
       }
     }
   }

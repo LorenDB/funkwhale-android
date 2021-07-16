@@ -21,24 +21,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.coroutines.awaitStringResponse
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.offline.DownloadService
-import com.google.gson.Gson
-import com.preference.PowerPreference
-import com.squareup.picasso.Picasso
-import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.partial_now_playing.*
-import kotlinx.coroutines.Dispatchers.Default
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import audio.funkwhale.ffa.FFA
 import audio.funkwhale.ffa.R
+import audio.funkwhale.ffa.databinding.ActivityMainBinding
 import audio.funkwhale.ffa.fragments.*
 import audio.funkwhale.ffa.playback.MediaControlsManager
 import audio.funkwhale.ffa.playback.PinService
@@ -48,6 +32,20 @@ import audio.funkwhale.ffa.repositories.FavoritesRepository
 import audio.funkwhale.ffa.repositories.Repository
 import audio.funkwhale.ffa.utils.*
 import audio.funkwhale.ffa.views.DisableableFrameLayout
+import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.coroutines.awaitStringResponse
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.offline.DownloadService
+import com.google.gson.Gson
+import com.preference.PowerPreference
+import com.squareup.picasso.Picasso
+import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
+import kotlinx.coroutines.Dispatchers.Default
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
   enum class ResultCode(val code: Int) {
@@ -58,13 +56,18 @@ class MainActivity : AppCompatActivity() {
   private val favoritedRepository = FavoritedRepository(this)
   private var menu: Menu? = null
 
+  private lateinit var binding: ActivityMainBinding
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
     AppContext.init(this)
 
-    setContentView(R.layout.activity_main)
-    setSupportActionBar(appbar)
+    binding = ActivityMainBinding.inflate(layoutInflater)
+
+    setContentView(binding.root)
+
+    setSupportActionBar(binding.appbar)
 
     when (intent.action) {
       MediaControlsManager.NOTIFICATION_ACTION_OPEN_QUEUE.toString() -> launchDialog(QueueFragment())
@@ -81,9 +84,9 @@ class MainActivity : AppCompatActivity() {
   override fun onResume() {
     super.onResume()
 
-    (container as? DisableableFrameLayout)?.setShouldRegisterTouch { _ ->
-      if (now_playing.isOpened()) {
-        now_playing.close()
+    (binding.container as? DisableableFrameLayout)?.setShouldRegisterTouch { _ ->
+      if (binding.nowPlaying.isOpened()) {
+        binding.nowPlaying.close()
 
         return@setShouldRegisterTouch false
       }
@@ -102,48 +105,51 @@ class MainActivity : AppCompatActivity() {
       Userinfo.get()
     }
 
-    now_playing_toggle.setOnClickListener {
-      CommandBus.send(Command.ToggleState)
-    }
+    with(binding) {
 
-    now_playing_next.setOnClickListener {
-      CommandBus.send(Command.NextTrack)
-    }
-
-    now_playing_details_previous.setOnClickListener {
-      CommandBus.send(Command.PreviousTrack)
-    }
-
-    now_playing_details_next.setOnClickListener {
-      CommandBus.send(Command.NextTrack)
-    }
-
-    now_playing_details_toggle.setOnClickListener {
-      CommandBus.send(Command.ToggleState)
-    }
-
-    now_playing_details_progress.setOnSeekBarChangeListener(object :
-      SeekBar.OnSeekBarChangeListener {
-      override fun onStopTrackingTouch(view: SeekBar?) {}
-
-      override fun onStartTrackingTouch(view: SeekBar?) {}
-
-      override fun onProgressChanged(view: SeekBar?, progress: Int, fromUser: Boolean) {
-        if (fromUser) {
-          CommandBus.send(Command.Seek(progress))
-        }
+      nowPlayingContainer?.nowPlayingToggle?.setOnClickListener {
+        CommandBus.send(Command.ToggleState)
       }
-    })
 
-    landscape_queue?.let {
-      supportFragmentManager.beginTransaction()
-        .replace(R.id.landscape_queue, LandscapeQueueFragment()).commit()
+      nowPlayingContainer?.nowPlayingNext?.setOnClickListener {
+        CommandBus.send(Command.NextTrack)
+      }
+
+      nowPlayingContainer?.nowPlayingDetailsPrevious?.setOnClickListener {
+        CommandBus.send(Command.PreviousTrack)
+      }
+
+      nowPlayingContainer?.nowPlayingDetailsNext?.setOnClickListener {
+        CommandBus.send(Command.NextTrack)
+      }
+
+      nowPlayingContainer?.nowPlayingDetailsToggle?.setOnClickListener {
+        CommandBus.send(Command.ToggleState)
+      }
+
+      binding.nowPlayingContainer?.nowPlayingDetailsProgress?.setOnSeekBarChangeListener(object :
+        SeekBar.OnSeekBarChangeListener {
+        override fun onStopTrackingTouch(view: SeekBar?) {}
+
+        override fun onStartTrackingTouch(view: SeekBar?) {}
+
+        override fun onProgressChanged(view: SeekBar?, progress: Int, fromUser: Boolean) {
+          if (fromUser) {
+            CommandBus.send(Command.Seek(progress))
+          }
+        }
+      })
+
+      landscapeQueue?.let {
+        supportFragmentManager.beginTransaction()
+          .replace(R.id.landscape_queue, LandscapeQueueFragment()).commit()
+      }
     }
   }
 
   override fun onBackPressed() {
-    if (now_playing.isOpened()) {
-      now_playing.close()
+    if (binding.nowPlaying.isOpened()) {
+      binding.nowPlaying.close()
       return
     }
 
@@ -173,7 +179,7 @@ class MainActivity : AppCompatActivity() {
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     when (item.itemId) {
       android.R.id.home -> {
-        now_playing.close()
+        binding.nowPlaying.close()
 
         (supportFragmentManager.fragments.last() as? BrowseFragment)?.let {
           it.selectTabAt(0)
@@ -305,29 +311,29 @@ class MainActivity : AppCompatActivity() {
 
           is Event.Buffering -> {
             when (message.value) {
-              true -> now_playing_buffering.visibility = View.VISIBLE
-              false -> now_playing_buffering.visibility = View.GONE
+              true -> binding.nowPlayingContainer?.nowPlayingBuffering?.visibility = View.VISIBLE
+              false -> binding.nowPlayingContainer?.nowPlayingBuffering?.visibility = View.GONE
             }
           }
 
           is Event.PlaybackStopped -> {
-            if (now_playing.visibility == View.VISIBLE) {
-              (container.layoutParams as? ViewGroup.MarginLayoutParams)?.let {
+            if (binding.nowPlaying.visibility == View.VISIBLE) {
+              (binding.container.layoutParams as? ViewGroup.MarginLayoutParams)?.let {
                 it.bottomMargin = it.bottomMargin / 2
               }
 
-              landscape_queue?.let { landscape_queue ->
+              binding.landscapeQueue?.let { landscape_queue ->
                 (landscape_queue.layoutParams as? ViewGroup.MarginLayoutParams)?.let {
                   it.bottomMargin = it.bottomMargin / 2
                 }
               }
 
-              now_playing.animate()
+              binding.nowPlaying.animate()
                 .alpha(0.0f)
                 .setDuration(400)
                 .setListener(object : AnimatorListenerAdapter() {
                   override fun onAnimationEnd(animator: Animator?) {
-                    now_playing.visibility = View.GONE
+                    binding.nowPlaying.visibility = View.GONE
                   }
                 })
                 .start()
@@ -339,13 +345,14 @@ class MainActivity : AppCompatActivity() {
           is Event.StateChanged -> {
             when (message.playing) {
               true -> {
-                now_playing_toggle.icon = getDrawable(R.drawable.pause)
-                now_playing_details_toggle.icon = getDrawable(R.drawable.pause)
+                binding.nowPlayingContainer?.nowPlayingToggle?.icon = getDrawable(R.drawable.pause)
+                binding.nowPlayingContainer?.nowPlayingToggle?.icon = getDrawable(R.drawable.pause)
               }
 
               false -> {
-                now_playing_toggle.icon = getDrawable(R.drawable.play)
-                now_playing_details_toggle.icon = getDrawable(R.drawable.play)
+                binding.nowPlayingContainer?.nowPlayingToggle?.icon = getDrawable(R.drawable.play)
+                binding.nowPlayingContainer?.nowPlayingDetailsToggle?.icon =
+                  getDrawable(R.drawable.play)
               }
             }
           }
@@ -369,9 +376,13 @@ class MainActivity : AppCompatActivity() {
           is Command.StartService -> {
             Build.VERSION_CODES.O.onApi(
               {
-                startForegroundService(Intent(this@MainActivity, PlayerService::class.java).apply {
-                  putExtra(PlayerService.INITIAL_COMMAND_KEY, command.command.toString())
-                })
+                startForegroundService(
+                  Intent(
+                    this@MainActivity,
+                    PlayerService::class.java
+                  ).apply {
+                    putExtra(PlayerService.INITIAL_COMMAND_KEY, command.command.toString())
+                  })
               },
               {
                 startService(Intent(this@MainActivity, PlayerService::class.java).apply {
@@ -384,7 +395,12 @@ class MainActivity : AppCompatActivity() {
           is Command.RefreshTrack -> refreshCurrentTrack(command.track)
 
           is Command.AddToPlaylist -> if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
-            AddToPlaylistDialog.show(this@MainActivity, lifecycleScope, command.tracks)
+            AddToPlaylistDialog.show(
+              layoutInflater,
+              this@MainActivity,
+              lifecycleScope,
+              command.tracks
+            )
           }
         }
       }
@@ -392,8 +408,8 @@ class MainActivity : AppCompatActivity() {
 
     lifecycleScope.launch(Main) {
       ProgressBus.get().collect { (current, duration, percent) ->
-        now_playing_progress.progress = percent
-        now_playing_details_progress.progress = percent
+        binding.nowPlayingContainer?.nowPlayingProgress?.progress = percent
+        binding.nowPlayingContainer?.nowPlayingDetailsProgress?.progress = percent
 
         val currentMins = (current / 1000) / 60
         val currentSecs = (current / 1000) % 60
@@ -401,59 +417,61 @@ class MainActivity : AppCompatActivity() {
         val durationMins = duration / 60
         val durationSecs = duration % 60
 
-        now_playing_details_progress_current.text = "%02d:%02d".format(currentMins, currentSecs)
-        now_playing_details_progress_duration.text = "%02d:%02d".format(durationMins, durationSecs)
+        binding.nowPlayingContainer?.nowPlayingDetailsProgressCurrent?.text =
+          "%02d:%02d".format(currentMins, currentSecs)
+        binding.nowPlayingContainer?.nowPlayingDetailsProgressDuration?.text =
+          "%02d:%02d".format(durationMins, durationSecs)
       }
     }
   }
 
   private fun refreshCurrentTrack(track: Track?) {
     track?.let {
-      if (now_playing.visibility == View.GONE) {
-        now_playing.visibility = View.VISIBLE
-        now_playing.alpha = 0f
+      if (binding.nowPlaying.visibility == View.GONE) {
+        binding.nowPlaying.visibility = View.VISIBLE
+        binding.nowPlaying.alpha = 0f
 
-        now_playing.animate()
+        binding.nowPlaying.animate()
           .alpha(1.0f)
           .setDuration(400)
           .setListener(null)
           .start()
 
-        (container.layoutParams as? ViewGroup.MarginLayoutParams)?.let {
+        (binding.container.layoutParams as? ViewGroup.MarginLayoutParams)?.let {
           it.bottomMargin = it.bottomMargin * 2
         }
 
-        landscape_queue?.let { landscape_queue ->
+        binding.landscapeQueue?.let { landscape_queue ->
           (landscape_queue.layoutParams as? ViewGroup.MarginLayoutParams)?.let {
             it.bottomMargin = it.bottomMargin * 2
           }
         }
       }
 
-      now_playing_title.text = track.title
-      now_playing_album.text = track.artist.name
-      now_playing_toggle.icon = getDrawable(R.drawable.pause)
+      binding.nowPlayingContainer?.nowPlayingTitle?.text = track.title
+      binding.nowPlayingContainer?.nowPlayingAlbum?.text = track.artist.name
+      binding.nowPlayingContainer?.nowPlayingToggle?.icon = getDrawable(R.drawable.pause)
 
-      now_playing_details_title.text = track.title
-      now_playing_details_artist.text = track.artist.name
-      now_playing_details_toggle.icon = getDrawable(R.drawable.pause)
+      binding.nowPlayingContainer?.nowPlayingDetailsTitle?.text = track.title
+      binding.nowPlayingContainer?.nowPlayingDetailsArtist?.text = track.artist.name
+      binding.nowPlayingContainer?.nowPlayingDetailsToggle?.icon = getDrawable(R.drawable.pause)
 
       Picasso.get()
         .maybeLoad(maybeNormalizeUrl(track.album?.cover?.urls?.original))
         .fit()
         .centerCrop()
-        .into(now_playing_cover)
+        .into(binding.nowPlayingContainer?.nowPlayingCover)
 
-      now_playing_details_cover?.let { now_playing_details_cover ->
+      binding.nowPlayingContainer?.nowPlayingDetailsCover?.let { nowPlayingDetailsCover ->
         Picasso.get()
           .maybeLoad(maybeNormalizeUrl(track.album?.cover()))
           .fit()
           .centerCrop()
           .transform(RoundedCornersTransformation(16, 0))
-          .into(now_playing_details_cover)
+          .into(nowPlayingDetailsCover)
       }
 
-      if (now_playing_details_cover == null) {
+      if (binding.nowPlayingContainer?.nowPlayingCover == null) {
         lifecycleScope.launch(Default) {
           val width = DisplayMetrics().apply {
             windowManager.defaultDisplay.getMetrics(this)
@@ -469,12 +487,12 @@ class MainActivity : AppCompatActivity() {
             }
 
           withContext(Main) {
-            now_playing_details.background = backgroundCover
+            binding.nowPlayingContainer?.nowPlayingDetails?.background = backgroundCover
           }
         }
       }
 
-      now_playing_details_repeat?.let { now_playing_details_repeat ->
+      binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.let { now_playing_details_repeat ->
         changeRepeatMode(Cache.get(this@MainActivity, "repeat")?.readLine()?.toInt() ?: 0)
 
         now_playing_details_repeat.setOnClickListener {
@@ -484,11 +502,11 @@ class MainActivity : AppCompatActivity() {
         }
       }
 
-      now_playing_details_info?.let { now_playing_details_info ->
-        now_playing_details_info.setOnClickListener {
+      binding.nowPlayingContainer?.nowPlayingDetailsInfo?.let { nowPlayingDetailsInfo ->
+        nowPlayingDetailsInfo.setOnClickListener {
           PopupMenu(
             this@MainActivity,
-            now_playing_details_info,
+            nowPlayingDetailsInfo,
             Gravity.START,
             R.attr.actionOverflowMenuStyle,
             0
@@ -507,7 +525,7 @@ class MainActivity : AppCompatActivity() {
                   .show(supportFragmentManager, "dialog")
               }
 
-              now_playing.close()
+              binding.nowPlaying.close()
 
               true
             }
@@ -517,7 +535,7 @@ class MainActivity : AppCompatActivity() {
         }
       }
 
-      now_playing_details_favorite?.let { now_playing_details_favorite ->
+      binding.nowPlayingContainer?.nowPlayingDetailsFavorite?.let { now_playing_details_favorite ->
         favoritedRepository.fetch().untilNetwork(lifecycleScope, IO) { favorites, _, _, _ ->
           lifecycleScope.launch(Main) {
             track.favorite = favorites.contains(track.id)
@@ -547,7 +565,7 @@ class MainActivity : AppCompatActivity() {
           favoriteRepository.fetch(Repository.Origin.Network.origin)
         }
 
-        now_playing_details_add_to_playlist.setOnClickListener {
+        binding.nowPlayingContainer?.nowPlayingDetailsAddToPlaylist?.setOnClickListener {
           CommandBus.send(Command.AddToPlaylist(listOf(track)))
         }
       }
@@ -560,14 +578,14 @@ class MainActivity : AppCompatActivity() {
       0 -> {
         Cache.set(this@MainActivity, "repeat", "0".toByteArray())
 
-        now_playing_details_repeat?.setImageResource(R.drawable.repeat)
-        now_playing_details_repeat?.setColorFilter(
+        binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.setImageResource(R.drawable.repeat)
+        binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.setColorFilter(
           ContextCompat.getColor(
             this,
             R.color.controlForeground
           )
         )
-        now_playing_details_repeat?.alpha = 0.2f
+        binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.alpha = 0.2f
 
         CommandBus.send(Command.SetRepeatMode(Player.REPEAT_MODE_OFF))
       }
@@ -576,14 +594,14 @@ class MainActivity : AppCompatActivity() {
       1 -> {
         Cache.set(this@MainActivity, "repeat", "1".toByteArray())
 
-        now_playing_details_repeat?.setImageResource(R.drawable.repeat)
-        now_playing_details_repeat?.setColorFilter(
+        binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.setImageResource(R.drawable.repeat)
+        binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.setColorFilter(
           ContextCompat.getColor(
             this,
             R.color.controlForeground
           )
         )
-        now_playing_details_repeat?.alpha = 1.0f
+        binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.alpha = 1.0f
 
         CommandBus.send(Command.SetRepeatMode(Player.REPEAT_MODE_ALL))
       }
@@ -591,14 +609,14 @@ class MainActivity : AppCompatActivity() {
       // From repeat one to no repeat
       2 -> {
         Cache.set(this@MainActivity, "repeat", "2".toByteArray())
-        now_playing_details_repeat?.setImageResource(R.drawable.repeat_one)
-        now_playing_details_repeat?.setColorFilter(
+        binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.setImageResource(R.drawable.repeat_one)
+        binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.setColorFilter(
           ContextCompat.getColor(
             this,
             R.color.controlForeground
           )
         )
-        now_playing_details_repeat?.alpha = 1.0f
+        binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.alpha = 1.0f
 
         CommandBus.send(Command.SetRepeatMode(Player.REPEAT_MODE_ONE))
       }

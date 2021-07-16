@@ -2,9 +2,12 @@ package audio.funkwhale.ffa.fragments
 
 import android.content.Context
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -16,13 +19,13 @@ import androidx.transition.Slide
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.activities.MainActivity
 import audio.funkwhale.ffa.adapters.AlbumsAdapter
+import audio.funkwhale.ffa.databinding.FragmentAlbumsBinding
 import audio.funkwhale.ffa.repositories.AlbumsRepository
 import audio.funkwhale.ffa.repositories.ArtistTracksRepository
 import audio.funkwhale.ffa.repositories.Repository
 import audio.funkwhale.ffa.utils.*
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
-import kotlinx.android.synthetic.main.fragment_albums.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.flow.map
@@ -30,16 +33,19 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class AlbumsFragment : OtterFragment<Album, AlbumsAdapter>() {
-  override val viewRes = R.layout.fragment_albums
-  override val recycler: RecyclerView get() = albums
+class AlbumsFragment : FFAFragment<Album, AlbumsAdapter>() {
+
+  override val recycler: RecyclerView get() = binding.albums
   override val alwaysRefresh = false
+
+  private var _binding: FragmentAlbumsBinding? = null
+  private val binding get() = _binding!!
 
   private lateinit var artistTracksRepository: ArtistTracksRepository
 
-  var artistId = 0
-  var artistName = ""
-  var artistArt = ""
+  private var artistId = 0
+  private var artistName = ""
+  private var artistArt = ""
 
   companion object {
     fun new(artist: Artist, _art: String? = null): AlbumsFragment {
@@ -100,15 +106,30 @@ class AlbumsFragment : OtterFragment<Album, AlbumsAdapter>() {
       artistArt = getString("artistArt") ?: ""
     }
 
-    adapter = AlbumsAdapter(context, OnAlbumClickListener())
+    adapter = AlbumsAdapter(layoutInflater, context, OnAlbumClickListener())
     repository = AlbumsRepository(context, artistId)
     artistTracksRepository = ArtistTracksRepository(context, artistId)
+  }
+
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View {
+    _binding = FragmentAlbumsBinding.inflate(inflater)
+    swiper = binding.swiper
+    return binding.root
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    cover?.let { cover ->
+    binding.cover.let { cover ->
       Picasso.get()
         .maybeLoad(maybeNormalizeUrl(artistArt))
         .noFade()
@@ -118,9 +139,9 @@ class AlbumsFragment : OtterFragment<Album, AlbumsAdapter>() {
         .into(cover)
     }
 
-    artist.text = artistName
+    binding.artist.text = artistName
 
-    play.setOnClickListener {
+    binding.play.setOnClickListener {
       val loader = CircularProgressDrawable(requireContext()).apply {
         setColorSchemeColors(ContextCompat.getColor(requireContext(), android.R.color.white))
         strokeWidth = 4f
@@ -128,8 +149,8 @@ class AlbumsFragment : OtterFragment<Album, AlbumsAdapter>() {
 
       loader.start()
 
-      play.icon = loader
-      play.isClickable = false
+      binding.play.icon = loader
+      binding.play.isClickable = false
 
       lifecycleScope.launch(IO) {
         artistTracksRepository.fetch(Repository.Origin.Network.origin)
@@ -141,8 +162,9 @@ class AlbumsFragment : OtterFragment<Album, AlbumsAdapter>() {
             CommandBus.send(Command.ReplaceQueue(it))
 
             withContext(Main) {
-              play.icon = requireContext().getDrawable(R.drawable.play)
-              play.isClickable = true
+              binding.play.icon =
+                AppCompatResources.getDrawable(binding.root.context, R.drawable.play)
+              binding.play.isClickable = true
             }
           }
       }
@@ -154,15 +176,15 @@ class AlbumsFragment : OtterFragment<Album, AlbumsAdapter>() {
 
     var coverHeight: Float? = null
 
-    scroller.setOnScrollChangeListener { _: View?, _: Int, scrollY: Int, _: Int, _: Int ->
+    binding.scroller.setOnScrollChangeListener { _: View?, _: Int, scrollY: Int, _: Int, _: Int ->
       if (coverHeight == null) {
-        coverHeight = cover.measuredHeight.toFloat()
+        coverHeight = binding.cover.measuredHeight.toFloat()
       }
 
-      cover.translationY = (scrollY / 2).toFloat()
+      binding.cover.translationY = (scrollY / 2).toFloat()
 
       coverHeight?.let { height ->
-        cover.alpha = (height - scrollY.toFloat()) / height
+        binding.cover.alpha = (height - scrollY.toFloat()) / height
       }
     }
   }

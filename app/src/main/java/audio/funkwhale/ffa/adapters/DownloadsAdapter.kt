@@ -7,16 +7,24 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import audio.funkwhale.ffa.R
+import audio.funkwhale.ffa.databinding.RowDownloadBinding
 import audio.funkwhale.ffa.playback.PinService
-import audio.funkwhale.ffa.utils.*
+import audio.funkwhale.ffa.utils.DownloadInfo
+import audio.funkwhale.ffa.utils.Track
 import com.google.android.exoplayer2.offline.Download
 import com.google.android.exoplayer2.offline.DownloadService
-import kotlinx.android.synthetic.main.row_download.view.*
 
-class DownloadsAdapter(private val context: Context, private val listener: OnDownloadChangedListener) : RecyclerView.Adapter<DownloadsAdapter.ViewHolder>() {
+class DownloadsAdapter(
+  private val layoutInflater: LayoutInflater,
+  private val context: Context,
+  private val listener: OnDownloadChangedListener
+) : RecyclerView.Adapter<DownloadsAdapter.ViewHolder>() {
+
   interface OnDownloadChangedListener {
     fun onItemRemoved(index: Int)
   }
+
+  private lateinit var binding: RowDownloadBinding
 
   var downloads: MutableList<DownloadInfo> = mutableListOf()
 
@@ -25,9 +33,10 @@ class DownloadsAdapter(private val context: Context, private val listener: OnDow
   override fun getItemId(position: Int) = downloads[position].id.toLong()
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-    val view = LayoutInflater.from(context).inflate(R.layout.row_download, parent, false)
 
-    return ViewHolder(view)
+    binding = RowDownloadBinding.inflate(layoutInflater, parent, false)
+
+    return ViewHolder(binding)
   }
 
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -67,7 +76,12 @@ class DownloadsAdapter(private val context: Context, private val listener: OnDow
               holder.toggle.visibility = View.GONE
             }
 
-            Download.STATE_STOPPED -> holder.toggle.setImageIcon(Icon.createWithResource(context, R.drawable.play))
+            Download.STATE_STOPPED -> holder.toggle.setImageIcon(
+              Icon.createWithResource(
+                context,
+                R.drawable.play
+              )
+            )
 
             else -> holder.toggle.setImageIcon(Icon.createWithResource(context, R.drawable.pause))
           }
@@ -76,7 +90,13 @@ class DownloadsAdapter(private val context: Context, private val listener: OnDow
 
       holder.toggle.setOnClickListener {
         when (state.state) {
-          Download.STATE_QUEUED, Download.STATE_DOWNLOADING -> DownloadService.sendSetStopReason(context, PinService::class.java, download.contentId, 1, false)
+          Download.STATE_QUEUED, Download.STATE_DOWNLOADING -> DownloadService.sendSetStopReason(
+            context,
+            PinService::class.java,
+            download.contentId,
+            1,
+            false
+          )
 
           Download.STATE_FAILED -> {
             Track.fromDownload(download).also {
@@ -84,22 +104,33 @@ class DownloadsAdapter(private val context: Context, private val listener: OnDow
             }
           }
 
-          else -> DownloadService.sendSetStopReason(context, PinService::class.java, download.contentId, Download.STOP_REASON_NONE, false)
+          else -> DownloadService.sendSetStopReason(
+            context,
+            PinService::class.java,
+            download.contentId,
+            Download.STOP_REASON_NONE,
+            false
+          )
         }
       }
 
       holder.delete.setOnClickListener {
         listener.onItemRemoved(position)
-        DownloadService.sendRemoveDownload(context, PinService::class.java, download.contentId, false)
+        DownloadService.sendRemoveDownload(
+          context,
+          PinService::class.java,
+          download.contentId,
+          false
+        )
       }
     }
   }
 
-  inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-    val title = view.title
-    val artist = view.artist
-    val progress = view.progress
-    val toggle = view.toggle
-    val delete = view.delete
+  inner class ViewHolder(binding: RowDownloadBinding) : RecyclerView.ViewHolder(binding.root) {
+    val title = binding.title
+    val artist = binding.artist
+    val progress = binding.progress
+    val toggle = binding.toggle
+    val delete = binding.delete
   }
 }

@@ -4,13 +4,16 @@ import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.adapters.TracksAdapter
+import audio.funkwhale.ffa.databinding.FragmentTracksBinding
 import audio.funkwhale.ffa.repositories.FavoritedRepository
 import audio.funkwhale.ffa.repositories.FavoritesRepository
 import audio.funkwhale.ffa.repositories.TracksRepository
@@ -32,25 +35,21 @@ import com.google.android.exoplayer2.offline.Download
 import com.preference.PowerPreference
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
-import kotlinx.android.synthetic.main.fragment_tracks.actions
-import kotlinx.android.synthetic.main.fragment_tracks.artist
-import kotlinx.android.synthetic.main.fragment_tracks.cover
-import kotlinx.android.synthetic.main.fragment_tracks.play
-import kotlinx.android.synthetic.main.fragment_tracks.scroller
-import kotlinx.android.synthetic.main.fragment_tracks.title
-import kotlinx.android.synthetic.main.fragment_tracks.tracks
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class TracksFragment : OtterFragment<Track, TracksAdapter>() {
-  override val viewRes = R.layout.fragment_tracks
-  override val recycler: RecyclerView get() = tracks
+class TracksFragment : FFAFragment<Track, TracksAdapter>() {
 
-  lateinit var favoritesRepository: FavoritesRepository
-  lateinit var favoritedRepository: FavoritedRepository
+  override val recycler: RecyclerView get() = binding.tracks
+
+  private var _binding: FragmentTracksBinding? = null
+  private val binding get() = _binding!!
+
+  private lateinit var favoritesRepository: FavoritesRepository
+  private lateinit var favoritedRepository: FavoritedRepository
 
   private var albumId = 0
   private var albumArtist = ""
@@ -80,7 +79,7 @@ class TracksFragment : OtterFragment<Track, TracksAdapter>() {
       albumCover = getString("albumCover") ?: ""
     }
 
-    adapter = TracksAdapter(context, FavoriteListener())
+    adapter = TracksAdapter(layoutInflater, context, FavoriteListener())
     repository = TracksRepository(context, albumId)
     favoritesRepository = FavoritesRepository(context)
     favoritedRepository = FavoritedRepository(context)
@@ -92,8 +91,8 @@ class TracksFragment : OtterFragment<Track, TracksAdapter>() {
 
     when {
       data.all { it.downloaded } -> {
-        title.setCompoundDrawablesWithIntrinsicBounds(R.drawable.downloaded, 0, 0, 0)
-        title.compoundDrawables.forEach {
+        binding.title.setCompoundDrawablesWithIntrinsicBounds(R.drawable.downloaded, 0, 0, 0)
+        binding.title.compoundDrawables.forEach {
           it?.colorFilter =
             PorterDuffColorFilter(
               requireContext().getColor(R.color.downloaded),
@@ -102,8 +101,8 @@ class TracksFragment : OtterFragment<Track, TracksAdapter>() {
         }
       }
       data.all { it.cached } -> {
-        title.setCompoundDrawablesWithIntrinsicBounds(R.drawable.downloaded, 0, 0, 0)
-        title.compoundDrawables.forEach {
+        binding.title.setCompoundDrawablesWithIntrinsicBounds(R.drawable.downloaded, 0, 0, 0)
+        binding.title.compoundDrawables.forEach {
           it?.colorFilter =
             PorterDuffColorFilter(
               requireContext().getColor(R.color.cached),
@@ -112,9 +111,24 @@ class TracksFragment : OtterFragment<Track, TracksAdapter>() {
         }
       }
       else -> {
-        title.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+        binding.title.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
       }
     }
+  }
+
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View {
+    _binding = FragmentTracksBinding.inflate(inflater)
+    swiper = binding.swiper
+    return binding.root
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -126,10 +140,10 @@ class TracksFragment : OtterFragment<Track, TracksAdapter>() {
       .fit()
       .centerCrop()
       .transform(RoundedCornersTransformation(16, 0))
-      .into(cover)
+      .into(binding.cover)
 
-    artist.text = albumArtist
-    title.text = albumTitle
+    binding.artist.text = albumArtist
+    binding.title.text = albumTitle
   }
 
   override fun onResume() {
@@ -146,24 +160,24 @@ class TracksFragment : OtterFragment<Track, TracksAdapter>() {
 
     var coverHeight: Float? = null
 
-    scroller.setOnScrollChangeListener { _: View?, _: Int, scrollY: Int, _: Int, _: Int ->
+    binding.scroller.setOnScrollChangeListener { _: View?, _: Int, scrollY: Int, _: Int, _: Int ->
       if (coverHeight == null) {
-        coverHeight = cover.measuredHeight.toFloat()
+        coverHeight = binding.cover.measuredHeight.toFloat()
       }
 
-      cover.translationY = (scrollY / 2).toFloat()
+      binding.cover.translationY = (scrollY / 2).toFloat()
 
       coverHeight?.let { height ->
-        cover.alpha = (height - scrollY.toFloat()) / height
+        binding.cover.alpha = (height - scrollY.toFloat()) / height
       }
     }
 
     when (PowerPreference.getDefaultFile().getString("play_order")) {
-      "in_order" -> play.text = getString(R.string.playback_play)
-      else -> play.text = getString(R.string.playback_shuffle)
+      "in_order" -> binding.play.text = getString(R.string.playback_play)
+      else -> binding.play.text = getString(R.string.playback_shuffle)
     }
 
-    play.setOnClickListener {
+    binding.play.setOnClickListener {
       when (PowerPreference.getDefaultFile().getString("play_order")) {
         "in_order" -> CommandBus.send(Command.ReplaceQueue(adapter.data))
         else -> CommandBus.send(Command.ReplaceQueue(adapter.data.shuffled()))
@@ -173,8 +187,14 @@ class TracksFragment : OtterFragment<Track, TracksAdapter>() {
     }
 
     context?.let { context ->
-      actions.setOnClickListener {
-        PopupMenu(context, actions, Gravity.START, R.attr.actionOverflowMenuStyle, 0).apply {
+      binding.actions.setOnClickListener {
+        PopupMenu(
+          context,
+          binding.actions,
+          Gravity.START,
+          R.attr.actionOverflowMenuStyle,
+          0
+        ).apply {
           inflate(R.menu.album)
 
           menu.findItem(R.id.play_secondary)?.let { item ->

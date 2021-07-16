@@ -13,12 +13,27 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import audio.funkwhale.ffa.R
-import audio.funkwhale.ffa.utils.*
+import audio.funkwhale.ffa.databinding.RowSearchHeaderBinding
+import audio.funkwhale.ffa.databinding.RowTrackBinding
+import audio.funkwhale.ffa.utils.Album
+import audio.funkwhale.ffa.utils.Artist
+import audio.funkwhale.ffa.utils.Command
+import audio.funkwhale.ffa.utils.CommandBus
+import audio.funkwhale.ffa.utils.Track
+import audio.funkwhale.ffa.utils.maybeLoad
+import audio.funkwhale.ffa.utils.maybeNormalizeUrl
+import audio.funkwhale.ffa.utils.onApi
+import audio.funkwhale.ffa.utils.toast
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
-import kotlinx.android.synthetic.main.row_track.view.*
 
-class SearchAdapter(private val context: Context?, private val listener: OnSearchResultClickListener? = null, private val favoriteListener: OnFavoriteListener? = null) : RecyclerView.Adapter<SearchAdapter.ViewHolder>() {
+class SearchAdapter(
+  private val layoutInflater: LayoutInflater,
+  private val context: Context?,
+  private val listener: OnSearchResultClickListener? = null,
+  private val favoriteListener: OnFavoriteListener? = null
+) : RecyclerView.Adapter<SearchAdapter.ViewHolder>() {
+
   interface OnSearchResultClickListener {
     fun onArtistClick(holder: View?, artist: Artist)
     fun onAlbumClick(holder: View?, album: Album)
@@ -35,7 +50,10 @@ class SearchAdapter(private val context: Context?, private val listener: OnSearc
     Track
   }
 
-  val SECTION_COUNT = 3
+  private lateinit var searchHeaderBinding: RowSearchHeaderBinding
+  private lateinit var rowTrackBinding: RowTrackBinding
+
+  val sectionCount = 3
 
   var artists: MutableList<Artist> = mutableListOf()
   var albums: MutableList<Album> = mutableListOf()
@@ -43,7 +61,7 @@ class SearchAdapter(private val context: Context?, private val listener: OnSearc
 
   var currentTrack: Track? = null
 
-  override fun getItemCount() = SECTION_COUNT + artists.size + albums.size + tracks.size
+  override fun getItemCount() = sectionCount + artists.size + albums.size + tracks.size
 
   override fun getItemId(position: Int): Long {
     return when (getItemViewType(position)) {
@@ -55,7 +73,7 @@ class SearchAdapter(private val context: Context?, private val listener: OnSearc
 
       ResultType.Artist.ordinal -> artists[position].id.toLong()
       ResultType.Artist.ordinal -> albums[position - artists.size - 2].id.toLong()
-      ResultType.Track.ordinal -> tracks[position - artists.size - albums.size - SECTION_COUNT].id.toLong()
+      ResultType.Track.ordinal -> tracks[position - artists.size - albums.size - sectionCount].id.toLong()
       else -> 0
     }
   }
@@ -72,26 +90,35 @@ class SearchAdapter(private val context: Context?, private val listener: OnSearc
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-    val view = when (viewType) {
-      ResultType.Header.ordinal -> LayoutInflater.from(context).inflate(R.layout.row_search_header, parent, false)
-      else -> LayoutInflater.from(context).inflate(R.layout.row_track, parent, false)
-    }
-
-    return ViewHolder(view, context).also {
-      view.setOnClickListener(it)
+    return when (viewType) {
+      ResultType.Header.ordinal -> {
+        searchHeaderBinding = RowSearchHeaderBinding.inflate(layoutInflater, parent, false)
+        SearchHeaderViewHolder(searchHeaderBinding, context)
+      }
+      else -> {
+        rowTrackBinding = RowTrackBinding.inflate(layoutInflater, parent, false)
+        RowTrackViewHolder(rowTrackBinding, context).also {
+          rowTrackBinding.root.setOnClickListener(it)
+        }
+      }
     }
   }
 
   @SuppressLint("NewApi")
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
     val resultType = getItemViewType(position)
+    val searchHeaderViewHolder = holder as? SearchHeaderViewHolder
+    val rowTrackViewHolder = holder as? RowTrackViewHolder
 
     if (resultType == ResultType.Header.ordinal) {
       context?.let { context ->
         if (position == 0) {
-          holder.title.text = context.getString(R.string.artists)
+          searchHeaderViewHolder?.title?.text = context.getString(R.string.artists)
           holder.itemView.visibility = View.VISIBLE
-          holder.itemView.layoutParams = RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+          holder.itemView.layoutParams = RecyclerView.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+          )
 
           if (artists.isEmpty()) {
             holder.itemView.visibility = View.GONE
@@ -100,9 +127,12 @@ class SearchAdapter(private val context: Context?, private val listener: OnSearc
         }
 
         if (position == (artists.size + 1)) {
-          holder.title.text = context.getString(R.string.albums)
+          searchHeaderViewHolder?.title?.text = context.getString(R.string.albums)
           holder.itemView.visibility = View.VISIBLE
-          holder.itemView.layoutParams = RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+          holder.itemView.layoutParams = RecyclerView.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+          )
 
           if (albums.isEmpty()) {
             holder.itemView.visibility = View.GONE
@@ -111,9 +141,12 @@ class SearchAdapter(private val context: Context?, private val listener: OnSearc
         }
 
         if (position == (artists.size + albums.size + 2)) {
-          holder.title.text = context.getString(R.string.tracks)
+          searchHeaderViewHolder?.title?.text = context.getString(R.string.tracks)
           holder.itemView.visibility = View.VISIBLE
-          holder.itemView.layoutParams = RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+          holder.itemView.layoutParams = RecyclerView.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+          )
 
           if (tracks.isEmpty()) {
             holder.itemView.visibility = View.GONE
@@ -127,20 +160,20 @@ class SearchAdapter(private val context: Context?, private val listener: OnSearc
 
     val item = when (resultType) {
       ResultType.Artist.ordinal -> {
-        holder.actions.visibility = View.GONE
-        holder.favorite.visibility = View.GONE
+        rowTrackViewHolder?.actions?.visibility = View.GONE
+        rowTrackViewHolder?.favorite?.visibility = View.GONE
 
         artists[position - 1]
       }
 
       ResultType.Album.ordinal -> {
-        holder.actions.visibility = View.GONE
-        holder.favorite.visibility = View.GONE
+        rowTrackViewHolder?.actions?.visibility = View.GONE
+        rowTrackViewHolder?.favorite?.visibility = View.GONE
 
         albums[position - artists.size - 2]
       }
 
-      ResultType.Track.ordinal -> tracks[position - artists.size - albums.size - SECTION_COUNT]
+      ResultType.Track.ordinal -> tracks[position - artists.size - albums.size - sectionCount]
 
       else -> tracks[position]
     }
@@ -149,65 +182,98 @@ class SearchAdapter(private val context: Context?, private val listener: OnSearc
       .maybeLoad(maybeNormalizeUrl(item.cover()))
       .fit()
       .transform(RoundedCornersTransformation(16, 0))
-      .into(holder.cover)
+      .into(rowTrackViewHolder?.cover)
 
-    holder.title.text = item.title()
-    holder.artist.text = item.subtitle()
+    searchHeaderViewHolder?.title?.text = item.title()
+    rowTrackViewHolder?.artist?.text = item.subtitle()
 
     Build.VERSION_CODES.P.onApi(
       {
-        holder.title.setTypeface(holder.title.typeface, Typeface.DEFAULT.weight)
-        holder.artist.setTypeface(holder.artist.typeface, Typeface.DEFAULT.weight)
+        searchHeaderViewHolder?.title?.setTypeface(
+          searchHeaderViewHolder.title.typeface,
+          Typeface.DEFAULT.weight
+        )
+        rowTrackViewHolder?.artist?.setTypeface(
+          rowTrackViewHolder.artist.typeface,
+          Typeface.DEFAULT.weight
+        )
       },
       {
-        holder.title.typeface = Typeface.create(holder.title.typeface, Typeface.NORMAL)
-        holder.artist.typeface = Typeface.create(holder.artist.typeface, Typeface.NORMAL)
+        searchHeaderViewHolder?.title?.typeface =
+          Typeface.create(searchHeaderViewHolder?.title?.typeface, Typeface.NORMAL)
+        rowTrackViewHolder?.artist?.typeface =
+          Typeface.create(rowTrackViewHolder?.artist?.typeface, Typeface.NORMAL)
       })
 
-    holder.title.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+    searchHeaderViewHolder?.title?.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
 
     if (resultType == ResultType.Track.ordinal) {
       (item as? Track)?.let { track ->
         context?.let { context ->
           if (track == currentTrack || track.current) {
-            holder.title.setTypeface(holder.title.typeface, Typeface.BOLD)
-            holder.artist.setTypeface(holder.artist.typeface, Typeface.BOLD)
+            searchHeaderViewHolder?.title?.setTypeface(
+              searchHeaderViewHolder.title.typeface,
+              Typeface.BOLD
+            )
+            rowTrackViewHolder?.artist?.setTypeface(
+              rowTrackViewHolder.artist.typeface,
+              Typeface.BOLD
+            )
           }
 
           when (track.favorite) {
-            true -> holder.favorite.setColorFilter(context.getColor(R.color.colorFavorite))
-            false -> holder.favorite.setColorFilter(context.getColor(R.color.colorSelected))
+            true -> rowTrackViewHolder?.favorite?.setColorFilter(context.getColor(R.color.colorFavorite))
+            false -> rowTrackViewHolder?.favorite?.setColorFilter(context.getColor(R.color.colorSelected))
           }
 
-          holder.favorite.setOnClickListener {
+          rowTrackViewHolder?.favorite?.setOnClickListener {
             favoriteListener?.let {
               favoriteListener.onToggleFavorite(track.id, !track.favorite)
 
-              tracks[position - artists.size - albums.size - SECTION_COUNT].favorite = !track.favorite
+              tracks[position - artists.size - albums.size - sectionCount].favorite =
+                !track.favorite
 
               notifyItemChanged(position)
             }
           }
 
           when (track.cached || track.downloaded) {
-            true -> holder.title.setCompoundDrawablesWithIntrinsicBounds(R.drawable.downloaded, 0, 0, 0)
-            false -> holder.title.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+            true -> searchHeaderViewHolder?.title?.setCompoundDrawablesWithIntrinsicBounds(
+              R.drawable.downloaded,
+              0,
+              0,
+              0
+            )
+            false -> searchHeaderViewHolder?.title?.setCompoundDrawablesWithIntrinsicBounds(
+              0,
+              0,
+              0,
+              0
+            )
           }
 
           if (track.cached && !track.downloaded) {
-            holder.title.compoundDrawables.forEach {
-              it?.colorFilter = PorterDuffColorFilter(context.getColor(R.color.cached), PorterDuff.Mode.SRC_IN)
+            searchHeaderViewHolder?.title?.compoundDrawables?.forEach {
+              it?.colorFilter =
+                PorterDuffColorFilter(context.getColor(R.color.cached), PorterDuff.Mode.SRC_IN)
             }
           }
 
           if (track.downloaded) {
-            holder.title.compoundDrawables.forEach {
-              it?.colorFilter = PorterDuffColorFilter(context.getColor(R.color.downloaded), PorterDuff.Mode.SRC_IN)
+            searchHeaderViewHolder?.title?.compoundDrawables?.forEach {
+              it?.colorFilter =
+                PorterDuffColorFilter(context.getColor(R.color.downloaded), PorterDuff.Mode.SRC_IN)
             }
           }
 
-          holder.actions.setOnClickListener {
-            PopupMenu(context, holder.actions, Gravity.START, R.attr.actionOverflowMenuStyle, 0).apply {
+          rowTrackViewHolder?.actions?.setOnClickListener {
+            PopupMenu(
+              context,
+              rowTrackViewHolder.actions,
+              Gravity.START,
+              R.attr.actionOverflowMenuStyle,
+              0
+            ).apply {
               inflate(R.menu.row_track)
 
               setOnMenuItemClickListener {
@@ -234,19 +300,23 @@ class SearchAdapter(private val context: Context?, private val listener: OnSearc
     return when (type) {
       ResultType.Artist -> position + 1
       ResultType.Album -> position + artists.size + 2
-      ResultType.Track -> artists.size + albums.size + SECTION_COUNT + position
+      ResultType.Track -> artists.size + albums.size + sectionCount + position
       else -> 0
     }
   }
 
-  inner class ViewHolder(view: View, val context: Context?) : RecyclerView.ViewHolder(view), View.OnClickListener {
-    val handle = view.handle
-    val cover = view.cover
-    val title = view.title
-    val artist = view.artist
+  inner class SearchHeaderViewHolder(val binding: RowSearchHeaderBinding, context: Context?) :
+    ViewHolder(binding.root, context) {
+    val title = binding.title
+  }
 
-    val favorite = view.favorite
-    val actions = view.actions
+  inner class RowTrackViewHolder(val binding: RowTrackBinding, context: Context?) :
+    ViewHolder(binding.root, context), View.OnClickListener {
+    val cover = binding.cover
+    val artist = binding.artist
+
+    val favorite = binding.favorite
+    val actions = binding.actions
 
     override fun onClick(view: View?) {
       when (getItemViewType(layoutPosition)) {
@@ -263,7 +333,7 @@ class SearchAdapter(private val context: Context?, private val listener: OnSearc
         }
 
         ResultType.Track.ordinal -> {
-          val position = layoutPosition - artists.size - albums.size - SECTION_COUNT
+          val position = layoutPosition - artists.size - albums.size - sectionCount
 
           tracks.subList(position, tracks.size).plus(tracks.subList(0, position)).apply {
             CommandBus.send(Command.ReplaceQueue(this))
@@ -273,8 +343,11 @@ class SearchAdapter(private val context: Context?, private val listener: OnSearc
         }
 
         else -> {
+          // empty
         }
       }
     }
   }
+
+  abstract inner class ViewHolder(view: View, val context: Context?) : RecyclerView.ViewHolder(view)
 }

@@ -2,16 +2,18 @@ package audio.funkwhale.ffa.fragments
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
-import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.adapters.PlaylistsAdapter
+import audio.funkwhale.ffa.databinding.DialogAddToPlaylistBinding
 import audio.funkwhale.ffa.repositories.ManagementPlaylistsRepository
 import audio.funkwhale.ffa.utils.*
 import com.google.gson.Gson
-import kotlinx.android.synthetic.main.dialog_add_to_playlist.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -19,10 +21,18 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 object AddToPlaylistDialog {
-  fun show(activity: Activity, lifecycleScope: CoroutineScope, tracks: List<Track>) {
+
+  fun show(
+    layoutInflater: LayoutInflater,
+    activity: Activity,
+    lifecycleScope: CoroutineScope,
+    tracks: List<Track>
+  ) {
+
+    val binding = DialogAddToPlaylistBinding.inflate(layoutInflater)
     val dialog = AlertDialog.Builder(activity).run {
       setTitle(activity.getString(R.string.playlist_add_to))
-      setView(activity.layoutInflater.inflate(R.layout.dialog_add_to_playlist, null))
+      setView(binding.root)
 
       create()
     }
@@ -31,12 +41,22 @@ object AddToPlaylistDialog {
 
     val repository = ManagementPlaylistsRepository(activity)
 
-    dialog.name.editText?.addTextChangedListener {
-      dialog.create.isEnabled = !(dialog.name.editText?.text?.trim()?.isBlank() ?: true)
-    }
+    binding.name.editText?.addTextChangedListener(object : TextWatcher {
+      override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+        // empty
+      }
 
-    dialog.create.setOnClickListener {
-      val name = dialog.name.editText?.text?.toString()?.trim() ?: ""
+      override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+        // empty
+      }
+
+      override fun afterTextChanged(s: Editable?) {
+        binding.create.isEnabled = !(binding.name.editText?.text?.trim()?.isBlank() ?: true)
+      }
+    })
+
+    binding.create.setOnClickListener {
+      val name = binding.name.editText?.text?.toString()?.trim() ?: ""
 
       if (name.isEmpty()) return@setOnClickListener
 
@@ -45,7 +65,11 @@ object AddToPlaylistDialog {
           repository.add(id, tracks)
 
           withContext(Main) {
-            Toast.makeText(activity, activity.getString(R.string.playlist_added_to, name), Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+              activity,
+              activity.getString(R.string.playlist_added_to, name),
+              Toast.LENGTH_SHORT
+            ).show()
           }
 
           dialog.dismiss()
@@ -53,18 +77,23 @@ object AddToPlaylistDialog {
       }
     }
 
-    val adapter = PlaylistsAdapter(activity, object : PlaylistsAdapter.OnPlaylistClickListener {
-      override fun onClick(holder: View?, playlist: Playlist) {
-        repository.add(playlist.id, tracks)
+    val adapter =
+      PlaylistsAdapter(layoutInflater, activity, object : PlaylistsAdapter.OnPlaylistClickListener {
+        override fun onClick(holder: View?, playlist: Playlist) {
+          repository.add(playlist.id, tracks)
 
-        Toast.makeText(activity, activity.getString(R.string.playlist_added_to, playlist.name), Toast.LENGTH_SHORT).show()
+          Toast.makeText(
+            activity,
+            activity.getString(R.string.playlist_added_to, playlist.name),
+            Toast.LENGTH_SHORT
+          ).show()
 
-        dialog.dismiss()
-      }
-    })
+          dialog.dismiss()
+        }
+      })
 
-    dialog.playlists.layoutManager = LinearLayoutManager(activity)
-    dialog.playlists.adapter = adapter
+    binding.playlists.layoutManager = LinearLayoutManager(activity)
+    binding.playlists.adapter = adapter
 
     repository.apply {
       var first = true

@@ -4,23 +4,41 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.view.*
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import audio.funkwhale.ffa.R
-import audio.funkwhale.ffa.fragments.OtterAdapter
-import audio.funkwhale.ffa.utils.*
+import audio.funkwhale.ffa.databinding.RowTrackBinding
+import audio.funkwhale.ffa.fragments.FFAAdapter
+import audio.funkwhale.ffa.utils.Command
+import audio.funkwhale.ffa.utils.CommandBus
+import audio.funkwhale.ffa.utils.PlaylistTrack
+import audio.funkwhale.ffa.utils.Track
+import audio.funkwhale.ffa.utils.maybeLoad
+import audio.funkwhale.ffa.utils.maybeNormalizeUrl
+import audio.funkwhale.ffa.utils.toast
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
-import kotlinx.android.synthetic.main.row_track.view.*
-import java.util.*
+import java.util.Collections
 
-class PlaylistTracksAdapter(private val context: Context?, private val favoriteListener: OnFavoriteListener? = null, private val playlistListener: OnPlaylistListener? = null) : OtterAdapter<PlaylistTrack, PlaylistTracksAdapter.ViewHolder>() {
+class PlaylistTracksAdapter(
+  private val layoutInflater: LayoutInflater,
+  private val context: Context?,
+  private val favoriteListener: OnFavoriteListener? = null,
+  private val playlistListener: OnPlaylistListener? = null
+) : FFAAdapter<PlaylistTrack, PlaylistTracksAdapter.ViewHolder>() {
+
   interface OnFavoriteListener {
     fun onToggleFavorite(id: Int, state: Boolean)
   }
+
+  private lateinit var binding: RowTrackBinding
 
   interface OnPlaylistListener {
     fun onMoveTrack(from: Int, to: Int)
@@ -46,10 +64,11 @@ class PlaylistTracksAdapter(private val context: Context?, private val favoriteL
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-    val view = LayoutInflater.from(context).inflate(R.layout.row_track, parent, false)
 
-    return ViewHolder(view, context).also {
-      view.setOnClickListener(it)
+    binding = RowTrackBinding.inflate(layoutInflater, parent, false)
+
+    return ViewHolder(binding, context).also {
+      binding.root.setOnClickListener(it)
     }
   }
 
@@ -105,7 +124,10 @@ class PlaylistTracksAdapter(private val context: Context?, private val favoriteL
               R.id.track_add_to_queue -> CommandBus.send(Command.AddToQueue(listOf(track.track)))
               R.id.track_play_next -> CommandBus.send(Command.PlayNext(track.track))
               R.id.queue_remove -> CommandBus.send(Command.RemoveFromQueue(track.track))
-              R.id.track_remove_from_playlist -> playlistListener?.onRemoveTrackFromPlaylist(track.track, position)
+              R.id.track_remove_from_playlist -> playlistListener?.onRemoveTrackFromPlaylist(
+                track.track,
+                position
+              )
             }
 
             true
@@ -141,14 +163,16 @@ class PlaylistTracksAdapter(private val context: Context?, private val favoriteL
     notifyItemMoved(oldPosition, newPosition)
   }
 
-  inner class ViewHolder(view: View, val context: Context?) : RecyclerView.ViewHolder(view), View.OnClickListener {
-    val handle = view.handle
-    val cover = view.cover
-    val title = view.title
-    val artist = view.artist
+  inner class ViewHolder(binding: RowTrackBinding, val context: Context?) :
+    RecyclerView.ViewHolder(binding.root),
+    View.OnClickListener {
+    val handle = binding.handle
+    val cover = binding.cover
+    val title = binding.title
+    val artist = binding.artist
 
-    val favorite = view.favorite
-    val actions = view.actions
+    val favorite = binding.favorite
+    val actions = binding.actions
 
     override fun onClick(view: View?) {
       data.subList(layoutPosition, data.size).plus(data.subList(0, layoutPosition)).apply {
@@ -170,7 +194,11 @@ class PlaylistTracksAdapter(private val context: Context?, private val favoriteL
     override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) =
       makeMovementFlags(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0)
 
-    override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+    override fun onMove(
+      recyclerView: RecyclerView,
+      viewHolder: RecyclerView.ViewHolder,
+      target: RecyclerView.ViewHolder
+    ): Boolean {
       if (from == -1) from = viewHolder.adapterPosition
       to = target.adapterPosition
 

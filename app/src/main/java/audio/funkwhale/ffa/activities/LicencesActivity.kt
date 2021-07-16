@@ -3,17 +3,18 @@ package audio.funkwhale.ffa.activities
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import audio.funkwhale.ffa.R
-import kotlinx.android.synthetic.main.activity_licences.*
-import kotlinx.android.synthetic.main.row_licence.view.*
+import audio.funkwhale.ffa.databinding.ActivityLicencesBinding
+import audio.funkwhale.ffa.databinding.RowLicenceBinding
 
 class LicencesActivity : AppCompatActivity() {
+
+  private lateinit var binding: ActivityLicencesBinding
+
   data class Licence(val name: String, val licence: String, val url: String)
 
   interface OnLicenceClickListener {
@@ -23,15 +24,18 @@ class LicencesActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    setContentView(R.layout.activity_licences)
+    binding = ActivityLicencesBinding.inflate(layoutInflater)
+    setContentView(binding.root)
 
     LicencesAdapter(OnLicenceClick()).also {
-      licences.layoutManager = LinearLayoutManager(this)
-      licences.adapter = it
+      binding.licences.layoutManager = LinearLayoutManager(this)
+      binding.licences.adapter = it
     }
   }
 
-  private inner class LicencesAdapter(val listener: OnLicenceClickListener) : RecyclerView.Adapter<LicencesAdapter.ViewHolder>() {
+  private inner class LicencesAdapter(val listener: OnLicenceClickListener) :
+    RecyclerView.Adapter<LicencesAdapter.ViewHolder>() {
+
     val licences = listOf(
       Licence(
         "ExoPlayer",
@@ -73,10 +77,9 @@ class LicencesActivity : AppCompatActivity() {
     override fun getItemCount() = licences.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-      val view = LayoutInflater.from(this@LicencesActivity).inflate(R.layout.row_licence, parent, false)
-
-      return ViewHolder(view).also {
-        view.setOnClickListener(it)
+      val binding = RowLicenceBinding.inflate(layoutInflater)
+      return ViewHolder(binding).also {
+        binding.root.setOnClickListener(it)
       }
     }
 
@@ -87,9 +90,10 @@ class LicencesActivity : AppCompatActivity() {
       holder.licence.text = item.licence
     }
 
-    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
-      val name = view.name
-      val licence = view.licence
+    inner class ViewHolder(binding: RowLicenceBinding) : RecyclerView.ViewHolder(binding.root),
+      View.OnClickListener {
+      val name = binding.name
+      val licence = binding.licence
 
       override fun onClick(view: View?) {
         listener.onClick(licences[layoutPosition].url)

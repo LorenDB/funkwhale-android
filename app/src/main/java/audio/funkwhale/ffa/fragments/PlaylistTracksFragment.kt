@@ -2,27 +2,43 @@ package audio.funkwhale.ffa.fragments
 
 import android.os.Bundle
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.adapters.PlaylistTracksAdapter
+import audio.funkwhale.ffa.databinding.FragmentTracksBinding
 import audio.funkwhale.ffa.repositories.FavoritesRepository
 import audio.funkwhale.ffa.repositories.ManagementPlaylistsRepository
 import audio.funkwhale.ffa.repositories.PlaylistTracksRepository
-import audio.funkwhale.ffa.utils.*
+import audio.funkwhale.ffa.utils.Command
+import audio.funkwhale.ffa.utils.CommandBus
+import audio.funkwhale.ffa.utils.Playlist
+import audio.funkwhale.ffa.utils.PlaylistTrack
+import audio.funkwhale.ffa.utils.Request
+import audio.funkwhale.ffa.utils.RequestBus
+import audio.funkwhale.ffa.utils.Response
+import audio.funkwhale.ffa.utils.Track
+import audio.funkwhale.ffa.utils.maybeLoad
+import audio.funkwhale.ffa.utils.maybeNormalizeUrl
+import audio.funkwhale.ffa.utils.toast
+import audio.funkwhale.ffa.utils.wait
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
-import kotlinx.android.synthetic.main.fragment_tracks.*
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
-class PlaylistTracksFragment : OtterFragment<PlaylistTrack, PlaylistTracksAdapter>() {
-  override val viewRes = R.layout.fragment_tracks
-  override val recycler: RecyclerView get() = tracks
+class PlaylistTracksFragment : FFAFragment<PlaylistTrack, PlaylistTracksAdapter>() {
+
+  override val recycler: RecyclerView get() = binding.tracks
+
+  private var _binding: FragmentTracksBinding? = null
+  private val binding get() = _binding!!
 
   lateinit var favoritesRepository: FavoritesRepository
   lateinit var playlistsRepository: ManagementPlaylistsRepository
@@ -55,7 +71,7 @@ class PlaylistTracksFragment : OtterFragment<PlaylistTrack, PlaylistTracksAdapte
       albumCover = getString("albumCover") ?: ""
     }
 
-    adapter = PlaylistTracksAdapter(context, FavoriteListener(), PlaylistListener())
+    adapter = PlaylistTracksAdapter(layoutInflater, context, FavoriteListener(), PlaylistListener())
     repository = PlaylistTracksRepository(context, albumId)
     favoritesRepository = FavoritesRepository(context)
     playlistsRepository = ManagementPlaylistsRepository(context)
@@ -63,14 +79,29 @@ class PlaylistTracksFragment : OtterFragment<PlaylistTrack, PlaylistTracksAdapte
     watchEventBus()
   }
 
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View {
+    _binding = FragmentTracksBinding.inflate(layoutInflater)
+    swiper = binding.swiper
+    return binding.root
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
+  }
+
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    cover.visibility = View.INVISIBLE
-    covers.visibility = View.VISIBLE
+    binding.cover.visibility = View.INVISIBLE
+    binding.covers.visibility = View.VISIBLE
 
-    artist.text = "Playlist"
-    title.text = albumTitle
+    binding.artist.text = "Playlist"
+    binding.title.text = albumTitle
   }
 
   override fun onResume() {
@@ -85,27 +116,33 @@ class PlaylistTracksFragment : OtterFragment<PlaylistTrack, PlaylistTracksAdapte
 
     var coverHeight: Float? = null
 
-    scroller.setOnScrollChangeListener { _: View?, _: Int, scrollY: Int, _: Int, _: Int ->
+    binding.scroller.setOnScrollChangeListener { _: View?, _: Int, scrollY: Int, _: Int, _: Int ->
       if (coverHeight == null) {
-        coverHeight = covers.measuredHeight.toFloat()
+        coverHeight = binding.covers.measuredHeight.toFloat()
       }
 
-      covers.translationY = (scrollY / 2).toFloat()
+      binding.covers.translationY = (scrollY / 2).toFloat()
 
       coverHeight?.let { height ->
-        covers.alpha = (height - scrollY.toFloat()) / height
+        binding.covers.alpha = (height - scrollY.toFloat()) / height
       }
     }
 
-    play.setOnClickListener {
+    binding.play.setOnClickListener {
       CommandBus.send(Command.ReplaceQueue(adapter.data.map { it.track }.shuffled()))
 
       context.toast("All tracks were added to your queue")
     }
 
     context?.let { context ->
-      actions.setOnClickListener {
-        PopupMenu(context, actions, Gravity.START, R.attr.actionOverflowMenuStyle, 0).apply {
+      binding.actions.setOnClickListener {
+        PopupMenu(
+          context,
+          binding.actions,
+          Gravity.START,
+          R.attr.actionOverflowMenuStyle,
+          0
+        ).apply {
           inflate(R.menu.album)
 
           setOnMenuItemClickListener {
@@ -131,11 +168,11 @@ class PlaylistTracksFragment : OtterFragment<PlaylistTrack, PlaylistTracksAdapte
   override fun onDataFetched(data: List<PlaylistTrack>) {
     data.map { it.track.album }.toSet().map { it?.cover() }.take(4).forEachIndexed { index, url ->
       val imageView = when (index) {
-        0 -> cover_top_left
-        1 -> cover_top_right
-        2 -> cover_bottom_left
-        3 -> cover_bottom_right
-        else -> cover_top_left
+        0 -> binding.coverTopLeft
+        1 -> binding.coverTopRight
+        2 -> binding.coverBottomLeft
+        3 -> binding.coverBottomRight
+        else -> binding.coverTopLeft
       }
 
       val corner = when (index) {

@@ -7,27 +7,34 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import audio.funkwhale.ffa.R
-import audio.funkwhale.ffa.fragments.OtterAdapter
+import audio.funkwhale.ffa.databinding.RowPlaylistBinding
+import audio.funkwhale.ffa.fragments.FFAAdapter
 import audio.funkwhale.ffa.utils.Playlist
 import audio.funkwhale.ffa.utils.toDurationString
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
-import kotlinx.android.synthetic.main.row_playlist.view.*
 
-class PlaylistsAdapter(val context: Context?, private val listener: OnPlaylistClickListener) : OtterAdapter<Playlist, PlaylistsAdapter.ViewHolder>() {
+class PlaylistsAdapter(
+  private val layoutInflater: LayoutInflater,
+  private val context: Context?,
+  private val listener: OnPlaylistClickListener
+) : FFAAdapter<Playlist, PlaylistsAdapter.ViewHolder>() {
+
   interface OnPlaylistClickListener {
     fun onClick(holder: View?, playlist: Playlist)
   }
+
+  private lateinit var binding: RowPlaylistBinding
 
   override fun getItemCount() = data.size
 
   override fun getItemId(position: Int) = data[position].id.toLong()
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-    val view = LayoutInflater.from(context).inflate(R.layout.row_playlist, parent, false)
+    binding = RowPlaylistBinding.inflate(layoutInflater, parent, false)
 
-    return ViewHolder(view, listener).also {
-      view.setOnClickListener(it)
+    return ViewHolder(binding, listener).also {
+      binding.root.setOnClickListener(it)
     }
   }
 
@@ -35,24 +42,29 @@ class PlaylistsAdapter(val context: Context?, private val listener: OnPlaylistCl
     val playlist = data[position]
 
     holder.name.text = playlist.name
-    holder.summary.text = context?.resources?.getQuantityString(R.plurals.playlist_description, playlist.tracks_count, playlist.tracks_count, toDurationString(playlist.duration.toLong())) ?: ""
+    holder.summary.text = context?.resources?.getQuantityString(
+      R.plurals.playlist_description,
+      playlist.tracks_count,
+      playlist.tracks_count,
+      toDurationString(playlist.duration.toLong())
+    ) ?: ""
 
     context?.let {
       ContextCompat.getDrawable(context, R.drawable.cover).let {
-        holder.cover_top_left.setImageDrawable(it)
-        holder.cover_top_right.setImageDrawable(it)
-        holder.cover_bottom_left.setImageDrawable(it)
-        holder.cover_bottom_right.setImageDrawable(it)
+        holder.coverTopLeft.setImageDrawable(it)
+        holder.covertTopRight.setImageDrawable(it)
+        holder.coverBottomLeft.setImageDrawable(it)
+        holder.coverBottomRight.setImageDrawable(it)
       }
     }
 
     playlist.album_covers.shuffled().take(4).forEachIndexed { index, url ->
       val imageView = when (index) {
-        0 -> holder.cover_top_left
-        1 -> holder.cover_top_right
-        2 -> holder.cover_bottom_left
-        3 -> holder.cover_bottom_right
-        else -> holder.cover_top_left
+        0 -> holder.coverTopLeft
+        1 -> holder.covertTopRight
+        2 -> holder.coverBottomLeft
+        3 -> holder.coverBottomRight
+        else -> holder.coverTopLeft
       }
 
       val corner = when (index) {
@@ -70,14 +82,18 @@ class PlaylistsAdapter(val context: Context?, private val listener: OnPlaylistCl
     }
   }
 
-  inner class ViewHolder(view: View, private val listener: OnPlaylistClickListener) : RecyclerView.ViewHolder(view), View.OnClickListener {
-    val name = view.name
-    val summary = view.summary
+  inner class ViewHolder(
+    binding: RowPlaylistBinding,
+    private val listener: OnPlaylistClickListener
+  ) :
+    RecyclerView.ViewHolder(binding.root), View.OnClickListener {
+    val name = binding.name
+    val summary = binding.summary
 
-    val cover_top_left = view.cover_top_left
-    val cover_top_right = view.cover_top_right
-    val cover_bottom_left = view.cover_bottom_left
-    val cover_bottom_right = view.cover_bottom_right
+    val coverTopLeft = binding.coverTopLeft
+    val covertTopRight = binding.coverTopRight
+    val coverBottomLeft = binding.coverBottomLeft
+    val coverBottomRight = binding.coverBottomRight
 
     override fun onClick(view: View?) {
       listener.onClick(view, data[layoutPosition])

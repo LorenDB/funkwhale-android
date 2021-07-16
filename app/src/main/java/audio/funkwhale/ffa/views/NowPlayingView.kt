@@ -5,13 +5,14 @@ import android.content.Context
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.GestureDetector
+import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewTreeObserver
 import android.view.animation.DecelerateInterpolator
 import audio.funkwhale.ffa.R
+import audio.funkwhale.ffa.databinding.PartialNowPlayingBinding
 import com.google.android.material.card.MaterialCardView
-import kotlinx.android.synthetic.main.partial_now_playing.view.*
 import kotlin.math.abs
 import kotlin.math.min
 
@@ -19,6 +20,9 @@ class NowPlayingView : MaterialCardView {
   val activity: Context
   var gestureDetector: GestureDetector? = null
   var gestureDetectorCallback: OnGestureDetection? = null
+
+  private val binding =
+    PartialNowPlayingBinding.inflate(LayoutInflater.from(context), this, true)
 
   constructor(context: Context) : super(context) {
     activity = context
@@ -35,7 +39,10 @@ class NowPlayingView : MaterialCardView {
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
-    now_playing_root.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(heightMeasureSpec), MeasureSpec.UNSPECIFIED))
+    binding.nowPlayingRoot.measure(
+      widthMeasureSpec,
+      MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(heightMeasureSpec), MeasureSpec.UNSPECIFIED)
+    )
   }
 
   override fun onVisibilityChanged(changedView: View, visibility: Int) {
@@ -55,7 +62,7 @@ class NowPlayingView : MaterialCardView {
                 gestureDetectorCallback?.onUp()
               }
             }
-
+            performClick()
             ret
           }
 
@@ -93,7 +100,7 @@ class NowPlayingView : MaterialCardView {
         TypedValue.complexToDimensionPixelSize(it.data, resources.displayMetrics)
       }
 
-      maxHeight = now_playing_details.measuredHeight + (2 * maxMargin)
+      maxHeight = binding.nowPlayingDetails.measuredHeight + (2 * maxMargin)
     }
 
     override fun onDown(e: MotionEvent): Boolean {
@@ -120,7 +127,12 @@ class NowPlayingView : MaterialCardView {
       }
     }
 
-    override fun onFling(firstMotionEvent: MotionEvent?, secondMotionEvent: MotionEvent?, velocityX: Float, velocityY: Float): Boolean {
+    override fun onFling(
+      firstMotionEvent: MotionEvent?,
+      secondMotionEvent: MotionEvent?,
+      velocityX: Float,
+      velocityY: Float
+    ): Boolean {
       isScrolling = false
 
       layoutParams.let {
@@ -138,7 +150,12 @@ class NowPlayingView : MaterialCardView {
       return true
     }
 
-    override fun onScroll(firstMotionEvent: MotionEvent, secondMotionEvent: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
+    override fun onScroll(
+      firstMotionEvent: MotionEvent,
+      secondMotionEvent: MotionEvent,
+      distanceX: Float,
+      distanceY: Float
+    ): Boolean {
       isScrolling = true
 
       layoutParams.let {
@@ -146,10 +163,10 @@ class NowPlayingView : MaterialCardView {
         val progress = (newHeight - minHeight) / (maxHeight - minHeight)
         val newMargin = maxMargin - (maxMargin * progress)
 
-        (layoutParams as? MarginLayoutParams)?.let {
-          it.marginStart = newMargin.toInt()
-          it.marginEnd = newMargin.toInt()
-          it.bottomMargin = newMargin.toInt()
+        (layoutParams as? MarginLayoutParams)?.let { params ->
+          params.marginStart = newMargin.toInt()
+          params.marginEnd = newMargin.toInt()
+          params.bottomMargin = newMargin.toInt()
         }
 
         layoutParams = layoutParams.apply {
@@ -166,9 +183,9 @@ class NowPlayingView : MaterialCardView {
           }
         }
 
-        summary.alpha = 1f - progress
+        binding.summary.alpha = 1f - progress
 
-        summary.layoutParams = summary.layoutParams.apply {
+        binding.summary.layoutParams = binding.summary.layoutParams.apply {
           height = (minHeight * (1f - progress)).toInt()
         }
       }
@@ -223,9 +240,9 @@ class NowPlayingView : MaterialCardView {
 
             height = newHeight
 
-            summary.alpha = 1f - progress
+            binding.summary.alpha = 1f - progress
 
-            summary.layoutParams = summary.layoutParams.apply {
+            binding.summary.layoutParams = binding.summary.layoutParams.apply {
               height = (minHeight * (1f - progress)).toInt()
             }
           }

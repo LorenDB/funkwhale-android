@@ -4,36 +4,38 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import audio.funkwhale.ffa.adapters.DownloadsAdapter
+import audio.funkwhale.ffa.databinding.ActivityDownloadsBinding
+import audio.funkwhale.ffa.utils.Event
+import audio.funkwhale.ffa.utils.EventBus
+import audio.funkwhale.ffa.utils.getMetadata
 import com.google.android.exoplayer2.offline.Download
-import kotlinx.android.synthetic.main.activity_downloads.downloads
 import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import audio.funkwhale.ffa.FFA
-import audio.funkwhale.ffa.R
-import audio.funkwhale.ffa.adapters.DownloadsAdapter
-import audio.funkwhale.ffa.utils.Event
-import audio.funkwhale.ffa.utils.EventBus
-import audio.funkwhale.ffa.utils.getMetadata
 
 class DownloadsActivity : AppCompatActivity() {
-  lateinit var adapter: DownloadsAdapter
+
+  private lateinit var adapter: DownloadsAdapter
+  private lateinit var binding: ActivityDownloadsBinding
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    setContentView(R.layout.activity_downloads)
+    binding = ActivityDownloadsBinding.inflate(layoutInflater)
 
-    downloads.itemAnimator = null
+    setContentView(binding.root)
 
-    adapter = DownloadsAdapter(this, DownloadChangedListener()).also {
+    binding.downloads.itemAnimator = null
+
+    adapter = DownloadsAdapter(layoutInflater, this, DownloadChangedListener()).also {
       it.setHasStableIds(true)
 
-      downloads.layoutManager = LinearLayoutManager(this)
-      downloads.adapter = it
+      binding.downloads.layoutManager = LinearLayoutManager(this)
+      binding.downloads.adapter = it
     }
 
     lifecycleScope.launch(Default) {
@@ -80,17 +82,18 @@ class DownloadsActivity : AppCompatActivity() {
 
   private suspend fun refreshTrack(download: Download) {
     download.getMetadata()?.let { info ->
-      adapter.downloads.withIndex().associate { it.value to it.index }.filter { it.key.id == info.id }.toList().getOrNull(0)?.let { match ->
-        if (download.state != info.download?.state) {
-          withContext(Main) {
-            adapter.downloads[match.second] = info.apply {
-              this.download = download
-            }
+      adapter.downloads.withIndex().associate { it.value to it.index }
+        .filter { it.key.id == info.id }.toList().getOrNull(0)?.let { match ->
+          if (download.state != info.download?.state) {
+            withContext(Main) {
+              adapter.downloads[match.second] = info.apply {
+                this.download = download
+              }
 
-            adapter.notifyItemChanged(match.second)
+              adapter.notifyItemChanged(match.second)
+            }
           }
         }
-      }
     }
   }
 
@@ -101,17 +104,18 @@ class DownloadsActivity : AppCompatActivity() {
       val download = cursor.download
 
       download.getMetadata()?.let { info ->
-        adapter.downloads.withIndex().associate { it.value to it.index }.filter { it.key.id == info.id }.toList().getOrNull(0)?.let { match ->
-          if (download.state == Download.STATE_DOWNLOADING && download.percentDownloaded != info.download?.percentDownloaded ?: 0) {
-            withContext(Main) {
-              adapter.downloads[match.second] = info.apply {
-                this.download = download
-              }
+        adapter.downloads.withIndex().associate { it.value to it.index }
+          .filter { it.key.id == info.id }.toList().getOrNull(0)?.let { match ->
+            if (download.state == Download.STATE_DOWNLOADING && download.percentDownloaded != info.download?.percentDownloaded ?: 0) {
+              withContext(Main) {
+                adapter.downloads[match.second] = info.apply {
+                  this.download = download
+                }
 
-              adapter.notifyItemChanged(match.second)
+                adapter.notifyItemChanged(match.second)
+              }
             }
           }
-        }
       }
     }
   }

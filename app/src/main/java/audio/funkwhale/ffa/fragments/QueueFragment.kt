@@ -10,19 +10,27 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.adapters.TracksAdapter
+import audio.funkwhale.ffa.databinding.FragmentQueueBinding
 import audio.funkwhale.ffa.repositories.FavoritesRepository
-import audio.funkwhale.ffa.utils.*
+import audio.funkwhale.ffa.utils.Command
+import audio.funkwhale.ffa.utils.CommandBus
+import audio.funkwhale.ffa.utils.Event
+import audio.funkwhale.ffa.utils.EventBus
+import audio.funkwhale.ffa.utils.Request
+import audio.funkwhale.ffa.utils.RequestBus
+import audio.funkwhale.ffa.utils.Response
+import audio.funkwhale.ffa.utils.wait
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import kotlinx.android.synthetic.main.fragment_queue.*
-import kotlinx.android.synthetic.main.fragment_queue.view.*
-import kotlinx.android.synthetic.main.partial_queue.*
-import kotlinx.android.synthetic.main.partial_queue.view.*
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class QueueFragment : BottomSheetDialogFragment() {
+
+  private var _binding: FragmentQueueBinding? = null
+  private val binding get() = _binding!!
+
   private var adapter: TracksAdapter? = null
 
   lateinit var favoritesRepository: FavoritesRepository
@@ -47,32 +55,42 @@ class QueueFragment : BottomSheetDialogFragment() {
     }
   }
 
-  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-    return inflater.inflate(R.layout.fragment_queue, container, false).apply {
-      adapter = TracksAdapter(context, FavoriteListener(), fromQueue = true).also {
-        included.queue.layoutManager = LinearLayoutManager(context)
-        included.queue.adapter = it
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View {
+    _binding = FragmentQueueBinding.inflate(inflater)
+    return binding.root.apply {
+      adapter = TracksAdapter(layoutInflater, context, FavoriteListener(), fromQueue = true).also {
+        binding.included.queue.layoutManager = LinearLayoutManager(context)
+        binding.included.queue.adapter = it
       }
     }
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
   }
 
   override fun onResume() {
     super.onResume()
 
-    included.queue?.visibility = View.GONE
-    placeholder?.visibility = View.VISIBLE
+    binding.included.queue.visibility = View.GONE
+    binding.included.placeholder?.visibility = View.VISIBLE
 
-    queue_shuffle.setOnClickListener {
+    binding.included.queueShuffle.setOnClickListener {
       CommandBus.send(Command.ShuffleQueue)
     }
 
-    queue_save.setOnClickListener {
+    binding.included.queueSave.setOnClickListener {
       adapter?.data?.let {
         CommandBus.send(Command.AddToPlaylist(it))
       }
     }
 
-    queue_clear.setOnClickListener {
+    binding.included.queueClear.setOnClickListener {
       CommandBus.send(Command.ClearQueue)
     }
 
@@ -82,17 +100,17 @@ class QueueFragment : BottomSheetDialogFragment() {
   private fun refresh() {
     lifecycleScope.launch(Main) {
       RequestBus.send(Request.GetQueue).wait<Response.Queue>()?.let { response ->
-        included?.let { included ->
+        binding.included.let { included ->
           adapter?.let {
             it.data = response.queue.toMutableList()
             it.notifyDataSetChanged()
 
             if (it.data.isEmpty()) {
-              included.queue?.visibility = View.GONE
-              placeholder?.visibility = View.VISIBLE
+              included.queue.visibility = View.GONE
+              binding.included.placeholder.visibility = View.VISIBLE
             } else {
-              included.queue?.visibility = View.VISIBLE
-              placeholder?.visibility = View.GONE
+              included.queue.visibility = View.VISIBLE
+              binding.included.placeholder.visibility = View.GONE
             }
           }
         }
