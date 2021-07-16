@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.doOnLayout
 import androidx.lifecycle.lifecycleScope
 import audio.funkwhale.ffa.R
+import audio.funkwhale.ffa.databinding.ActivityLoginBinding
 import audio.funkwhale.ffa.fragments.LoginDialog
 import audio.funkwhale.ffa.utils.AppContext
 import audio.funkwhale.ffa.utils.Userinfo
@@ -19,17 +20,21 @@ import com.github.kittinunf.fuel.gson.gsonDeserializerOf
 import com.github.kittinunf.result.Result
 import com.google.gson.Gson
 import com.preference.PowerPreference
-import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 
 data class FwCredentials(val token: String, val non_field_errors: List<String>?)
 
 class LoginActivity : AppCompatActivity() {
+
+  private lateinit var binding: ActivityLoginBinding
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    setContentView(R.layout.activity_login)
+    binding = ActivityLoginBinding.inflate(layoutInflater)
+
+    setContentView(binding.root)
 
     limitContainerWidth()
   }
@@ -37,40 +42,40 @@ class LoginActivity : AppCompatActivity() {
   override fun onResume() {
     super.onResume()
 
-    anonymous?.setOnCheckedChangeListener { _, isChecked ->
+    binding.anonymous.setOnCheckedChangeListener { _, isChecked ->
       val state = when (isChecked) {
         true -> View.GONE
         false -> View.VISIBLE
       }
 
-      username_field.visibility = state
-      password_field.visibility = state
+      binding.usernameField.visibility = state
+      binding.passwordField.visibility = state
     }
 
-    login?.setOnClickListener {
-      var hostname = hostname.text.toString().trim()
-      val username = username.text.toString()
-      val password = password.text.toString()
+    binding.login?.setOnClickListener {
+      var hostname = binding.hostname.text.toString().trim()
+      val username = binding.username.text.toString()
+      val password = binding.password.text.toString()
 
       try {
         if (hostname.isEmpty()) throw Exception(getString(R.string.login_error_hostname))
 
         Uri.parse(hostname).apply {
-          if (!cleartext.isChecked && scheme == "http") {
+          if (!binding.cleartext.isChecked && scheme == "http") {
             throw Exception(getString(R.string.login_error_hostname_https))
           }
 
           if (scheme == null) {
-            hostname = when (cleartext.isChecked) {
+            hostname = when (binding.cleartext.isChecked) {
               true -> "http://$hostname"
               false -> "https://$hostname"
             }
           }
         }
 
-        hostname_field.error = ""
+        binding.hostnameField.error = ""
 
-        when (anonymous.isChecked) {
+        when (binding.anonymous.isChecked) {
           false -> authedLogin(hostname, username, password)
           true -> anonymousLogin(hostname)
         }
@@ -79,7 +84,7 @@ class LoginActivity : AppCompatActivity() {
           if (e.message?.isEmpty() == true) getString(R.string.login_error_hostname)
           else e.message
 
-        hostname_field.error = message
+        binding.hostnameField.error = message
       }
     }
   }
@@ -130,13 +135,13 @@ class LoginActivity : AppCompatActivity() {
 
             val error = Gson().fromJson(String(response.data), FwCredentials::class.java)
 
-            hostname_field.error = null
-            username_field.error = null
+            binding.hostnameField.error = null
+            binding.usernameField.error = null
 
             if (error != null && error.non_field_errors?.isNotEmpty() == true) {
-              username_field.error = error.non_field_errors[0]
+              binding.usernameField.error = error.non_field_errors[0]
             } else {
-              hostname_field.error = result.error.localizedMessage
+              binding.hostnameField.error = result.error.localizedMessage
             }
           }
         }
@@ -147,7 +152,7 @@ class LoginActivity : AppCompatActivity() {
           if (e.message?.isEmpty() == true) getString(R.string.login_error_hostname)
           else e.message
 
-        hostname_field.error = message
+        binding.hostnameField.error = message
       }
     }
   }
@@ -177,7 +182,7 @@ class LoginActivity : AppCompatActivity() {
           is Result.Failure -> {
             dialog.dismiss()
 
-            hostname_field.error = result.error.localizedMessage
+            binding.hostnameField.error = result.error.localizedMessage
           }
         }
       } catch (e: Exception) {
@@ -187,20 +192,20 @@ class LoginActivity : AppCompatActivity() {
           if (e.message?.isEmpty() == true) getString(R.string.login_error_hostname)
           else e.message
 
-        hostname_field.error = message
+        binding.hostnameField.error = message
       }
     }
   }
 
   private fun limitContainerWidth() {
-    container.doOnLayout {
-      if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE && container.width >= 1440) {
-        container.layoutParams.width = 1440
+    binding.container.doOnLayout {
+      if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE && binding.container.width >= 1440) {
+        binding.container.layoutParams.width = 1440
       } else {
-        container.layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
+        binding.container.layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
       }
 
-      container.requestLayout()
+      binding.container.requestLayout()
     }
   }
 }

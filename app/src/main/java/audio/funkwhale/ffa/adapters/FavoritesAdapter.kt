@@ -11,17 +11,30 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import audio.funkwhale.ffa.R
-import audio.funkwhale.ffa.fragments.OtterAdapter
-import audio.funkwhale.ffa.utils.*
+import audio.funkwhale.ffa.databinding.RowTrackBinding
+import audio.funkwhale.ffa.fragments.FFAAdapter
+import audio.funkwhale.ffa.utils.Command
+import audio.funkwhale.ffa.utils.CommandBus
+import audio.funkwhale.ffa.utils.Track
+import audio.funkwhale.ffa.utils.maybeLoad
+import audio.funkwhale.ffa.utils.maybeNormalizeUrl
+import audio.funkwhale.ffa.utils.toast
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
-import kotlinx.android.synthetic.main.row_track.view.*
-import java.util.*
+import java.util.Collections
 
-class FavoritesAdapter(private val context: Context?, private val favoriteListener: OnFavoriteListener, val fromQueue: Boolean = false) : OtterAdapter<Track, FavoritesAdapter.ViewHolder>() {
+class FavoritesAdapter(
+  private val layoutInflater: LayoutInflater,
+  private val context: Context?,
+  private val favoriteListener: OnFavoriteListener,
+  val fromQueue: Boolean = false
+) : FFAAdapter<Track, FavoritesAdapter.ViewHolder>() {
+
   interface OnFavoriteListener {
     fun onToggleFavorite(id: Int, state: Boolean)
   }
+
+  private lateinit var binding: RowTrackBinding
 
   var currentTrack: Track? = null
 
@@ -32,10 +45,11 @@ class FavoritesAdapter(private val context: Context?, private val favoriteListen
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-    val view = LayoutInflater.from(context).inflate(R.layout.row_track, parent, false)
 
-    return ViewHolder(view, context).also {
-      view.setOnClickListener(it)
+    binding = RowTrackBinding.inflate(layoutInflater, parent, false)
+
+    return ViewHolder(binding, context).also {
+      binding.root.setOnClickListener(it)
     }
   }
 
@@ -76,13 +90,15 @@ class FavoritesAdapter(private val context: Context?, private val favoriteListen
 
       if (favorite.cached && !favorite.downloaded) {
         holder.title.compoundDrawables.forEach {
-          it?.colorFilter = PorterDuffColorFilter(context.getColor(R.color.cached), PorterDuff.Mode.SRC_IN)
+          it?.colorFilter =
+            PorterDuffColorFilter(context.getColor(R.color.cached), PorterDuff.Mode.SRC_IN)
         }
       }
 
       if (favorite.downloaded) {
         holder.title.compoundDrawables.forEach {
-          it?.colorFilter = PorterDuffColorFilter(context.getColor(R.color.downloaded), PorterDuff.Mode.SRC_IN)
+          it?.colorFilter =
+            PorterDuffColorFilter(context.getColor(R.color.downloaded), PorterDuff.Mode.SRC_IN)
         }
       }
 
@@ -131,13 +147,15 @@ class FavoritesAdapter(private val context: Context?, private val favoriteListen
     CommandBus.send(Command.MoveFromQueue(oldPosition, newPosition))
   }
 
-  inner class ViewHolder(view: View, val context: Context?) : RecyclerView.ViewHolder(view), View.OnClickListener {
-    val cover = view.cover
-    val title = view.title
-    val artist = view.artist
+  inner class ViewHolder(binding: RowTrackBinding, val context: Context?) :
+    RecyclerView.ViewHolder(binding.root),
+    View.OnClickListener {
+    val cover = binding.cover
+    val title = binding.title
+    val artist = binding.artist
 
-    val favorite = view.favorite
-    val actions = view.actions
+    val favorite = binding.favorite
+    val actions = binding.actions
 
     override fun onClick(view: View?) {
       when (fromQueue) {

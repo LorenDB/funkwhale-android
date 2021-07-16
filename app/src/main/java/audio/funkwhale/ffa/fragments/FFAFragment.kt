@@ -1,19 +1,17 @@
 package audio.funkwhale.ffa.fragments
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import audio.funkwhale.ffa.repositories.HttpUpstream
 import audio.funkwhale.ffa.repositories.Repository
 import audio.funkwhale.ffa.utils.*
 import com.google.gson.Gson
-import kotlinx.android.synthetic.main.fragment_artists.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.Job
@@ -21,7 +19,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-abstract class OtterAdapter<D, VH : RecyclerView.ViewHolder> : RecyclerView.Adapter<VH>() {
+abstract class FFAAdapter<D, VH : RecyclerView.ViewHolder> : RecyclerView.Adapter<VH>() {
   var data: MutableList<D> = mutableListOf()
 
   init {
@@ -31,25 +29,21 @@ abstract class OtterAdapter<D, VH : RecyclerView.ViewHolder> : RecyclerView.Adap
   abstract override fun getItemId(position: Int): Long
 }
 
-abstract class OtterFragment<D : Any, A : OtterAdapter<D, *>> : Fragment() {
+abstract class FFAFragment<D : Any, A : FFAAdapter<D, *>>() : Fragment() {
   companion object {
     const val OFFSCREEN_PAGES = 20
   }
 
-  abstract val viewRes: Int
   abstract val recycler: RecyclerView
   open val layoutManager: RecyclerView.LayoutManager get() = LinearLayoutManager(context)
   open val alwaysRefresh = true
 
   lateinit var repository: Repository<D, *>
   lateinit var adapter: A
+  lateinit var swiper: SwipeRefreshLayout
 
   private var moreLoading = false
   private var listener: Job? = null
-
-  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-    return inflater.inflate(viewRes, container, false)
-  }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
@@ -77,7 +71,8 @@ abstract class OtterFragment<D : Any, A : OtterAdapter<D, *>> : Fragment() {
         EventBus.get().collect { event ->
           if (event is Event.ListingsChanged) {
             withContext(Main) {
-              swiper?.isRefreshing = true
+
+              swiper.isRefreshing = true
               fetch(Repository.Origin.Network.origin)
             }
           }
@@ -95,13 +90,13 @@ abstract class OtterFragment<D : Any, A : OtterAdapter<D, *>> : Fragment() {
   override fun onResume() {
     super.onResume()
 
-    swiper?.setOnRefreshListener {
+    swiper.setOnRefreshListener {
       fetch(Repository.Origin.Network.origin)
     }
   }
 
   fun update() {
-    swiper?.isRefreshing = true
+    swiper.isRefreshing = true
     fetch(Repository.Origin.Network.origin)
   }
 
@@ -112,82 +107,84 @@ abstract class OtterFragment<D : Any, A : OtterAdapter<D, *>> : Fragment() {
 
     if (!moreLoading && upstreams == Repository.Origin.Network.origin) {
       lifecycleScope.launch(Main) {
-        swiper?.isRefreshing = true
+        swiper.isRefreshing = true
       }
     }
 
     moreLoading = true
 
-    repository.fetch(upstreams, size).untilNetwork(lifecycleScope, IO) { data, isCache, _, hasMore ->
-      if (isCache && data.isEmpty()) {
-        moreLoading = false
-
-        return@untilNetwork fetch(Repository.Origin.Network.origin)
-      }
-
-      lifecycleScope.launch(Main) {
-        if (isCache) {
+    repository.fetch(upstreams, size)
+      .untilNetwork(lifecycleScope, IO) { data, isCache, _, hasMore ->
+        if (isCache && data.isEmpty()) {
           moreLoading = false
 
-          adapter.data = data.toMutableList()
-          adapter.notifyDataSetChanged()
-
-          return@launch
+          return@untilNetwork fetch(Repository.Origin.Network.origin)
         }
 
-        if (first) {
-          adapter.data.clear()
-        }
+        lifecycleScope.launch(Main) {
+          if (isCache) {
+            moreLoading = false
 
-        onDataFetched(data)
+            adapter.data = data.toMutableList()
+            adapter.notifyDataSetChanged()
 
-        adapter.data.addAll(data)
-
-        withContext(IO) {
-          try {
-            repository.cacheId?.let { cacheId ->
-              Cache.set(
-                context,
-                cacheId,
-                Gson().toJson(repository.cache(adapter.data)).toByteArray()
-              )
-            }
-          } catch (e: ConcurrentModificationException) {
+            return@launch
           }
-        }
 
-        if (hasMore) {
-          (repository.upstream as? HttpUpstream<*, *>)?.let { upstream ->
-            if (!isCache && upstream.behavior == HttpUpstream.Behavior.Progressive) {
-              if (first || needsMoreOffscreenPages()) {
-                fetch(Repository.Origin.Network.origin, adapter.data.size)
+          if (first) {
+            adapter.data.clear()
+          }
+
+          onDataFetched(data)
+
+          adapter.data.addAll(data)
+
+          withContext(IO) {
+            try {
+              repository.cacheId?.let { cacheId ->
+                Cache.set(
+                  context,
+                  cacheId,
+                  Gson().toJson(repository.cache(adapter.data)).toByteArray()
+                )
+              }
+            } catch (e: ConcurrentModificationException) {
+            }
+          }
+
+          if (hasMore) {
+            (repository.upstream as? HttpUpstream<*, *>)?.let { upstream ->
+              if (!isCache && upstream.behavior == HttpUpstream.Behavior.Progressive) {
+                if (first || needsMoreOffscreenPages()) {
+                  fetch(Repository.Origin.Network.origin, adapter.data.size)
+                } else {
+                  moreLoading = false
+                }
               } else {
                 moreLoading = false
               }
-            } else {
-              moreLoading = false
             }
           }
-        }
 
-        (repository.upstream as? HttpUpstream<*, *>)?.let { upstream ->
-          when (upstream.behavior) {
-            HttpUpstream.Behavior.Progressive -> if (!hasMore || !moreLoading) swiper?.isRefreshing = false
-            HttpUpstream.Behavior.AtOnce -> if (!hasMore) swiper?.isRefreshing = false
-            HttpUpstream.Behavior.Single -> if (!hasMore) swiper?.isRefreshing = false
-          }
-        }
-
-        when (first) {
-          true -> {
-            adapter.notifyDataSetChanged()
-            first = false
+          (repository.upstream as? HttpUpstream<*, *>)?.let { upstream ->
+            when (upstream.behavior) {
+              HttpUpstream.Behavior.Progressive -> if (!hasMore || !moreLoading) swiper?.isRefreshing =
+                false
+              HttpUpstream.Behavior.AtOnce -> if (!hasMore) swiper.isRefreshing = false
+              HttpUpstream.Behavior.Single -> if (!hasMore) swiper.isRefreshing = false
+            }
           }
 
-          false -> adapter.notifyItemRangeInserted(adapter.data.size, data.size)
+          when (first) {
+            true -> {
+              adapter.notifyDataSetChanged()
+              first = false
+            }
+
+            false -> adapter.notifyItemRangeInserted(adapter.data.size, data.size)
+          }
         }
       }
-    }
   }
 
   private fun needsMoreOffscreenPages(): Boolean {

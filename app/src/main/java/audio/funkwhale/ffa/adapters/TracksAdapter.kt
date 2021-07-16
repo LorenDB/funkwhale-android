@@ -2,26 +2,44 @@ package audio.funkwhale.ffa.adapters
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.*
+import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.ColorDrawable
-import android.view.*
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import audio.funkwhale.ffa.R
-import audio.funkwhale.ffa.fragments.OtterAdapter
-import audio.funkwhale.ffa.utils.*
+import audio.funkwhale.ffa.databinding.RowTrackBinding
+import audio.funkwhale.ffa.fragments.FFAAdapter
+import audio.funkwhale.ffa.utils.Command
+import audio.funkwhale.ffa.utils.CommandBus
+import audio.funkwhale.ffa.utils.Track
+import audio.funkwhale.ffa.utils.maybeLoad
+import audio.funkwhale.ffa.utils.maybeNormalizeUrl
+import audio.funkwhale.ffa.utils.toast
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
-import kotlinx.android.synthetic.main.row_track.view.*
-import java.util.*
+import java.util.Collections
 
-class TracksAdapter(private val context: Context?, private val favoriteListener: OnFavoriteListener? = null, val fromQueue: Boolean = false) : OtterAdapter<Track, TracksAdapter.ViewHolder>() {
+class TracksAdapter(
+  private val layoutInflater: LayoutInflater,
+  private val context: Context?,
+  private val favoriteListener: OnFavoriteListener? = null,
+  val fromQueue: Boolean = false
+) : FFAAdapter<Track, TracksAdapter.ViewHolder>() {
+
   interface OnFavoriteListener {
     fun onToggleFavorite(id: Int, state: Boolean)
   }
 
+  private lateinit var binding: RowTrackBinding
   private lateinit var touchHelper: ItemTouchHelper
 
   var currentTrack: Track? = null
@@ -41,10 +59,11 @@ class TracksAdapter(private val context: Context?, private val favoriteListener:
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-    val view = LayoutInflater.from(context).inflate(R.layout.row_track, parent, false)
 
-    return ViewHolder(view, context).also {
-      view.setOnClickListener(it)
+    binding = RowTrackBinding.inflate(layoutInflater, parent, false)
+
+    return ViewHolder(binding, context).also {
+      binding.root.setOnClickListener(it)
     }
   }
 
@@ -94,13 +113,15 @@ class TracksAdapter(private val context: Context?, private val favoriteListener:
 
       if (track.cached && !track.downloaded) {
         holder.title.compoundDrawables.forEach {
-          it?.colorFilter = PorterDuffColorFilter(context.getColor(R.color.cached), PorterDuff.Mode.SRC_IN)
+          it?.colorFilter =
+            PorterDuffColorFilter(context.getColor(R.color.cached), PorterDuff.Mode.SRC_IN)
         }
       }
 
       if (track.downloaded) {
         holder.title.compoundDrawables.forEach {
-          it?.colorFilter = PorterDuffColorFilter(context.getColor(R.color.downloaded), PorterDuff.Mode.SRC_IN)
+          it?.colorFilter =
+            PorterDuffColorFilter(context.getColor(R.color.downloaded), PorterDuff.Mode.SRC_IN)
         }
       }
     }
@@ -154,14 +175,17 @@ class TracksAdapter(private val context: Context?, private val favoriteListener:
     notifyItemMoved(oldPosition, newPosition)
   }
 
-  inner class ViewHolder(view: View, val context: Context?) : RecyclerView.ViewHolder(view), View.OnClickListener {
-    val handle = view.handle
-    val cover = view.cover
-    val title = view.title
-    val artist = view.artist
+  inner class ViewHolder(binding: RowTrackBinding, val context: Context?) :
+    RecyclerView.ViewHolder(binding.root),
+    View.OnClickListener {
 
-    val favorite = view.favorite
-    val actions = view.actions
+    val handle = binding.handle
+    val cover = binding.cover
+    val title = binding.title
+    val artist = binding.artist
+
+    val favorite = binding.favorite
+    val actions = binding.actions
 
     override fun onClick(view: View?) {
       when (fromQueue) {
@@ -188,10 +212,14 @@ class TracksAdapter(private val context: Context?, private val favoriteListener:
     override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) =
       makeMovementFlags(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0)
 
-    override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-      to = target.adapterPosition
+    override fun onMove(
+      recyclerView: RecyclerView,
+      viewHolder: RecyclerView.ViewHolder,
+      target: RecyclerView.ViewHolder
+    ): Boolean {
+      to = target.absoluteAdapterPosition
 
-      onItemMove(viewHolder.adapterPosition, to)
+      onItemMove(viewHolder.absoluteAdapterPosition, to)
 
       return true
     }

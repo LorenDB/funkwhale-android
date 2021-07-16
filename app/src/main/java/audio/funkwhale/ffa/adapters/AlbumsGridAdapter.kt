@@ -1,20 +1,25 @@
 package audio.funkwhale.ffa.adapters
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import audio.funkwhale.ffa.R
-import audio.funkwhale.ffa.fragments.OtterAdapter
+import audio.funkwhale.ffa.databinding.RowAlbumGridBinding
+import audio.funkwhale.ffa.fragments.FFAAdapter
 import audio.funkwhale.ffa.utils.Album
 import audio.funkwhale.ffa.utils.maybeLoad
 import audio.funkwhale.ffa.utils.maybeNormalizeUrl
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
-import kotlinx.android.synthetic.main.row_album_grid.view.*
 
-class AlbumsGridAdapter(val context: Context?, private val listener: OnAlbumClickListener) : OtterAdapter<Album, AlbumsGridAdapter.ViewHolder>() {
+class AlbumsGridAdapter(
+  private val layoutInflater: LayoutInflater,
+  private val listener: OnAlbumClickListener
+) : FFAAdapter<Album, AlbumsGridAdapter.ViewHolder>() {
+
+  private lateinit var binding: RowAlbumGridBinding
+
   interface OnAlbumClickListener {
     fun onClick(view: View?, album: Album)
   }
@@ -24,10 +29,11 @@ class AlbumsGridAdapter(val context: Context?, private val listener: OnAlbumClic
   override fun getItemCount() = data.size
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-    val view = LayoutInflater.from(context).inflate(R.layout.row_album_grid, parent, false)
 
-    return ViewHolder(view, listener).also {
-      view.setOnClickListener(it)
+    binding = RowAlbumGridBinding.inflate(layoutInflater, parent, false)
+
+    return ViewHolder(binding, listener).also {
+      binding.root.setOnClickListener(it)
     }
   }
 
@@ -44,9 +50,10 @@ class AlbumsGridAdapter(val context: Context?, private val listener: OnAlbumClic
     holder.title.text = album.title
   }
 
-  inner class ViewHolder(view: View, private val listener: OnAlbumClickListener) : RecyclerView.ViewHolder(view), View.OnClickListener {
-    val cover = view.cover
-    val title = view.title
+  inner class ViewHolder(binding: RowAlbumGridBinding, private val listener: OnAlbumClickListener) :
+    RecyclerView.ViewHolder(binding.root), View.OnClickListener {
+    val cover = binding.cover
+    val title = binding.title
 
     override fun onClick(view: View?) {
       listener.onClick(view, data[layoutPosition])

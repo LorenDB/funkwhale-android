@@ -7,16 +7,25 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.adapters.TracksAdapter
-import audio.funkwhale.ffa.utils.*
-import kotlinx.android.synthetic.main.partial_queue.*
-import kotlinx.android.synthetic.main.partial_queue.view.*
+import audio.funkwhale.ffa.databinding.PartialQueueBinding
+import audio.funkwhale.ffa.utils.Command
+import audio.funkwhale.ffa.utils.CommandBus
+import audio.funkwhale.ffa.utils.Event
+import audio.funkwhale.ffa.utils.EventBus
+import audio.funkwhale.ffa.utils.Request
+import audio.funkwhale.ffa.utils.RequestBus
+import audio.funkwhale.ffa.utils.Response
+import audio.funkwhale.ffa.utils.wait
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class LandscapeQueueFragment : Fragment() {
+
+  private var _binding: PartialQueueBinding? = null
+  private val binding get() = _binding!!
+
   private var adapter: TracksAdapter? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,32 +34,42 @@ class LandscapeQueueFragment : Fragment() {
     watchEventBus()
   }
 
-  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-    return inflater.inflate(R.layout.partial_queue, container, false).apply {
-      adapter = TracksAdapter(context, fromQueue = true).also {
-        queue.layoutManager = LinearLayoutManager(context)
-        queue.adapter = it
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View {
+    _binding = PartialQueueBinding.inflate(inflater)
+    return binding.root.apply {
+      adapter = TracksAdapter(layoutInflater, context, fromQueue = true).also {
+        binding.queue.layoutManager = LinearLayoutManager(context)
+        binding.queue.adapter = it
       }
     }
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
   }
 
   override fun onResume() {
     super.onResume()
 
-    queue?.visibility = View.GONE
-    placeholder?.visibility = View.VISIBLE
+    binding.queue.visibility = View.GONE
+    binding.placeholder.visibility = View.VISIBLE
 
-    queue_shuffle.setOnClickListener {
+    binding.queueShuffle.setOnClickListener {
       CommandBus.send(Command.ShuffleQueue)
     }
 
-    queue_save.setOnClickListener {
+    binding.queueSave.setOnClickListener {
       adapter?.data?.let {
         CommandBus.send(Command.AddToPlaylist(it))
       }
     }
 
-    queue_clear.setOnClickListener {
+    binding.queueClear.setOnClickListener {
       CommandBus.send(Command.ClearQueue)
     }
 
@@ -65,11 +84,11 @@ class LandscapeQueueFragment : Fragment() {
           it.notifyDataSetChanged()
 
           if (it.data.isEmpty()) {
-            queue?.visibility = View.GONE
-            placeholder?.visibility = View.VISIBLE
+            binding.queue.visibility = View.GONE
+            binding.placeholder.visibility = View.VISIBLE
           } else {
-            queue?.visibility = View.VISIBLE
-            placeholder?.visibility = View.GONE
+            binding.queue.visibility = View.VISIBLE
+            binding.placeholder.visibility = View.GONE
           }
         }
       }

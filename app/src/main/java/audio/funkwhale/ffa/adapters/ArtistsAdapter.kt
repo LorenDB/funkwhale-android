@@ -6,15 +6,22 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import audio.funkwhale.ffa.R
-import audio.funkwhale.ffa.fragments.OtterAdapter
+import audio.funkwhale.ffa.databinding.RowArtistBinding
+import audio.funkwhale.ffa.fragments.FFAAdapter
 import audio.funkwhale.ffa.utils.Artist
 import audio.funkwhale.ffa.utils.maybeLoad
 import audio.funkwhale.ffa.utils.maybeNormalizeUrl
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
-import kotlinx.android.synthetic.main.row_artist.view.*
 
-class ArtistsAdapter(val context: Context?, private val listener: OnArtistClickListener) : OtterAdapter<Artist, ArtistsAdapter.ViewHolder>() {
+class ArtistsAdapter(
+  private val layoutInflater: LayoutInflater,
+  private val context: Context?,
+  private val listener: OnArtistClickListener
+) : FFAAdapter<Artist, ArtistsAdapter.ViewHolder>() {
+
+  private lateinit var binding: RowArtistBinding
+
   private var active: List<Artist> = mutableListOf()
 
   interface OnArtistClickListener {
@@ -42,10 +49,11 @@ class ArtistsAdapter(val context: Context?, private val listener: OnArtistClickL
   override fun getItemId(position: Int) = active[position].id.toLong()
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-    val view = LayoutInflater.from(context).inflate(R.layout.row_artist, parent, false)
 
-    return ViewHolder(view, listener).also {
-      view.setOnClickListener(it)
+    binding = RowArtistBinding.inflate(layoutInflater, parent, false)
+
+    return ViewHolder(binding, listener).also {
+      binding.root.setOnClickListener(it)
     }
   }
 
@@ -66,15 +74,22 @@ class ArtistsAdapter(val context: Context?, private val listener: OnArtistClickL
 
     artist.albums?.let {
       context?.let {
-        holder.albums.text = context.resources.getQuantityString(R.plurals.album_count, artist.albums.size, artist.albums.size)
+        holder.albums.text = context.resources.getQuantityString(
+          R.plurals.album_count,
+          artist.albums.size,
+          artist.albums.size
+        )
       }
     }
   }
 
-  inner class ViewHolder(view: View, private val listener: OnArtistClickListener) : RecyclerView.ViewHolder(view), View.OnClickListener {
-    val art = view.art
-    val name = view.name
-    val albums = view.albums
+  inner class ViewHolder(binding: RowArtistBinding, private val listener: OnArtistClickListener) :
+    RecyclerView.ViewHolder(binding.root),
+    View.OnClickListener {
+
+    val art = binding.art
+    val name = binding.name
+    val albums = binding.albums
 
     override fun onClick(view: View?) {
       listener.onClick(view, active[layoutPosition])

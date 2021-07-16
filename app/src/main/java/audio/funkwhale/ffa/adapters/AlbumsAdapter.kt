@@ -5,30 +5,36 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import audio.funkwhale.ffa.R
-import audio.funkwhale.ffa.fragments.OtterAdapter
+import audio.funkwhale.ffa.databinding.RowAlbumBinding
+import audio.funkwhale.ffa.fragments.FFAAdapter
 import audio.funkwhale.ffa.utils.Album
 import audio.funkwhale.ffa.utils.maybeLoad
 import audio.funkwhale.ffa.utils.maybeNormalizeUrl
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
-import kotlinx.android.synthetic.main.row_album.view.*
-import kotlinx.android.synthetic.main.row_artist.view.art
 
-class AlbumsAdapter(val context: Context?, private val listener: OnAlbumClickListener) : OtterAdapter<Album, AlbumsAdapter.ViewHolder>() {
+class AlbumsAdapter(
+  val layoutInflater: LayoutInflater,
+  val context: Context?,
+  private val listener: OnAlbumClickListener
+) : FFAAdapter<Album, AlbumsAdapter.ViewHolder>() {
+
   interface OnAlbumClickListener {
     fun onClick(view: View?, album: Album)
   }
+
+  private lateinit var binding: RowAlbumBinding
 
   override fun getItemId(position: Int): Long = data[position].id.toLong()
 
   override fun getItemCount() = data.size
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-    val view = LayoutInflater.from(context).inflate(R.layout.row_album, parent, false)
 
-    return ViewHolder(view, listener).also {
-      view.setOnClickListener(it)
+    binding = RowAlbumBinding.inflate(layoutInflater, parent, false)
+
+    return ViewHolder(binding, listener).also {
+      binding.root.setOnClickListener(it)
     }
   }
 
@@ -43,21 +49,22 @@ class AlbumsAdapter(val context: Context?, private val listener: OnAlbumClickLis
 
     holder.title.text = album.title
     holder.artist.text = album.artist.name
-    holder.release_date.visibility = View.GONE
+    holder.releaseDate.visibility = View.GONE
 
     album.release_date?.split('-')?.getOrNull(0)?.let { year ->
       if (year.isNotEmpty()) {
-        holder.release_date.visibility = View.VISIBLE
-        holder.release_date.text = year
+        holder.releaseDate.visibility = View.VISIBLE
+        holder.releaseDate.text = year
       }
     }
   }
 
-  inner class ViewHolder(view: View, private val listener: OnAlbumClickListener) : RecyclerView.ViewHolder(view), View.OnClickListener {
-    val art = view.art
-    val title = view.title
-    val artist = view.artist
-    val release_date = view.release_date
+  inner class ViewHolder(binding: RowAlbumBinding, private val listener: OnAlbumClickListener) :
+    RecyclerView.ViewHolder(binding.root), View.OnClickListener {
+    val art = binding.art
+    val title = binding.title
+    val artist = binding.artist
+    val releaseDate = binding.releaseDate
 
     override fun onClick(view: View?) {
       listener.onClick(view, data[layoutPosition])

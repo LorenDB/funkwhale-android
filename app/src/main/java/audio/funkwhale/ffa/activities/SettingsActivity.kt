@@ -1,6 +1,10 @@
 package audio.funkwhale.ffa.activities
 
-import android.content.*
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -10,18 +14,22 @@ import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SeekBarPreference
-import audio.funkwhale.ffa.BuildConfig
-import audio.funkwhale.ffa.FFA
 import audio.funkwhale.ffa.R
+import audio.funkwhale.ffa.databinding.ActivitySettingsBinding
 import audio.funkwhale.ffa.utils.Cache
 import audio.funkwhale.ffa.utils.Command
 import audio.funkwhale.ffa.utils.CommandBus
 
 class SettingsActivity : AppCompatActivity() {
+
+  private lateinit var binding: ActivitySettingsBinding
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    setContentView(R.layout.activity_settings)
+    binding = ActivitySettingsBinding.inflate(layoutInflater)
+
+    setContentView(binding.root)
 
     supportFragmentManager
       .beginTransaction()
@@ -35,7 +43,10 @@ class SettingsActivity : AppCompatActivity() {
   fun getThemeResId(): Int = R.style.AppTheme
 }
 
-class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
+class SettingsFragment :
+  PreferenceFragmentCompat(),
+  SharedPreferences.OnSharedPreferenceChangeListener {
+
   override fun onResume() {
     super.onResume()
 
@@ -68,7 +79,11 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
             Cache.get(activity, "crashdump")?.readLines()?.joinToString("\n").also {
               clip.setPrimaryClip(ClipData.newPlainText("Otter logs", it))
 
-              Toast.makeText(activity, activity.getString(R.string.settings_crash_report_copied), Toast.LENGTH_SHORT).show()
+              Toast.makeText(
+                activity,
+                activity.getString(R.string.settings_crash_report_copied),
+                Toast.LENGTH_SHORT
+              ).show()
             }
           }
         }
@@ -150,7 +165,8 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
       }
 
       preferenceManager.findPreference<Preference>("version")?.let {
-        it.summary = "${audio.funkwhale.ffa.BuildConfig.VERSION_NAME} (${audio.funkwhale.ffa.BuildConfig.VERSION_CODE})"
+        it.summary =
+          "${audio.funkwhale.ffa.BuildConfig.VERSION_NAME} (${audio.funkwhale.ffa.BuildConfig.VERSION_CODE})"
       }
     }
   }

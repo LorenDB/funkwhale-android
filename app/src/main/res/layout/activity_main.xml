@@ -27,7 +27,9 @@
         tools:alpha="1"
         tools:visibility="visible">
 
-        <include layout="@layout/partial_now_playing" />
+        <include
+            android:id="@+id/now_playing_container"
+            layout="@layout/partial_now_playing" />
 
     </audio.funkwhale.ffa.views.NowPlayingView>
 

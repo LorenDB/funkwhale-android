@@ -6,24 +6,33 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import audio.funkwhale.ffa.R
-import audio.funkwhale.ffa.fragments.OtterAdapter
+import audio.funkwhale.ffa.databinding.RowRadioBinding
+import audio.funkwhale.ffa.databinding.RowRadioHeaderBinding
+import audio.funkwhale.ffa.fragments.FFAAdapter
 import audio.funkwhale.ffa.utils.AppContext
 import audio.funkwhale.ffa.utils.Event
 import audio.funkwhale.ffa.utils.EventBus
 import audio.funkwhale.ffa.utils.Radio
 import audio.funkwhale.ffa.views.LoadingImageView
 import com.preference.PowerPreference
-import kotlinx.android.synthetic.main.row_radio.view.*
-import kotlinx.android.synthetic.main.row_radio_header.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
-class RadiosAdapter(val context: Context?, val scope: CoroutineScope, private val listener: OnRadioClickListener) : OtterAdapter<Radio, RadiosAdapter.ViewHolder>() {
+class RadiosAdapter(
+  private val layoutInflater: LayoutInflater,
+  private val context: Context?,
+  private val scope: CoroutineScope,
+  private val listener: OnRadioClickListener
+) : FFAAdapter<Radio, RadiosAdapter.ViewHolder>() {
+
   interface OnRadioClickListener {
-    fun onClick(holder: ViewHolder, radio: Radio)
+    fun onClick(holder: RowRadioViewHolder, radio: Radio)
   }
+
+  private lateinit var rowRadioBinding: RowRadioBinding
+  private lateinit var rowRadioHeaderBinding: RowRadioHeaderBinding
 
   enum class RowType {
     Header,
@@ -33,16 +42,43 @@ class RadiosAdapter(val context: Context?, val scope: CoroutineScope, private va
 
   private val instanceRadios: List<Radio> by lazy {
     context?.let {
-      return@lazy when (val username = PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).getString("actor_username")) {
+      return@lazy when (val username =
+        PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).getString("actor_username")) {
         "" -> listOf(
-          Radio(0, "random", context.getString(R.string.radio_random_title), context.getString(R.string.radio_random_description))
+          Radio(
+            0,
+            "random",
+            context.getString(R.string.radio_random_title),
+            context.getString(R.string.radio_random_description)
+          )
         )
 
         else -> listOf(
-          Radio(0, "actor_content", context.getString(R.string.radio_your_content_title), context.getString(R.string.radio_your_content_description), username),
-          Radio(0, "random", context.getString(R.string.radio_random_title), context.getString(R.string.radio_random_description)),
-          Radio(0, "favorites", context.getString(R.string.favorites), context.getString(R.string.radio_favorites_description)),
-          Radio(0, "less-listened", context.getString(R.string.radio_less_listened_title), context.getString(R.string.radio_less_listened_description))
+          Radio(
+            0,
+            "actor_content",
+            context.getString(R.string.radio_your_content_title),
+            context.getString(R.string.radio_your_content_description),
+            username
+          ),
+          Radio(
+            0,
+            "random",
+            context.getString(R.string.radio_random_title),
+            context.getString(R.string.radio_random_description)
+          ),
+          Radio(
+            0,
+            "favorites",
+            context.getString(R.string.favorites),
+            context.getString(R.string.radio_favorites_description)
+          ),
+          Radio(
+            0,
+            "less-listened",
+            context.getString(R.string.radio_less_listened_title),
+            context.getString(R.string.radio_less_listened_description)
+          )
         )
       }
     }
@@ -76,31 +112,36 @@ class RadiosAdapter(val context: Context?, val scope: CoroutineScope, private va
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RadiosAdapter.ViewHolder {
     return when (viewType) {
       RowType.InstanceRadio.ordinal, RowType.UserRadio.ordinal -> {
-        val view = LayoutInflater.from(context).inflate(R.layout.row_radio, parent, false)
+        rowRadioBinding = RowRadioBinding.inflate(layoutInflater, parent, false)
 
-        ViewHolder(view, listener).also {
-          view.setOnClickListener(it)
+        RowRadioViewHolder(rowRadioBinding, listener).also {
+          rowRadioBinding.root.setOnClickListener(it)
         }
       }
 
-      else -> ViewHolder(LayoutInflater.from(context).inflate(R.layout.row_radio_header, parent, false), null)
+      else -> {
+        rowRadioHeaderBinding = RowRadioHeaderBinding.inflate(layoutInflater, parent, false)
+        RowRadioHeaderViewHolder(rowRadioHeaderBinding)
+      }
     }
   }
 
   override fun onBindViewHolder(holder: RadiosAdapter.ViewHolder, position: Int) {
     when (getItemViewType(position)) {
       RowType.Header.ordinal -> {
+        holder as RowRadioHeaderViewHolder
         context?.let {
           when (position) {
             0 -> holder.label.text = context.getString(R.string.radio_instance_radios)
-            instanceRadios.size + 1 -> holder.label.text = context.getString(R.string.radio_user_radios)
+            instanceRadios.size + 1 -> holder.label.text =
+              context.getString(R.string.radio_user_radios)
           }
         }
       }
 
       RowType.InstanceRadio.ordinal, RowType.UserRadio.ordinal -> {
         val radio = getRadioAt(position)
-
+        holder as RowRadioViewHolder
         holder.art.visibility = View.VISIBLE
         holder.name.text = radio.name
         holder.description.text = radio.description
@@ -126,17 +167,12 @@ class RadiosAdapter(val context: Context?, val scope: CoroutineScope, private va
     }
   }
 
-  inner class ViewHolder(view: View, private val listener: OnRadioClickListener?) : RecyclerView.ViewHolder(view), View.OnClickListener {
-    val label = view.label
-    val art = view.art
-    val name = view.name
-    val description = view.description
-
-    var native = false
-
-    override fun onClick(view: View?) {
-      listener?.onClick(this, getRadioAt(layoutPosition))
-    }
+  inner class RowRadioViewHolder(binding: RowRadioBinding, val listener: OnRadioClickListener) :
+    ViewHolder(binding.root),
+    View.OnClickListener {
+    val art = binding.art
+    val name = binding.name
+    val description = binding.description
 
     fun spin() {
       context?.let {
@@ -151,7 +187,6 @@ class RadiosAdapter(val context: Context?, val scope: CoroutineScope, private va
             when (message) {
               is Event.RadioStarted -> {
                 art.colorFilter = originalColorFilter
-
                 LoadingImageView.stop(context, originalDrawable, art, imageAnimator)
               }
             }
@@ -159,5 +194,21 @@ class RadiosAdapter(val context: Context?, val scope: CoroutineScope, private va
         }
       }
     }
+
+    override fun onClick(view: View?) {
+      listener.onClick(this, getRadioAt(layoutPosition))
+    }
+  }
+
+  inner class RowRadioHeaderViewHolder(
+    binding: RowRadioHeaderBinding
+  ) : ViewHolder(
+    binding.root
+  ) {
+    val label = binding.label
+  }
+
+  abstract inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    var native = false
   }
 }

@@ -1,32 +1,57 @@
 package audio.funkwhale.ffa.fragments
 
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.view.forEach
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
-import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.adapters.RadiosAdapter
+import audio.funkwhale.ffa.databinding.FragmentRadiosBinding
 import audio.funkwhale.ffa.repositories.RadiosRepository
-import audio.funkwhale.ffa.utils.*
-import kotlinx.android.synthetic.main.fragment_radios.*
+import audio.funkwhale.ffa.utils.Command
+import audio.funkwhale.ffa.utils.CommandBus
+import audio.funkwhale.ffa.utils.Event
+import audio.funkwhale.ffa.utils.EventBus
+import audio.funkwhale.ffa.utils.Radio
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
-class RadiosFragment : OtterFragment<Radio, RadiosAdapter>() {
-  override val viewRes = R.layout.fragment_radios
-  override val recycler: RecyclerView get() = radios
+class RadiosFragment : FFAFragment<Radio, RadiosAdapter>() {
+
+  override val recycler: RecyclerView get() = binding.radios
   override val alwaysRefresh = false
+
+  private var _binding: FragmentRadiosBinding? = null
+  private val binding get() = _binding!!
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    adapter = RadiosAdapter(context, lifecycleScope, RadioClickListener())
+    adapter = RadiosAdapter(layoutInflater, context, lifecycleScope, RadioClickListener())
     repository = RadiosRepository(context)
   }
 
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View {
+    _binding = FragmentRadiosBinding.inflate(inflater)
+    swiper = binding.swiper
+    return binding.root
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
+  }
+
   inner class RadioClickListener : RadiosAdapter.OnRadioClickListener {
-    override fun onClick(holder: RadiosAdapter.ViewHolder, radio: Radio) {
+
+    override fun onClick(holder: RadiosAdapter.RowRadioViewHolder, radio: Radio) {
       holder.spin()
       recycler.forEach {
         it.isEnabled = false
@@ -39,11 +64,9 @@ class RadiosFragment : OtterFragment<Radio, RadiosAdapter>() {
         EventBus.get().collect { message ->
           when (message) {
             is Event.RadioStarted ->
-              if (radios != null) {
-                recycler.forEach {
-                  it.isEnabled = true
-                  it.isClickable = true
-                }
+              recycler.forEach {
+                it.isEnabled = true
+                it.isClickable = true
               }
           }
         }

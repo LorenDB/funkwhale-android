@@ -5,7 +5,6 @@ import java.util.Properties
 plugins {
   id("com.android.application")
   id("kotlin-android")
-  id("kotlin-android-extensions")
 
   id("org.jlleitschuh.gradle.ktlint") version "8.1.0"
   id("com.gladed.androidgitversion") version "0.4.14"
@@ -32,6 +31,10 @@ android {
 
   kotlinOptions {
     jvmTarget = JavaVersion.VERSION_1_8.toString()
+  }
+
+  buildFeatures {
+    viewBinding = true
   }
 
   buildToolsVersion = "29.0.3"
