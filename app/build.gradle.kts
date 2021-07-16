@@ -125,9 +125,9 @@ play {
 dependencies {
   implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 
-  implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.5.20")
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0")
+  implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.5.21")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1")
 
   implementation("androidx.appcompat:appcompat:1.3.0")
   implementation("androidx.core:core-ktx:1.6.0")
@@ -154,7 +154,7 @@ dependencies {
   implementation("com.github.kittinunf.fuel:fuel-coroutines:2.3.1")
   implementation("com.github.kittinunf.fuel:fuel-android:2.3.1")
   implementation("com.github.kittinunf.fuel:fuel-gson:2.3.1")
-  implementation("com.google.code.gson:gson:2.8.6")
+  implementation("com.google.code.gson:gson:2.8.7")
   implementation("com.squareup.picasso:picasso:2.71828")
   implementation("jp.wasabeef:picasso-transformations:2.4.0")
 }
