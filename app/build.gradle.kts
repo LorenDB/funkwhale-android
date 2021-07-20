@@ -38,7 +38,7 @@ android {
   }
 
   lintOptions {
-    isAbortOnError = false
+    disable("MissingTranslation")
   }
 
   compileSdkVersion(30)
