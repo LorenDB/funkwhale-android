@@ -37,16 +37,17 @@ android {
     viewBinding = true
   }
 
-  buildToolsVersion = "29.0.3"
-  compileSdkVersion(29)
+  lintOptions {
+    isAbortOnError = false
+  }
+
+  compileSdkVersion(30)
 
   defaultConfig {
     applicationId = "audio.funkwhale.ffa"
 
-    minSdkVersion(23)
-    targetSdkVersion(29)
-
-    ndkVersion = "21.3.6528147"
+    minSdkVersion(24)
+    targetSdkVersion(30)
 
     versionCode = androidGitVersion.code()
     versionName = androidGitVersion.name()
