@@ -14,6 +14,7 @@ import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SeekBarPreference
+import audio.funkwhale.ffa.FFA
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.databinding.ActivitySettingsBinding
 import audio.funkwhale.ffa.utils.Cache
@@ -97,7 +98,7 @@ class SettingsFragment :
             .setPositiveButton(android.R.string.yes) { _, _ ->
               CommandBus.send(Command.ClearQueue)
 
-              audio.funkwhale.ffa.FFA.get().deleteAllData()
+              FFA.get().deleteAllData()
 
               activity?.setResult(MainActivity.ResultCode.LOGOUT.code)
               activity?.finish()

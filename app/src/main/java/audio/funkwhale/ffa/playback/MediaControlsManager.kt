@@ -99,7 +99,7 @@ class MediaControlsManager(val context: Service, private val scope: CoroutineSco
           }
         }
 
-        audio.funkwhale.ffa.FFA.get().mediaSession.connector.invalidateMediaSessionMetadata()
+        FFA.get().mediaSession.connector.invalidateMediaSessionMetadata()
       }
     }
   }

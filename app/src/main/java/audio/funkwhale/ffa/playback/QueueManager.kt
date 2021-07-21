@@ -30,10 +30,10 @@ class QueueManager(val context: Context) {
         }
       }
 
-      val playbackCache = CacheDataSourceFactory(audio.funkwhale.ffa.FFA.get().exoCache, http)
+      val playbackCache = CacheDataSourceFactory(FFA.get().exoCache, http)
 
       return CacheDataSourceFactory(
-        audio.funkwhale.ffa.FFA.get().exoDownloadCache,
+        FFA.get().exoDownloadCache,
         playbackCache,
         FileDataSource.Factory(),
         null,

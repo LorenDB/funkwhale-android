@@ -1,5 +1,6 @@
 package audio.funkwhale.ffa.utils
 
+import audio.funkwhale.ffa.FFA
 import com.google.android.exoplayer2.offline.Download
 import com.google.android.exoplayer2.offline.DownloadCursor
 import kotlinx.coroutines.Dispatchers.IO
@@ -70,21 +71,21 @@ sealed class Response {
 object EventBus {
   fun send(event: Event) {
     GlobalScope.launch(IO) {
-      audio.funkwhale.ffa.FFA.get().eventBus.offer(event)
+      FFA.get().eventBus.trySend(event).isSuccess
     }
   }
 
-  fun get() = audio.funkwhale.ffa.FFA.get().eventBus.asFlow()
+  fun get() = FFA.get().eventBus.asFlow()
 }
 
 object CommandBus {
   fun send(command: Command) {
     GlobalScope.launch(IO) {
-      audio.funkwhale.ffa.FFA.get().commandBus.offer(command)
+      FFA.get().commandBus.trySend(command).isSuccess
     }
   }
 
-  fun get() = audio.funkwhale.ffa.FFA.get().commandBus.asFlow()
+  fun get() = FFA.get().commandBus.asFlow()
 }
 
 object RequestBus {
@@ -93,22 +94,22 @@ object RequestBus {
       GlobalScope.launch(IO) {
         request.channel = it
 
-        audio.funkwhale.ffa.FFA.get().requestBus.offer(request)
+        FFA.get().requestBus.trySend(request).isSuccess
       }
     }
   }
 
-  fun get() = audio.funkwhale.ffa.FFA.get().requestBus.asFlow()
+  fun get() = FFA.get().requestBus.asFlow()
 }
 
 object ProgressBus {
   fun send(current: Int, duration: Int, percent: Int) {
     GlobalScope.launch(IO) {
-      audio.funkwhale.ffa.FFA.get().progressBus.send(Triple(current, duration, percent))
+      FFA.get().progressBus.send(Triple(current, duration, percent))
     }
   }
 
-  fun get() = audio.funkwhale.ffa.FFA.get().progressBus.asFlow().conflate()
+  fun get() = FFA.get().progressBus.asFlow().conflate()
 }
 
 suspend inline fun <reified T> Channel<Response>.wait(): T? {

@@ -2,6 +2,9 @@ package audio.funkwhale.ffa
 
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
+import audio.funkwhale.ffa.playback.MediaSession
+import audio.funkwhale.ffa.playback.QueueManager
+import audio.funkwhale.ffa.utils.*
 import com.google.android.exoplayer2.database.ExoDatabaseProvider
 import com.google.android.exoplayer2.offline.DefaultDownloadIndex
 import com.google.android.exoplayer2.offline.DefaultDownloaderFactory
@@ -13,17 +16,14 @@ import com.google.android.exoplayer2.upstream.cache.SimpleCache
 import com.preference.PowerPreference
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
-import audio.funkwhale.ffa.playback.MediaSession
-import audio.funkwhale.ffa.playback.QueueManager
-import audio.funkwhale.ffa.utils.*
 import java.text.SimpleDateFormat
 import java.util.*
 
 class FFA : Application() {
   companion object {
-    private var instance: audio.funkwhale.ffa.FFA = audio.funkwhale.ffa.FFA()
+    private var instance: FFA = FFA()
 
-    fun get(): audio.funkwhale.ffa.FFA = audio.funkwhale.ffa.FFA.Companion.instance
+    fun get(): FFA = instance
   }
 
   var defaultExceptionHandler: Thread.UncaughtExceptionHandler? = null
@@ -70,7 +70,7 @@ class FFA : Application() {
 
     Thread.setDefaultUncaughtExceptionHandler(CrashReportHandler())
 
-    audio.funkwhale.ffa.FFA.Companion.instance = this
+    FFA.Companion.instance = this
 
     when (PowerPreference.getDefaultFile().getString("night_mode")) {
       "on" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
@@ -94,19 +94,20 @@ class FFA : Application() {
       val now = Date(Date().time - (5 * 60 * 1000))
       val formatter = SimpleDateFormat("MM-dd kk:mm:ss.000", Locale.US)
 
-      Runtime.getRuntime().exec(listOf("logcat", "-d", "-T", formatter.format(now)).toTypedArray()).also {
-        it.inputStream.bufferedReader().also { reader ->
-          val builder = StringBuilder()
+      Runtime.getRuntime().exec(listOf("logcat", "-d", "-T", formatter.format(now)).toTypedArray())
+        .also {
+          it.inputStream.bufferedReader().also { reader ->
+            val builder = StringBuilder()
 
-          while (true) {
-            builder.appendln(reader.readLine() ?: break)
+            while (true) {
+              builder.appendLine(reader.readLine() ?: break)
+            }
+
+            builder.appendLine(e.toString())
+
+            Cache.set(this@FFA, "crashdump", builder.toString().toByteArray())
           }
-
-          builder.appendln(e.toString())
-
-          Cache.set(this@FFA, "crashdump", builder.toString().toByteArray())
         }
-      }
 
       defaultExceptionHandler?.uncaughtException(t, e)
     }

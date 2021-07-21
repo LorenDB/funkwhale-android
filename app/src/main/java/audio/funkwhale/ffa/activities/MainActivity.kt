@@ -21,6 +21,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import audio.funkwhale.ffa.FFA
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.databinding.ActivityMainBinding
 import audio.funkwhale.ffa.fragments.*
@@ -259,7 +260,7 @@ class MainActivity : AppCompatActivity() {
 
     if (resultCode == ResultCode.LOGOUT.code) {
       Intent(this, LoginActivity::class.java).apply {
-        audio.funkwhale.ffa.FFA.get().deleteAllData()
+        FFA.get().deleteAllData()
 
         flags =
           Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -298,7 +299,7 @@ class MainActivity : AppCompatActivity() {
       EventBus.get().collect { message ->
         when (message) {
           is Event.LogOut -> {
-            audio.funkwhale.ffa.FFA.get().deleteAllData()
+            FFA.get().deleteAllData()
 
             startActivity(Intent(this@MainActivity, LoginActivity::class.java).apply {
               flags = Intent.FLAG_ACTIVITY_NO_HISTORY

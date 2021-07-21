@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import audio.funkwhale.ffa.FFA
 import audio.funkwhale.ffa.adapters.DownloadsAdapter
 import audio.funkwhale.ffa.databinding.ActivityDownloadsBinding
 import audio.funkwhale.ffa.utils.Event
@@ -62,7 +63,7 @@ class DownloadsActivity : AppCompatActivity() {
 
   private fun refresh() {
     lifecycleScope.launch(Main) {
-      val cursor = audio.funkwhale.ffa.FFA.get().exoDownloadManager.downloadIndex.getDownloads()
+      val cursor = FFA.get().exoDownloadManager.downloadIndex.getDownloads()
 
       adapter.downloads.clear()
 
@@ -98,7 +99,7 @@ class DownloadsActivity : AppCompatActivity() {
   }
 
   private suspend fun refreshProgress() {
-    val cursor = audio.funkwhale.ffa.FFA.get().exoDownloadManager.downloadIndex.getDownloads()
+    val cursor = FFA.get().exoDownloadManager.downloadIndex.getDownloads()
 
     while (cursor.moveToNext()) {
       val download = cursor.download
