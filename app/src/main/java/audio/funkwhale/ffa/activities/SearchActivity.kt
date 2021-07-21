@@ -89,9 +89,9 @@ class SearchActivity : AppCompatActivity() {
 
           val query = URLEncoder.encode(it, "UTF-8")
 
-          artistsRepository.query = query.toLowerCase(Locale.ROOT)
-          albumsRepository.query = query.toLowerCase(Locale.ROOT)
-          tracksRepository.query = query.toLowerCase(Locale.ROOT)
+          artistsRepository.query = query.lowercase(Locale.ROOT)
+          albumsRepository.query = query.lowercase(Locale.ROOT)
+          tracksRepository.query = query.lowercase(Locale.ROOT)
 
           binding.searchSpinner.visibility = View.VISIBLE
           binding.searchEmpty.visibility = View.GONE

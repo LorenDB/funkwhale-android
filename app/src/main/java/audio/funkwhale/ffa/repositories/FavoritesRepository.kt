@@ -32,7 +32,7 @@ class FavoritesRepository(override val context: Context?) : Repository<Track, Tr
 
       track.bestUpload()?.let { upload ->
         maybeNormalizeUrl(upload.listen_url)?.let { url ->
-          track.cached = audio.funkwhale.ffa.FFA.get().exoCache.isCached(url, 0, upload.duration * 1000L)
+          track.cached = FFA.get().exoCache.isCached(url, 0, upload.duration * 1000L)
         }
       }
 

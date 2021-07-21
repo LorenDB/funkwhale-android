@@ -4,6 +4,17 @@ import android.app.Notification
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import audio.funkwhale.ffa.FFA
+import audio.funkwhale.ffa.R
+import audio.funkwhale.ffa.utils.AppContext
+import audio.funkwhale.ffa.utils.DownloadInfo
+import audio.funkwhale.ffa.utils.Event
+import audio.funkwhale.ffa.utils.EventBus
+import audio.funkwhale.ffa.utils.Request
+import audio.funkwhale.ffa.utils.RequestBus
+import audio.funkwhale.ffa.utils.Response
+import audio.funkwhale.ffa.utils.Track
+import audio.funkwhale.ffa.utils.mustNormalizeUrl
 import com.google.android.exoplayer2.offline.Download
 import com.google.android.exoplayer2.offline.DownloadManager
 import com.google.android.exoplayer2.offline.DownloadRequest
@@ -16,17 +27,6 @@ import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import audio.funkwhale.ffa.FFA
-import audio.funkwhale.ffa.R
-import audio.funkwhale.ffa.utils.AppContext
-import audio.funkwhale.ffa.utils.DownloadInfo
-import audio.funkwhale.ffa.utils.Event
-import audio.funkwhale.ffa.utils.EventBus
-import audio.funkwhale.ffa.utils.Request
-import audio.funkwhale.ffa.utils.RequestBus
-import audio.funkwhale.ffa.utils.Response
-import audio.funkwhale.ffa.utils.Track
-import audio.funkwhale.ffa.utils.mustNormalizeUrl
 import java.util.Collections
 
 class PinService : DownloadService(AppContext.NOTIFICATION_DOWNLOADS) {
@@ -66,7 +66,7 @@ class PinService : DownloadService(AppContext.NOTIFICATION_DOWNLOADS) {
     scope.launch(Main) {
       RequestBus.get().collect { request ->
         when (request) {
-          is Request.GetDownloads -> request.channel?.offer(Response.Downloads(getDownloads()))
+          is Request.GetDownloads -> request.channel?.trySend(Response.Downloads(getDownloads()))?.isSuccess
         }
       }
     }
@@ -74,7 +74,7 @@ class PinService : DownloadService(AppContext.NOTIFICATION_DOWNLOADS) {
     return super.onStartCommand(intent, flags, startId)
   }
 
-  override fun getDownloadManager() = audio.funkwhale.ffa.FFA.get().exoDownloadManager.apply {
+  override fun getDownloadManager() = FFA.get().exoDownloadManager.apply {
     addListener(DownloadListener())
   }
 

@@ -20,7 +20,7 @@ class TracksRepository(override val context: Context?, albumId: Int) : Repositor
 
   companion object {
     fun getDownloadedIds(): List<Int>? {
-      val cursor = audio.funkwhale.ffa.FFA.get().exoDownloadManager.downloadIndex.getDownloads()
+      val cursor = FFA.get().exoDownloadManager.downloadIndex.getDownloads()
       val ids: MutableList<Int> = mutableListOf()
 
       while (cursor.moveToNext()) {
@@ -52,7 +52,7 @@ class TracksRepository(override val context: Context?, albumId: Int) : Repositor
       track.bestUpload()?.let { upload ->
         val url = mustNormalizeUrl(upload.listen_url)
 
-        track.cached = audio.funkwhale.ffa.FFA.get().exoCache.isCached(url, 0, upload.duration * 1000L)
+        track.cached = FFA.get().exoCache.isCached(url, 0, upload.duration * 1000L)
       }
 
       track

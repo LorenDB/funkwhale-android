@@ -15,6 +15,9 @@ import android.support.v4.media.MediaMetadataCompat
 import android.view.KeyEvent
 import androidx.core.app.NotificationManagerCompat
 import androidx.media.session.MediaButtonReceiver
+import audio.funkwhale.ffa.FFA
+import audio.funkwhale.ffa.R
+import audio.funkwhale.ffa.utils.*
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlaybackException
 import com.google.android.exoplayer2.Player
@@ -26,9 +29,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.flow.collect
-import audio.funkwhale.ffa.FFA
-import audio.funkwhale.ffa.R
-import audio.funkwhale.ffa.utils.*
 
 class PlayerService : Service() {
   companion object {
@@ -63,12 +63,12 @@ class PlayerService : Service() {
           when (key.keyCode) {
             KeyEvent.KEYCODE_MEDIA_PLAY, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> {
               if (hasAudioFocus(true)) MediaButtonReceiver.handleIntent(
-                audio.funkwhale.ffa.FFA.get().mediaSession.session,
+                FFA.get().mediaSession.session,
                 intent
               )
               Unit
             }
-            else -> MediaButtonReceiver.handleIntent(audio.funkwhale.ffa.FFA.get().mediaSession.session, intent)
+            else -> MediaButtonReceiver.handleIntent(FFA.get().mediaSession.session, intent)
           }
         }
       }
@@ -108,7 +108,7 @@ class PlayerService : Service() {
       }
     }
 
-    mediaControlsManager = MediaControlsManager(this, scope, audio.funkwhale.ffa.FFA.get().mediaSession.session)
+    mediaControlsManager = MediaControlsManager(this, scope, FFA.get().mediaSession.session)
 
     player = SimpleExoPlayer.Builder(this).build().apply {
       playWhenReady = false
@@ -118,9 +118,9 @@ class PlayerService : Service() {
       }
     }
 
-    audio.funkwhale.ffa.FFA.get().mediaSession.active = true
+    FFA.get().mediaSession.active = true
 
-    audio.funkwhale.ffa.FFA.get().mediaSession.connector.apply {
+    FFA.get().mediaSession.connector.apply {
       setPlayer(player)
 
       setMediaMetadataProvider {
@@ -216,9 +216,9 @@ class PlayerService : Service() {
     scope.launch(Main) {
       RequestBus.get().collect { request ->
         when (request) {
-          is Request.GetCurrentTrack -> request.channel?.offer(Response.CurrentTrack(queue.current()))
-          is Request.GetState -> request.channel?.offer(Response.State(player.playWhenReady))
-          is Request.GetQueue -> request.channel?.offer(Response.Queue(queue.get()))
+          is Request.GetCurrentTrack -> request.channel?.trySend(Response.CurrentTrack(queue.current()))?.isSuccess
+          is Request.GetState -> request.channel?.trySend(Response.State(player.playWhenReady))?.isSuccess
+          is Request.GetQueue -> request.channel?.trySend(Response.Queue(queue.get()))?.isSuccess
         }
       }
     }
@@ -271,7 +271,7 @@ class PlayerService : Service() {
     setPlaybackState(false)
     player.release()
 
-    audio.funkwhale.ffa.FFA.get().mediaSession.active = false
+    FFA.get().mediaSession.active = false
 
     super.onDestroy()
   }

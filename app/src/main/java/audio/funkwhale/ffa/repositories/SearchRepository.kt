@@ -33,7 +33,7 @@ class TracksSearchRepository(override val context: Context?, var query: String) 
       track.bestUpload()?.let { upload ->
         val url = mustNormalizeUrl(upload.listen_url)
 
-        track.cached = audio.funkwhale.ffa.FFA.get().exoCache.isCached(url, 0, upload.duration * 1000L)
+        track.cached = FFA.get().exoCache.isCached(url, 0, upload.duration * 1000L)
       }
 
       track
