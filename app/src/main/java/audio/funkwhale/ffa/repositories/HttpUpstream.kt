@@ -18,7 +18,11 @@ import java.io.Reader
 import java.lang.reflect.Type
 import kotlin.math.ceil
 
-class HttpUpstream<D : Any, R : OtterResponse<D>>(val behavior: Behavior, private val url: String, private val type: Type) : Upstream<D> {
+class HttpUpstream<D : Any, R : OtterResponse<D>>(
+  val behavior: Behavior,
+  private val url: String,
+  private val type: Type
+) : Upstream<D> {
   enum class Behavior {
     Single, AtOnce, Progressive
   }
@@ -42,12 +46,10 @@ class HttpUpstream<D : Any, R : OtterResponse<D>>(val behavior: Behavior, privat
         val data = response.getData()
 
         when (behavior) {
-          Behavior.Single -> emit(Repository.Response(Repository.Origin.Network, data, page, false))
-          Behavior.Progressive -> emit(Repository.Response(Repository.Origin.Network, data, page, response.next != null))
-
+          Behavior.Single -> emit(networkResponse(data, page, false))
+          Behavior.Progressive -> emit(networkResponse(data, page, response.next != null))
           else -> {
-            emit(Repository.Response(Repository.Origin.Network, data, page, response.next != null))
-
+            emit(networkResponse(data, page, response.next != null))
             if (response.next != null) fetch(size + data.size).collect { emit(it) }
           }
         }
@@ -55,11 +57,18 @@ class HttpUpstream<D : Any, R : OtterResponse<D>>(val behavior: Behavior, privat
       { error ->
         when (error.exception) {
           is RefreshError -> EventBus.send(Event.LogOut)
-          else -> emit(Repository.Response(Repository.Origin.Network, listOf(), page, false))
+          else -> emit(networkResponse(listOf(), page, false))
         }
       }
     )
   }.flowOn(IO)
+
+  private fun networkResponse(data: List<D>, page: Int, hasMore: Boolean) = Repository.Response(
+    Repository.Origin.Network,
+    data,
+    page,
+    hasMore
+  )
 
   class GenericDeserializer<T : OtterResponse<*>>(val type: Type) : ResponseDeserializable<T> {
     override fun deserialize(reader: Reader): T? {
