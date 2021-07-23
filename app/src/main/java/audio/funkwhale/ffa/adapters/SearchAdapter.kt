@@ -184,7 +184,7 @@ class SearchAdapter(
       .transform(RoundedCornersTransformation(16, 0))
       .into(rowTrackViewHolder?.cover)
 
-    searchHeaderViewHolder?.title?.text = item.title()
+    rowTrackViewHolder?.title?.text = item.title()
     rowTrackViewHolder?.artist?.text = item.subtitle()
 
     Build.VERSION_CODES.P.onApi(
@@ -312,6 +312,7 @@ class SearchAdapter(
 
   inner class RowTrackViewHolder(val binding: RowTrackBinding, context: Context?) :
     ViewHolder(binding.root, context), View.OnClickListener {
+    val title = binding.title
     val cover = binding.cover
     val artist = binding.artist
 
