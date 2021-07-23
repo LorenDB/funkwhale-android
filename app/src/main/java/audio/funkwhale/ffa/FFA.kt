@@ -70,7 +70,7 @@ class FFA : Application() {
 
     Thread.setDefaultUncaughtExceptionHandler(CrashReportHandler())
 
-    FFA.Companion.instance = this
+    instance = this
 
     when (PowerPreference.getDefaultFile().getString("night_mode")) {
       "on" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)

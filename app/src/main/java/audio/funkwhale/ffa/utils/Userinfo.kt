@@ -1,5 +1,6 @@
 package audio.funkwhale.ffa.utils
 
+import android.content.Context
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.coroutines.awaitObjectResponseResult
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
@@ -7,11 +8,13 @@ import com.github.kittinunf.result.Result
 import com.preference.PowerPreference
 
 object Userinfo {
-  suspend fun get(): User? {
+
+  suspend fun get(context: Context): User? {
     try {
-      val hostname = PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).getString("hostname")
+      val hostname =
+        PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).getString("hostname")
       val (_, _, result) = Fuel.get("$hostname/api/v1/users/users/me/")
-        .authorize()
+        .authorize(context)
         .awaitObjectResponseResult(gsonDeserializerOf(User::class.java))
 
       return when (result) {

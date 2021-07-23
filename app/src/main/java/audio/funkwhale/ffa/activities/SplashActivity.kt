@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import audio.funkwhale.ffa.FFA
 import audio.funkwhale.ffa.utils.AppContext
+import audio.funkwhale.ffa.utils.OAuth
 import audio.funkwhale.ffa.utils.Settings
 
 class SplashActivity : AppCompatActivity() {
@@ -13,22 +14,21 @@ class SplashActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    getSharedPreferences(AppContext.PREFS_CREDENTIALS, Context.MODE_PRIVATE).apply {
-      when (Settings.hasAccessToken() || Settings.isAnonymous()) {
-        true -> Intent(this@SplashActivity, MainActivity::class.java).apply {
-          flags = Intent.FLAG_ACTIVITY_NO_ANIMATION
+    getSharedPreferences(AppContext.PREFS_CREDENTIALS, Context.MODE_PRIVATE)
+      .apply {
+        when (OAuth.isAuthorized(this@SplashActivity) || Settings.isAnonymous()) {
+          true -> Intent(this@SplashActivity, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NO_ANIMATION
+            startActivity(this)
+          }
 
-          startActivity(this)
-        }
-
-        false -> Intent(this@SplashActivity, LoginActivity::class.java).apply {
-          FFA.get().deleteAllData()
-
-          flags = Intent.FLAG_ACTIVITY_NO_ANIMATION
-
-          startActivity(this)
+          false -> Intent(this@SplashActivity, LoginActivity::class.java).apply {
+            FFA.get().deleteAllData()
+            flags = Intent.FLAG_ACTIVITY_NO_ANIMATION
+            startActivity(this)
+          }
         }
       }
-    }
   }
+
 }

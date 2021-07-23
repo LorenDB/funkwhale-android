@@ -51,6 +51,8 @@ android {
 
     versionCode = androidGitVersion.code()
     versionName = androidGitVersion.name()
+
+    manifestPlaceholders["appAuthRedirectScheme"] = "urn"
   }
 
   signingConfigs {
@@ -158,4 +160,6 @@ dependencies {
   implementation("com.google.code.gson:gson:2.8.7")
   implementation("com.squareup.picasso:picasso:2.71828")
   implementation("jp.wasabeef:picasso-transformations:2.4.0")
+
+  implementation("net.openid:appauth:0.9.1")
 }

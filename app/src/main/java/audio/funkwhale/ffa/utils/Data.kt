@@ -16,18 +16,23 @@ import java.security.MessageDigest
 
 object RefreshError : Throwable()
 
-object HTTP {
+class HTTP(val context: Context?) {
+
   suspend fun refresh(): Boolean {
     val body = mapOf(
-      "username" to PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).getString("username"),
-      "password" to PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).getString("password")
+      "username" to PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS)
+        .getString("username"),
+      "password" to PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS)
+        .getString("password")
     ).toList()
 
-    val result = Fuel.post(mustNormalizeUrl("/api/v1/token"), body).awaitObjectResult(gsonDeserializerOf(FwCredentials::class.java))
+    val result = Fuel.post(mustNormalizeUrl("/api/v1/token"), body)
+      .awaitObjectResult(gsonDeserializerOf(FwCredentials::class.java))
 
     return result.fold(
       { data ->
-        PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).setString("access_token", data.token)
+        PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS)
+          .setString("access_token", data.token)
 
         true
       },
@@ -36,33 +41,44 @@ object HTTP {
   }
 
   suspend inline fun <reified T : Any> get(url: String): Result<T, FuelError> {
-    val request = Fuel.get(mustNormalizeUrl(url)).apply {
-      if (!Settings.isAnonymous()) {
-        header("Authorization", "Bearer ${Settings.getAccessToken()}")
-      }
-    }
 
-    val (_, response, result) = request.awaitObjectResponseResult(gsonDeserializerOf(T::class.java))
-
-    if (response.statusCode == 401) {
-      return retryGet(url)
-    }
-
-    return result
-  }
-
-  suspend inline fun <reified T : Any> retryGet(url: String): Result<T, FuelError> {
-    return if (refresh()) {
+    context?.let {
       val request = Fuel.get(mustNormalizeUrl(url)).apply {
         if (!Settings.isAnonymous()) {
-          header("Authorization", "Bearer ${Settings.getAccessToken()}")
+          authorize(it)
+          header("Authorization", "Bearer ${OAuth.state().accessToken}")
         }
       }
 
-      request.awaitObjectResult(gsonDeserializerOf(T::class.java))
-    } else {
-      Result.Failure(FuelError.wrap(RefreshError))
+      val (_, response, result) = request.awaitObjectResponseResult(gsonDeserializerOf(T::class.java))
+
+      if (response.statusCode == 401) {
+        return retryGet(url)
+      } else {
+        return result
+      }
     }
+    throw IllegalStateException("Illegal state: context is null")
+  }
+
+  suspend inline fun <reified T : Any> retryGet(
+    url: String
+  ): Result<T, FuelError> {
+    context?.let {
+      return if (refresh()) {
+        val request = Fuel.get(mustNormalizeUrl(url)).apply {
+          if (!Settings.isAnonymous()) {
+            authorize(context)
+            header("Authorization", "Bearer ${OAuth.state().accessToken}")
+          }
+        }
+
+        request.awaitObjectResult(gsonDeserializerOf(T::class.java))
+      } else {
+        Result.Failure(FuelError.wrap(RefreshError))
+      }
+    }
+    throw IllegalStateException("Illegal state: context is null")
   }
 }
 

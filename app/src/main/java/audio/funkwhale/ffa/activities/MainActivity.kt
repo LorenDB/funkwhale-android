@@ -103,7 +103,7 @@ class MainActivity : AppCompatActivity() {
     CommandBus.send(Command.RefreshService)
 
     lifecycleScope.launch(IO) {
-      Userinfo.get()
+      Userinfo.get(this@MainActivity)
     }
 
     with(binding) {
@@ -630,7 +630,7 @@ class MainActivity : AppCompatActivity() {
         try {
           Fuel
             .post(mustNormalizeUrl("/api/v1/history/listenings/"))
-            .authorize()
+            .authorize(this@MainActivity)
             .header("Content-Type", "application/json")
             .body(Gson().toJson(mapOf("track" to track.id)))
             .awaitStringResponse()

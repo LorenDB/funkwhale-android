@@ -78,7 +78,7 @@ class SettingsFragment :
         activity?.let { activity ->
           (activity.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager)?.also { clip ->
             Cache.get(activity, "crashdump")?.readLines()?.joinToString("\n").also {
-              clip.setPrimaryClip(ClipData.newPlainText("Otter logs", it))
+              clip.setPrimaryClip(ClipData.newPlainText("Funkwhale logs", it))
 
               Toast.makeText(
                 activity,
@@ -95,7 +95,7 @@ class SettingsFragment :
           AlertDialog.Builder(context)
             .setTitle(context.getString(R.string.logout_title))
             .setMessage(context.getString(R.string.logout_content))
-            .setPositiveButton(android.R.string.yes) { _, _ ->
+            .setPositiveButton(android.R.string.ok) { _, _ ->
               CommandBus.send(Command.ClearQueue)
 
               FFA.get().deleteAllData()
@@ -103,7 +103,7 @@ class SettingsFragment :
               activity?.setResult(MainActivity.ResultCode.LOGOUT.code)
               activity?.finish()
             }
-            .setNegativeButton(android.R.string.no, null)
+            .setNegativeButton(android.R.string.cancel, null)
             .show()
         }
       }

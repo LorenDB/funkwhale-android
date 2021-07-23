@@ -2,7 +2,12 @@ package audio.funkwhale.ffa.repositories
 
 import android.content.Context
 import audio.funkwhale.ffa.FFA
-import audio.funkwhale.ffa.utils.*
+import audio.funkwhale.ffa.utils.OtterResponse
+import audio.funkwhale.ffa.utils.Track
+import audio.funkwhale.ffa.utils.TracksCache
+import audio.funkwhale.ffa.utils.TracksResponse
+import audio.funkwhale.ffa.utils.getMetadata
+import audio.funkwhale.ffa.utils.mustNormalizeUrl
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
 import com.google.android.exoplayer2.offline.Download
 import com.google.gson.reflect.TypeToken
@@ -11,12 +16,21 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import java.io.BufferedReader
 
-class TracksRepository(override val context: Context?, albumId: Int) : Repository<Track, TracksCache>() {
+class TracksRepository(override val context: Context?, albumId: Int) :
+  Repository<Track, TracksCache>() {
+
   override val cacheId = "tracks-album-$albumId"
-  override val upstream = HttpUpstream<Track, OtterResponse<Track>>(HttpUpstream.Behavior.AtOnce, "/api/v1/tracks/?playable=true&album=$albumId&ordering=disc_number,position", object : TypeToken<TracksResponse>() {}.type)
+
+  override val upstream = HttpUpstream<Track, OtterResponse<Track>>(
+    context,
+    HttpUpstream.Behavior.AtOnce,
+    "/api/v1/tracks/?playable=true&album=$albumId&ordering=disc_number,position",
+    object : TypeToken<TracksResponse>() {}.type
+  )
 
   override fun cache(data: List<Track>) = TracksCache(data)
-  override fun uncache(reader: BufferedReader) = gsonDeserializerOf(TracksCache::class.java).deserialize(reader)
+  override fun uncache(reader: BufferedReader) =
+    gsonDeserializerOf(TracksCache::class.java).deserialize(reader)
 
   companion object {
     fun getDownloadedIds(): List<Int>? {
