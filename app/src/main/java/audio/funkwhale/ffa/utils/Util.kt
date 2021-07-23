@@ -33,8 +33,8 @@ private fun logClassName(): String {
 
 fun Any?.log(prefix: String? = null) {
   prefix?.let {
-    Log.d("OTTER", "${logClassName()} - $prefix: $this")
-  } ?: Log.d("OTTER", "${logClassName()} - $this")
+    Log.d("FFA", "${logClassName()} - $prefix: $this")
+  } ?: Log.d("FFA", "${logClassName()} - $this")
 }
 
 fun maybeNormalizeUrl(rawUrl: String?): String? {
@@ -48,7 +48,8 @@ fun maybeNormalizeUrl(rawUrl: String?): String? {
 }
 
 fun mustNormalizeUrl(rawUrl: String): String {
-  val fallbackHost = PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).getString("hostname")
+  val fallbackHost =
+    PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).getString("hostname")
   val uri = URI(rawUrl).takeIf { it.host != null } ?: URI("$fallbackHost$rawUrl")
 
   return uri.toString()
@@ -71,9 +72,14 @@ fun toDurationString(duration: Long, showSeconds: Boolean = false): String {
 }
 
 object Settings {
-  fun hasAccessToken() = PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).contains("access_token")
-  fun getAccessToken(): String = PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).getString("access_token", "")
-  fun isAnonymous() = PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).getBoolean("anonymous", false)
+
+  fun hasAccessToken(): Boolean {
+    return PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).contains("access_token")
+  }
+
+  fun isAnonymous() =
+    PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).getBoolean("anonymous", false)
+
   fun areExperimentsEnabled() = PowerPreference.getDefaultFile().getBoolean("experiments", false)
 
   fun getScopes() = PowerPreference.getDefaultFile().getString("scope", "all").split(",")

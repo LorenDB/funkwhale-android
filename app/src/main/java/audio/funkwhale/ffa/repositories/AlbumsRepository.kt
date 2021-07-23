@@ -4,12 +4,13 @@ import android.content.Context
 import audio.funkwhale.ffa.utils.Album
 import audio.funkwhale.ffa.utils.AlbumsCache
 import audio.funkwhale.ffa.utils.AlbumsResponse
-import audio.funkwhale.ffa.utils.OtterResponse
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
 import com.google.gson.reflect.TypeToken
 import java.io.BufferedReader
 
-class AlbumsRepository(override val context: Context?, artistId: Int? = null) : Repository<Album, AlbumsCache>() {
+class AlbumsRepository(override val context: Context?, artistId: Int? = null) :
+  Repository<Album, AlbumsCache>() {
+
   override val cacheId: String by lazy {
     if (artistId == null) "albums"
     else "albums-artist-$artistId"
@@ -20,7 +21,8 @@ class AlbumsRepository(override val context: Context?, artistId: Int? = null) : 
       if (artistId == null) "/api/v1/albums/?playable=true&ordering=title"
       else "/api/v1/albums/?playable=true&artist=$artistId&ordering=release_date"
 
-    HttpUpstream<Album, OtterResponse<Album>>(
+    HttpUpstream(
+      context!!,
       HttpUpstream.Behavior.Progressive,
       url,
       object : TypeToken<AlbumsResponse>() {}.type
@@ -28,5 +30,6 @@ class AlbumsRepository(override val context: Context?, artistId: Int? = null) : 
   }
 
   override fun cache(data: List<Album>) = AlbumsCache(data)
-  override fun uncache(reader: BufferedReader) = gsonDeserializerOf(AlbumsCache::class.java).deserialize(reader)
+  override fun uncache(reader: BufferedReader) =
+    gsonDeserializerOf(AlbumsCache::class.java).deserialize(reader)
 }

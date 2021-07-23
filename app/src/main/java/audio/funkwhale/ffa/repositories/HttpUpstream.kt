@@ -1,5 +1,6 @@
 package audio.funkwhale.ffa.repositories
 
+import android.content.Context
 import android.net.Uri
 import audio.funkwhale.ffa.utils.*
 import com.github.kittinunf.fuel.Fuel
@@ -19,48 +20,57 @@ import java.lang.reflect.Type
 import kotlin.math.ceil
 
 class HttpUpstream<D : Any, R : OtterResponse<D>>(
+  val context: Context?,
   val behavior: Behavior,
   private val url: String,
   private val type: Type
 ) : Upstream<D> {
+
   enum class Behavior {
-    Single, AtOnce, Progressive
+    Single,
+    AtOnce,
+    Progressive
   }
 
+  private val http = HTTP(context)
+
   override fun fetch(size: Int): Flow<Repository.Response<D>> = flow<Repository.Response<D>> {
-    if (behavior == Behavior.Single && size != 0) return@flow
 
-    val page = ceil(size / AppContext.PAGE_SIZE.toDouble()).toInt() + 1
+    context?.let {
+      if (behavior == Behavior.Single && size != 0) return@flow
 
-    val url =
-      Uri.parse(url)
-        .buildUpon()
-        .appendQueryParameter("page_size", AppContext.PAGE_SIZE.toString())
-        .appendQueryParameter("page", page.toString())
-        .appendQueryParameter("scope", Settings.getScopes().joinToString(","))
-        .build()
-        .toString()
+      val page = ceil(size / AppContext.PAGE_SIZE.toDouble()).toInt() + 1
 
-    get(url).fold(
-      { response ->
-        val data = response.getData()
+      val url =
+        Uri.parse(url)
+          .buildUpon()
+          .appendQueryParameter("page_size", AppContext.PAGE_SIZE.toString())
+          .appendQueryParameter("page", page.toString())
+          .appendQueryParameter("scope", Settings.getScopes().joinToString(" "))
+          .build()
+          .toString()
 
-        when (behavior) {
-          Behavior.Single -> emit(networkResponse(data, page, false))
-          Behavior.Progressive -> emit(networkResponse(data, page, response.next != null))
-          else -> {
-            emit(networkResponse(data, page, response.next != null))
-            if (response.next != null) fetch(size + data.size).collect { emit(it) }
+      get(it, url).fold(
+        { response ->
+          val data = response.getData()
+
+          when (behavior) {
+            Behavior.Single -> emit(networkResponse(data, page, false))
+            Behavior.Progressive -> emit(networkResponse(data, page, response.next != null))
+            else -> {
+              emit(networkResponse(data, page, response.next != null))
+              if (response.next != null) fetch(size + data.size).collect { emit(it) }
+            }
+          }
+        },
+        { error ->
+          when (error.exception) {
+            is RefreshError -> EventBus.send(Event.LogOut)
+            else -> emit(Repository.Response(Repository.Origin.Network, listOf(), page, false))
           }
         }
-      },
-      { error ->
-        when (error.exception) {
-          is RefreshError -> EventBus.send(Event.LogOut)
-          else -> emit(networkResponse(listOf(), page, false))
-        }
-      }
-    )
+      )
+    }
   }.flowOn(IO)
 
   private fun networkResponse(data: List<D>, page: Int, hasMore: Boolean) = Repository.Response(
@@ -76,12 +86,10 @@ class HttpUpstream<D : Any, R : OtterResponse<D>>(
     }
   }
 
-  suspend fun get(url: String): Result<R, FuelError> {
+  suspend fun get(context: Context, url: String): Result<R, FuelError> {
     return try {
       val request = Fuel.get(mustNormalizeUrl(url)).apply {
-        if (!Settings.isAnonymous()) {
-          header("Authorization", "Bearer ${Settings.getAccessToken()}")
-        }
+        authorize(context)
       }
 
       val (_, response, result) = request.awaitObjectResponseResult(GenericDeserializer<R>(type))
@@ -97,20 +105,23 @@ class HttpUpstream<D : Any, R : OtterResponse<D>>(
   }
 
   private suspend fun retryGet(url: String): Result<R, FuelError> {
-    return try {
-      return if (HTTP.refresh()) {
-        val request = Fuel.get(mustNormalizeUrl(url)).apply {
-          if (!Settings.isAnonymous()) {
-            header("Authorization", "Bearer ${Settings.getAccessToken()}")
+    context?.let {
+      return try {
+        return if (http.refresh()) {
+          val request = Fuel.get(mustNormalizeUrl(url)).apply {
+            if (!Settings.isAnonymous()) {
+              header("Authorization", "Bearer ${OAuth.state().accessToken}")
+            }
           }
-        }
 
-        request.awaitObjectResult(GenericDeserializer(type))
-      } else {
-        Result.Failure(FuelError.wrap(RefreshError))
+          request.awaitObjectResult(GenericDeserializer(type))
+        } else {
+          Result.Failure(FuelError.wrap(RefreshError))
+        }
+      } catch (e: Exception) {
+        Result.error(FuelError.wrap(e))
       }
-    } catch (e: Exception) {
-      Result.error(FuelError.wrap(e))
     }
+    throw IllegalStateException("Illegal state: context is null")
   }
 }

@@ -4,7 +4,16 @@ import android.content.Context
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.repositories.FavoritedRepository
 import audio.funkwhale.ffa.repositories.Repository
-import audio.funkwhale.ffa.utils.*
+import audio.funkwhale.ffa.utils.Cache
+import audio.funkwhale.ffa.utils.Command
+import audio.funkwhale.ffa.utils.CommandBus
+import audio.funkwhale.ffa.utils.Event
+import audio.funkwhale.ffa.utils.EventBus
+import audio.funkwhale.ffa.utils.Radio
+import audio.funkwhale.ffa.utils.Track
+import audio.funkwhale.ffa.utils.authorize
+import audio.funkwhale.ffa.utils.mustNormalizeUrl
+import audio.funkwhale.ffa.utils.toast
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.coroutines.awaitObjectResponseResult
 import com.github.kittinunf.fuel.coroutines.awaitObjectResult
@@ -80,7 +89,7 @@ class RadioPlayer(val context: Context, val scope: CoroutineScope) {
 
         val body = Gson().toJson(request)
         val (_, response, result) = Fuel.post(mustNormalizeUrl("/api/v1/radios/sessions/"))
-          .authorize()
+          .authorize(context)
           .header("Content-Type", "application/json")
           .body(body)
           .awaitObjectResponseResult(gsonDeserializerOf(RadioSession::class.java))
@@ -107,7 +116,7 @@ class RadioPlayer(val context: Context, val scope: CoroutineScope) {
       try {
         val body = Gson().toJson(RadioTrackBody(session))
         val result = Fuel.post(mustNormalizeUrl("/api/v1/radios/tracks/"))
-          .authorize()
+          .authorize(context)
           .header("Content-Type", "application/json")
           .apply {
             cookie?.let {
@@ -118,7 +127,7 @@ class RadioPlayer(val context: Context, val scope: CoroutineScope) {
           .awaitObjectResult(gsonDeserializerOf(RadioTrack::class.java))
 
         val trackResponse = Fuel.get(mustNormalizeUrl("/api/v1/tracks/${result.get().track.id}/"))
-          .authorize()
+          .authorize(context)
           .awaitObjectResult(gsonDeserializerOf(Track::class.java))
 
         val favorites = favoritedRepository.fetch(Repository.Origin.Cache.origin)

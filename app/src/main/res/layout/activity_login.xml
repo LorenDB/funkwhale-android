@@ -18,15 +18,14 @@
             android:layout_height="128dp"
             android:layout_marginBottom="32dp"
             android:contentDescription="@string/alt_app_logo"
-            android:src="@drawable/funkwhale"/>
+            android:src="@drawable/funkwhale" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="32dp"
             android:text="@string/login_welcome"
-            android:textAlignment="center"
-            android:textColor="@color/colorPrimary" />
+            android:textAlignment="center" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/hostname_field"
@@ -34,7 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:textColorHint="@drawable/login_input"
-            app:boxBackgroundColor="@color/elevatedSurface"
+            app:boxBackgroundColor="@color/controlAccent"
             app:boxBackgroundMode="filled"
             app:boxStrokeWidth="0dp"
             app:hintTextColor="@drawable/login_input">
@@ -47,7 +46,8 @@
                 android:inputType="textUri"
                 android:lines="1"
                 android:text="@string/debug.hostname"
-                android:textColor="@color/controlColorText"
+                android:textColor="@android:color/white"
+                android:background="@color/elevatedSurface"
                 android:textCursorDrawable="@null" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -56,68 +56,13 @@
             android:id="@+id/cleartext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:buttonTint="@color/controlColorText"
-            android:text="@string/login_cleartext"
-            android:textColor="@color/controlColorText" />
+            android:text="@string/login_cleartext" />
 
         <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/anonymous"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:buttonTint="@color/controlColorText"
-            android:text="@string/login_anonymous"
-            android:textColor="@color/controlColorText" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/username_field"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:hint="@string/login_username"
-            android:textColorHint="@drawable/login_input"
-            app:boxBackgroundColor="@color/elevatedSurface"
-            app:boxBackgroundMode="filled"
-            app:boxStrokeColor="@drawable/login_input"
-            app:boxStrokeWidth="0dp"
-            app:hintTextColor="@drawable/login_input">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/username"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textEmailAddress"
-                android:lines="1"
-                android:text="@string/debug.username"
-                android:textColor="@color/controlColorText"
-                android:textCursorDrawable="@null" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/password_field"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:hint="@string/login_password"
-            android:textColorHint="@drawable/login_input"
-            app:boxBackgroundColor="@color/elevatedSurface"
-            app:boxBackgroundMode="filled"
-            app:boxStrokeColor="@drawable/login_input"
-            app:boxStrokeWidth="0dp"
-            app:hintTextColor="@drawable/login_input"
-            app:passwordToggleEnabled="true">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/password"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                android:lines="1"
-                android:text="@string/debug.password"
-                android:textColor="@color/controlColorText"
-                android:textCursorDrawable="@null" />
-
-        </com.google.android.material.textfield.TextInputLayout>
+            android:text="@string/login_anonymous" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/login"

@@ -4,7 +4,16 @@ import android.content.Context
 import android.net.Uri
 import audio.funkwhale.ffa.FFA
 import audio.funkwhale.ffa.R
-import audio.funkwhale.ffa.utils.*
+import audio.funkwhale.ffa.utils.Cache
+import audio.funkwhale.ffa.utils.Command
+import audio.funkwhale.ffa.utils.CommandBus
+import audio.funkwhale.ffa.utils.Event
+import audio.funkwhale.ffa.utils.EventBus
+import audio.funkwhale.ffa.utils.OAuth
+import audio.funkwhale.ffa.utils.QueueCache
+import audio.funkwhale.ffa.utils.Settings
+import audio.funkwhale.ffa.utils.Track
+import audio.funkwhale.ffa.utils.mustNormalizeUrl
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
@@ -21,16 +30,21 @@ class QueueManager(val context: Context) {
   var current = -1
 
   companion object {
+
     fun factory(context: Context): CacheDataSourceFactory {
-      val http = DefaultHttpDataSourceFactory(Util.getUserAgent(context, context.getString(R.string.app_name))).apply {
-        defaultRequestProperties.apply {
-          if (!Settings.isAnonymous()) {
-            set("Authorization", "Bearer ${Settings.getAccessToken()}")
+      val http = DefaultHttpDataSourceFactory(
+        Util.getUserAgent(context, context.getString(R.string.app_name))
+      )
+        .apply {
+          defaultRequestProperties.apply {
+            if (!Settings.isAnonymous()) {
+              set("Authorization", "Bearer ${OAuth.state().accessToken}")
+            }
           }
         }
-      }
 
-      val playbackCache = CacheDataSourceFactory(FFA.get().exoCache, http)
+      val playbackCache =
+        CacheDataSourceFactory(FFA.get().exoCache, OAuth2DatasourceFactory(context, http))
 
       return CacheDataSourceFactory(
         FFA.get().exoDownloadCache,
@@ -53,7 +67,8 @@ class QueueManager(val context: Context) {
         datasources.addMediaSources(metadata.map { track ->
           val url = mustNormalizeUrl(track.bestUpload()?.listen_url ?: "")
 
-          ProgressiveMediaSource.Factory(factory).setTag(track.title).createMediaSource(Uri.parse(url))
+          ProgressiveMediaSource.Factory(factory).setTag(track.title)
+            .createMediaSource(Uri.parse(url))
         })
       }
     }

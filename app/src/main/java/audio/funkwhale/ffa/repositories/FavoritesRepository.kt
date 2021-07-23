@@ -2,7 +2,19 @@ package audio.funkwhale.ffa.repositories
 
 import android.content.Context
 import audio.funkwhale.ffa.FFA
-import audio.funkwhale.ffa.utils.*
+import audio.funkwhale.ffa.utils.Cache
+import audio.funkwhale.ffa.utils.FavoritedCache
+import audio.funkwhale.ffa.utils.FavoritedResponse
+import audio.funkwhale.ffa.utils.OAuth
+import audio.funkwhale.ffa.utils.OtterResponse
+import audio.funkwhale.ffa.utils.Settings
+import audio.funkwhale.ffa.utils.Track
+import audio.funkwhale.ffa.utils.TracksCache
+import audio.funkwhale.ffa.utils.TracksResponse
+import audio.funkwhale.ffa.utils.authorize
+import audio.funkwhale.ffa.utils.maybeNormalizeUrl
+import audio.funkwhale.ffa.utils.mustNormalizeUrl
+import audio.funkwhale.ffa.utils.untilNetwork
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.coroutines.awaitByteArrayResponseResult
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
@@ -15,13 +27,21 @@ import kotlinx.coroutines.runBlocking
 import java.io.BufferedReader
 
 class FavoritesRepository(override val context: Context?) : Repository<Track, TracksCache>() {
+
   override val cacheId = "favorites.v2"
-  override val upstream = HttpUpstream<Track, OtterResponse<Track>>(HttpUpstream.Behavior.AtOnce, "/api/v1/tracks/?favorites=true&playable=true&ordering=title", object : TypeToken<TracksResponse>() {}.type)
+
+  override val upstream = HttpUpstream<Track, OtterResponse<Track>>(
+    context!!,
+    HttpUpstream.Behavior.AtOnce,
+    "/api/v1/tracks/?favorites=true&playable=true&ordering=title",
+    object : TypeToken<TracksResponse>() {}.type
+  )
 
   override fun cache(data: List<Track>) = TracksCache(data)
-  override fun uncache(reader: BufferedReader) = gsonDeserializerOf(TracksCache::class.java).deserialize(reader)
+  override fun uncache(reader: BufferedReader) =
+    gsonDeserializerOf(TracksCache::class.java).deserialize(reader)
 
-  private val favoritedRepository = FavoritedRepository(context)
+  private val favoritedRepository = FavoritedRepository(context!!)
 
   override fun onDataFetched(data: List<Track>): List<Track> = runBlocking {
     val downloaded = TracksRepository.getDownloadedIds() ?: listOf()
@@ -41,50 +61,62 @@ class FavoritesRepository(override val context: Context?) : Repository<Track, Tr
   }
 
   fun addFavorite(id: Int) {
-    val body = mapOf("track" to id)
+    context?.let {
+      val body = mapOf("track" to id)
 
-    val request = Fuel.post(mustNormalizeUrl("/api/v1/favorites/tracks/")).apply {
-      if (!Settings.isAnonymous()) {
-        header("Authorization", "Bearer ${Settings.getAccessToken()}")
+      val request = Fuel.post(mustNormalizeUrl("/api/v1/favorites/tracks/")).apply {
+        if (!Settings.isAnonymous()) {
+          authorize(context)
+          header("Authorization", "Bearer ${OAuth.state().accessToken}")
+        }
       }
-    }
 
-    scope.launch(IO) {
-      request
-        .header("Content-Type", "application/json")
-        .body(Gson().toJson(body))
-        .awaitByteArrayResponseResult()
+      scope.launch(IO) {
+        request
+          .header("Content-Type", "application/json")
+          .body(Gson().toJson(body))
+          .awaitByteArrayResponseResult()
 
-      favoritedRepository.update(context, scope)
+        favoritedRepository.update(context, scope)
+      }
     }
   }
 
   fun deleteFavorite(id: Int) {
-    val body = mapOf("track" to id)
+    context?.let {
+      val body = mapOf("track" to id)
 
-    val request = Fuel.post(mustNormalizeUrl("/api/v1/favorites/tracks/remove/")).apply {
-      if (!Settings.isAnonymous()) {
-        request.header("Authorization", "Bearer ${Settings.getAccessToken()}")
+      val request = Fuel.post(mustNormalizeUrl("/api/v1/favorites/tracks/remove/")).apply {
+        if (!Settings.isAnonymous()) {
+          authorize(context)
+          request.header("Authorization", "Bearer ${OAuth.state().accessToken}")
+        }
       }
-    }
 
-    scope.launch(IO) {
-      request
-        .header("Content-Type", "application/json")
-        .body(Gson().toJson(body))
-        .awaitByteArrayResponseResult()
+      scope.launch(IO) {
+        request
+          .header("Content-Type", "application/json")
+          .body(Gson().toJson(body))
+          .awaitByteArrayResponseResult()
 
-      favoritedRepository.update(context, scope)
+        favoritedRepository.update(context, scope)
+      }
     }
   }
 }
 
 class FavoritedRepository(override val context: Context?) : Repository<Int, FavoritedCache>() {
   override val cacheId = "favorited"
-  override val upstream = HttpUpstream<Int, OtterResponse<Int>>(HttpUpstream.Behavior.Single, "/api/v1/favorites/tracks/all/?playable=true", object : TypeToken<FavoritedResponse>() {}.type)
+  override val upstream = HttpUpstream<Int, OtterResponse<Int>>(
+    context,
+    HttpUpstream.Behavior.Single,
+    "/api/v1/favorites/tracks/all/?playable=true",
+    object : TypeToken<FavoritedResponse>() {}.type
+  )
 
   override fun cache(data: List<Int>) = FavoritedCache(data)
-  override fun uncache(reader: BufferedReader) = gsonDeserializerOf(FavoritedCache::class.java).deserialize(reader)
+  override fun uncache(reader: BufferedReader) =
+    gsonDeserializerOf(FavoritedCache::class.java).deserialize(reader)
 
   fun update(context: Context?, scope: CoroutineScope) {
     fetch(Origin.Network.origin).untilNetwork(scope, IO) { favorites, _, _, _ ->
