@@ -9,6 +9,7 @@ plugins {
   id("org.jlleitschuh.gradle.ktlint") version "8.1.0"
   id("com.gladed.androidgitversion") version "0.4.14"
   id("com.github.triplet.play") version "2.4.2"
+  jacoco
 }
 
 val props = Properties().apply {
@@ -16,6 +17,10 @@ val props = Properties().apply {
     load(FileInputStream(rootProject.file("local.properties")))
   } catch (e: Exception) {
   }
+}
+
+jacoco {
+  toolVersion = "0.8.7"
 }
 
 androidGitVersion {
@@ -75,6 +80,10 @@ android {
     }
   }
 
+  testOptions {
+    unitTests.isReturnDefaultValues = true
+  }
+
   buildTypes {
     getByName("debug") {
       isDebuggable = true
@@ -83,6 +92,8 @@ android {
       if (project.hasProperty("signing.store")) {
         signingConfig = signingConfigs.getByName("debug")
       }
+
+      isTestCoverageEnabled = true
 
       resValue("string", "debug.hostname", props.getProperty("debug.hostname", ""))
       resValue("string", "debug.username", props.getProperty("debug.username", ""))
@@ -160,6 +171,60 @@ dependencies {
   implementation("com.google.code.gson:gson:2.8.7")
   implementation("com.squareup.picasso:picasso:2.71828")
   implementation("jp.wasabeef:picasso-transformations:2.4.0")
-
   implementation("net.openid:appauth:0.9.1")
+  testImplementation("junit:junit:4.13.2")
+  testImplementation("io.mockk:mockk:1.12.0")
+  androidTestImplementation("io.mockk:mockk-android:1.12.0")
+  testImplementation("androidx.test:core:1.4.0")
+  testImplementation("io.strikt:strikt-core:0.31.0")
+}
+
+project.afterEvaluate {
+  android.applicationVariants.forEach { variant ->
+    val testTaskName = "test${variant.name.capitalize()}UnitTest"
+    tasks.create<JacocoReport>(name = "${testTaskName}Coverage") {
+
+      dependsOn(testTaskName)
+
+      group = "Reporting"
+      description = "Generate Jacoco coverage reports after running tests."
+
+      reports {
+        xml.required.set(true)
+        csv.required.set(true)
+        html.required.set(true)
+      }
+
+      val excludes = listOf(
+        "**/R.class",
+        "**/R$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "**/*Test*.*",
+        "android/**/*.*"
+      )
+
+      val javaClasses =
+        fileTree(baseDir = variant.javaCompileProvider.get().destinationDirectory).matching {
+          setExcludes(excludes)
+        }
+      val kotlinClasses =
+        fileTree(baseDir = "$buildDir/tmp/kotlin-classes/${variant.name}").matching {
+          setExcludes(excludes)
+        }
+      classDirectories.setFrom(files(listOf(javaClasses, kotlinClasses)))
+
+      val sourceDirectories = files(
+        listOf(
+          "$project.projectDir/src/main/java",
+          "$project.projectDir/src/${variant.name}/java",
+          "$project.projectDir/src/main/kotlin",
+          "$project.projectDir/src/${variant.name}/kotlin"
+        )
+      )
+
+      sourceDirectories.setFrom(files(sourceDirectories))
+      executionData.setFrom(files("${project.buildDir}/jacoco/$testTaskName.exec"))
+    }
+  }
 }

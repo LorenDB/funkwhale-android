@@ -23,7 +23,8 @@ class HttpUpstream<D : Any, R : OtterResponse<D>>(
   val context: Context?,
   val behavior: Behavior,
   private val url: String,
-  private val type: Type
+  private val type: Type,
+  private val oAuth: OAuth
 ) : Upstream<D> {
 
   enum class Behavior {
@@ -110,7 +111,7 @@ class HttpUpstream<D : Any, R : OtterResponse<D>>(
         return if (http.refresh()) {
           val request = Fuel.get(mustNormalizeUrl(url)).apply {
             if (!Settings.isAnonymous()) {
-              header("Authorization", "Bearer ${OAuth.state().accessToken}")
+              header("Authorization", "Bearer ${oAuth.state().accessToken}")
             }
           }
 

@@ -9,7 +9,7 @@ import audio.funkwhale.ffa.utils.Command
 import audio.funkwhale.ffa.utils.CommandBus
 import audio.funkwhale.ffa.utils.Event
 import audio.funkwhale.ffa.utils.EventBus
-import audio.funkwhale.ffa.utils.OAuth
+import audio.funkwhale.ffa.utils.OAuthFactory
 import audio.funkwhale.ffa.utils.QueueCache
 import audio.funkwhale.ffa.utils.Settings
 import audio.funkwhale.ffa.utils.Track
@@ -17,6 +17,7 @@ import audio.funkwhale.ffa.utils.mustNormalizeUrl
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 import com.google.android.exoplayer2.upstream.FileDataSource
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource
@@ -32,19 +33,9 @@ class QueueManager(val context: Context) {
   companion object {
 
     fun factory(context: Context): CacheDataSourceFactory {
-      val http = DefaultHttpDataSourceFactory(
-        Util.getUserAgent(context, context.getString(R.string.app_name))
-      )
-        .apply {
-          defaultRequestProperties.apply {
-            if (!Settings.isAnonymous()) {
-              set("Authorization", "Bearer ${OAuth.state().accessToken}")
-            }
-          }
-        }
 
       val playbackCache =
-        CacheDataSourceFactory(FFA.get().exoCache, OAuth2DatasourceFactory(context, http))
+        CacheDataSourceFactory(FFA.get().exoCache, createDatasourceFactory(context))
 
       return CacheDataSourceFactory(
         FFA.get().exoDownloadCache,
@@ -54,6 +45,17 @@ class QueueManager(val context: Context) {
         CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR,
         null
       )
+    }
+
+    private fun createDatasourceFactory(context: Context): DataSource.Factory {
+      val http = DefaultHttpDataSourceFactory(
+        Util.getUserAgent(context, context.getString(R.string.app_name))
+      )
+      return if (!Settings.isAnonymous()) {
+        OAuth2DatasourceFactory(context, http, OAuthFactory.instance())
+      } else {
+        http
+      }
     }
   }
 

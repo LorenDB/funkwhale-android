@@ -4,12 +4,15 @@ import android.content.Context
 import audio.funkwhale.ffa.utils.Album
 import audio.funkwhale.ffa.utils.AlbumsCache
 import audio.funkwhale.ffa.utils.AlbumsResponse
+import audio.funkwhale.ffa.utils.OAuthFactory
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
 import com.google.gson.reflect.TypeToken
 import java.io.BufferedReader
 
 class AlbumsRepository(override val context: Context?, artistId: Int? = null) :
   Repository<Album, AlbumsCache>() {
+
+  private val oAuth = OAuthFactory.instance()
 
   override val cacheId: String by lazy {
     if (artistId == null) "albums"
@@ -25,7 +28,8 @@ class AlbumsRepository(override val context: Context?, artistId: Int? = null) :
       context!!,
       HttpUpstream.Behavior.Progressive,
       url,
-      object : TypeToken<AlbumsResponse>() {}.type
+      object : TypeToken<AlbumsResponse>() {}.type,
+      oAuth
     )
   }
 

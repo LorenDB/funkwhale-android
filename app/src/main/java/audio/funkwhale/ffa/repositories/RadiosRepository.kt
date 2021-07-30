@@ -1,6 +1,7 @@
 package audio.funkwhale.ffa.repositories
 
 import android.content.Context
+import audio.funkwhale.ffa.utils.OAuthFactory
 import audio.funkwhale.ffa.utils.OtterResponse
 import audio.funkwhale.ffa.utils.Radio
 import audio.funkwhale.ffa.utils.RadiosCache
@@ -11,13 +12,16 @@ import java.io.BufferedReader
 
 class RadiosRepository(override val context: Context?) : Repository<Radio, RadiosCache>() {
 
+  private val oAuth = OAuthFactory.instance()
+
   override val cacheId = "radios"
 
   override val upstream = HttpUpstream<Radio, OtterResponse<Radio>>(
     context,
     HttpUpstream.Behavior.Progressive,
     "/api/v1/radios/radios/?ordering=name",
-    object : TypeToken<RadiosResponse>() {}.type
+    object : TypeToken<RadiosResponse>() {}.type,
+    oAuth
   )
 
   override fun cache(data: List<Radio>) = RadiosCache(data)
