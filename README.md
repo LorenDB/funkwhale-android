@@ -1,3 +1,5 @@
+[![coverage report](https://dev.funkwhale.audio/funkwhale/funkwhale-android/badges/develop/coverage.svg?job=test)](https://dev.funkwhale.audio/funkwhale/funkwhale-android/)
+
 # Funkwhale for Android
 
 This is based on the amazing [Otter](https://github.com/apognu/otter) made by
