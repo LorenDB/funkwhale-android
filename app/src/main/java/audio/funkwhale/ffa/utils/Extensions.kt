@@ -80,16 +80,17 @@ fun Request.authorize(context: Context): Request {
   return runBlocking {
     this@authorize.apply {
       if (!Settings.isAnonymous()) {
-        OAuth.state().let { state ->
+        val oauth = OAuthFactory.instance()
+        oauth.state().let { state ->
           val old = state.accessToken
-          val auth = ClientSecretPost(OAuth.state().clientSecret)
+          val auth = ClientSecretPost(oauth.state().clientSecret)
           val done = CompletableDeferred<Boolean>()
 
-          state.performActionWithFreshTokens(OAuth.service(context), auth) { token, _, _ ->
+          state.performActionWithFreshTokens(oauth.service(context), auth) { token, _, _ ->
             if (token != old && token != null) {
               state.save()
             }
-            header("Authorization", "Bearer ${OAuth.state().accessToken}")
+            header("Authorization", "Bearer ${oauth.state().accessToken}")
             done.complete(true)
           }
           done.await()

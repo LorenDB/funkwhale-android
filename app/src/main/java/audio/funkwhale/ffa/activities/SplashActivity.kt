@@ -7,16 +7,21 @@ import androidx.appcompat.app.AppCompatActivity
 import audio.funkwhale.ffa.FFA
 import audio.funkwhale.ffa.utils.AppContext
 import audio.funkwhale.ffa.utils.OAuth
+import audio.funkwhale.ffa.utils.OAuthFactory
 import audio.funkwhale.ffa.utils.Settings
 
 class SplashActivity : AppCompatActivity() {
 
+  private lateinit var oAuth: OAuth
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
+    oAuth = OAuthFactory.instance()
+
     getSharedPreferences(AppContext.PREFS_CREDENTIALS, Context.MODE_PRIVATE)
       .apply {
-        when (OAuth.isAuthorized(this@SplashActivity) || Settings.isAnonymous()) {
+        when (oAuth.isAuthorized(this@SplashActivity) || Settings.isAnonymous()) {
           true -> Intent(this@SplashActivity, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NO_ANIMATION
             startActivity(this)
@@ -30,5 +35,4 @@ class SplashActivity : AppCompatActivity() {
         }
       }
   }
-
 }

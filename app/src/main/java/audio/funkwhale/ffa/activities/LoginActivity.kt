@@ -13,6 +13,7 @@ import audio.funkwhale.ffa.databinding.ActivityLoginBinding
 import audio.funkwhale.ffa.fragments.LoginDialog
 import audio.funkwhale.ffa.utils.AppContext
 import audio.funkwhale.ffa.utils.OAuth
+import audio.funkwhale.ffa.utils.OAuthFactory
 import audio.funkwhale.ffa.utils.Userinfo
 import audio.funkwhale.ffa.utils.log
 import com.github.kittinunf.fuel.Fuel
@@ -28,13 +29,13 @@ data class FwCredentials(val token: String, val non_field_errors: List<String>?)
 class LoginActivity : AppCompatActivity() {
 
   private lateinit var binding: ActivityLoginBinding
-
+  private lateinit var oAuth: OAuth
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
     binding = ActivityLoginBinding.inflate(layoutInflater)
-
+    oAuth = OAuthFactory.instance()
     setContentView(binding.root)
     limitContainerWidth()
   }
@@ -45,7 +46,7 @@ class LoginActivity : AppCompatActivity() {
     data?.let {
       when (requestCode) {
         0 -> {
-          OAuth.exchange(this, data,
+          oAuth.exchange(this, data,
             {
               PowerPreference
                 .getFileByName(AppContext.PREFS_CREDENTIALS)
@@ -114,11 +115,9 @@ class LoginActivity : AppCompatActivity() {
 
   private fun authedLogin(hostname: String) {
     PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).setString("hostname", hostname)
-
-    OAuth.init(hostname)
-
-    OAuth.register {
-      OAuth.authorize(this)
+    oAuth.init(hostname)
+    oAuth.register {
+      oAuth.authorize(this)
     }
   }
 

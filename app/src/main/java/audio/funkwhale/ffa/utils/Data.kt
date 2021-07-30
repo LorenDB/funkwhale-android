@@ -19,25 +19,33 @@ object RefreshError : Throwable()
 class HTTP(val context: Context?) {
 
   suspend fun refresh(): Boolean {
-    val body = mapOf(
-      "username" to PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS)
-        .getString("username"),
-      "password" to PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS)
-        .getString("password")
-    ).toList()
+    context?.let {
+      val body = mapOf(
+        "username" to PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS)
+          .getString("username"),
+        "password" to PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS)
+          .getString("password")
+      ).toList()
 
-    val result = Fuel.post(mustNormalizeUrl("/api/v1/token"), body)
-      .awaitObjectResult(gsonDeserializerOf(FwCredentials::class.java))
+      val result = Fuel.post(mustNormalizeUrl("/api/v1/token"), body).apply {
+        if (!Settings.isAnonymous()) {
+          authorize(it)
+          header("Authorization", "Bearer ${OAuthFactory.instance().state().accessToken}")
+        }
+      }
+        .awaitObjectResult(gsonDeserializerOf(FwCredentials::class.java))
 
-    return result.fold(
-      { data ->
-        PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS)
-          .setString("access_token", data.token)
+      return result.fold(
+        { data ->
+          PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS)
+            .setString("access_token", data.token)
 
-        true
-      },
-      { false }
-    )
+          true
+        },
+        { false }
+      )
+    }
+    throw IllegalStateException("Illegal state: context is null")
   }
 
   suspend inline fun <reified T : Any> get(url: String): Result<T, FuelError> {
@@ -46,7 +54,7 @@ class HTTP(val context: Context?) {
       val request = Fuel.get(mustNormalizeUrl(url)).apply {
         if (!Settings.isAnonymous()) {
           authorize(it)
-          header("Authorization", "Bearer ${OAuth.state().accessToken}")
+          header("Authorization", "Bearer ${OAuthFactory.instance().state().accessToken}")
         }
       }
 
@@ -65,18 +73,13 @@ class HTTP(val context: Context?) {
     url: String
   ): Result<T, FuelError> {
     context?.let {
-      return if (refresh()) {
-        val request = Fuel.get(mustNormalizeUrl(url)).apply {
-          if (!Settings.isAnonymous()) {
-            authorize(context)
-            header("Authorization", "Bearer ${OAuth.state().accessToken}")
-          }
+      val request = Fuel.get(mustNormalizeUrl(url)).apply {
+        if (!Settings.isAnonymous()) {
+          authorize(context)
+          header("Authorization", "Bearer ${OAuthFactory.instance().state().accessToken}")
         }
-
-        request.awaitObjectResult(gsonDeserializerOf(T::class.java))
-      } else {
-        Result.Failure(FuelError.wrap(RefreshError))
       }
+      request.awaitObjectResult(gsonDeserializerOf(T::class.java))
     }
     throw IllegalStateException("Illegal state: context is null")
   }

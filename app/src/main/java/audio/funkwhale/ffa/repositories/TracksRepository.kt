@@ -2,6 +2,7 @@ package audio.funkwhale.ffa.repositories
 
 import android.content.Context
 import audio.funkwhale.ffa.FFA
+import audio.funkwhale.ffa.utils.OAuthFactory
 import audio.funkwhale.ffa.utils.OtterResponse
 import audio.funkwhale.ffa.utils.Track
 import audio.funkwhale.ffa.utils.TracksCache
@@ -19,13 +20,16 @@ import java.io.BufferedReader
 class TracksRepository(override val context: Context?, albumId: Int) :
   Repository<Track, TracksCache>() {
 
+  private val oAuth = OAuthFactory.instance()
+
   override val cacheId = "tracks-album-$albumId"
 
   override val upstream = HttpUpstream<Track, OtterResponse<Track>>(
     context,
     HttpUpstream.Behavior.AtOnce,
     "/api/v1/tracks/?playable=true&album=$albumId&ordering=disc_number,position",
-    object : TypeToken<TracksResponse>() {}.type
+    object : TypeToken<TracksResponse>() {}.type,
+    oAuth
   )
 
   override fun cache(data: List<Track>) = TracksCache(data)

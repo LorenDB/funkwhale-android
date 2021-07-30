@@ -29,13 +29,64 @@ fun AuthState.save() {
   }
 }
 
-object OAuth {
+interface OAuth {
+
+  fun exchange(context: Activity, authorization: Intent, success: () -> Unit, error: () -> Unit)
+
+  fun init(hostname: String)
+
+  fun register(callback: () -> Unit)
+
+  fun authorize(context: Activity)
+
+  fun isAuthorized(context: Context): Boolean
+
+  fun tryRefreshAccessToken(context: Context, overrideNeedsTokenRefresh: Boolean = false): Boolean
+
+  fun tryState(): AuthState?
+
+  fun state(): AuthState
+
+  fun service(context: Context): AuthorizationService
+}
+
+object OAuthFactory {
+
+  private val oAuth: OAuth
+
+  init {
+    oAuth = DefaultOAuth()
+  }
+
+  fun instance() = oAuth
+}
+
+class DefaultOAuth : OAuth {
+
+  companion object {
+
+    private val REDIRECT_URI =
+      Uri.parse("urn:/audio.funkwhale.funkwhale-android/oauth/callback")
+  }
+
   data class App(val client_id: String, val client_secret: String)
 
-  private val REDIRECT_URI =
-    Uri.parse("urn:/audio.funkwhale.funkwhale-android/oauth/callback")
+  override fun tryState(): AuthState? {
 
-  fun isAuthorized(context: Context): Boolean {
+    val savedState = PowerPreference
+      .getFileByName(AppContext.PREFS_CREDENTIALS)
+      .getString("state")
+
+    return if (savedState != null && savedState.isNotEmpty()) {
+      return AuthState.jsonDeserialize(savedState)
+    } else {
+      null
+    }
+  }
+
+  override fun state(): AuthState = tryState()!!
+
+  override fun isAuthorized(context: Context): Boolean {
     val state = tryState()
     return if (state != null) {
       state.isAuthorized || tryRefreshAccessToken(context)
@@ -46,9 +97,10 @@ object OAuth {
     }
   }
 
-  fun state(): AuthState = tryState()!!
-
-  fun tryRefreshAccessToken(context: Context, overrideNeedsTokenRefresh: Boolean = false): Boolean {
+  override fun tryRefreshAccessToken(
+    context: Context,
+    overrideNeedsTokenRefresh: Boolean
+  ): Boolean {
     tryState()?.let { state ->
       val shouldRefreshAccessToken = overrideNeedsTokenRefresh || state.needsTokenRefresh
       if (shouldRefreshAccessToken && state.refreshToken != null) {
@@ -71,26 +123,13 @@ object OAuth {
       }
   }
 
-  fun tryState(): AuthState? {
-
-    val savedState = PowerPreference
-      .getFileByName(AppContext.PREFS_CREDENTIALS)
-      .getString("state")
-
-    return if (savedState != null && savedState.isNotEmpty()) {
-      return AuthState.jsonDeserialize(savedState)
-    } else {
-      null
-    }
-  }
-
-  fun init(hostname: String) {
+  override fun init(hostname: String) {
     AuthState(config(hostname)).save()
   }
 
-  fun service(context: Context) = AuthorizationService(context)
+  override fun service(context: Context): AuthorizationService = AuthorizationService(context)
 
-  fun register(callback: () -> Unit) {
+  override fun register(callback: () -> Unit) {
     state().authorizationServiceConfiguration?.let { config ->
 
       runBlocking {
@@ -133,7 +172,7 @@ object OAuth {
     )
   }
 
-  fun authorize(context: Activity) {
+  override fun authorize(context: Activity) {
     val intent = service(context).run {
       authorizationRequest()?.let {
         getAuthorizationRequestIntent(it)
@@ -143,7 +182,12 @@ object OAuth {
     context.startActivityForResult(intent, 0)
   }
 
-  fun exchange(context: Activity, authorization: Intent, success: () -> Unit, error: () -> Unit) {
+  override fun exchange(
+    context: Activity,
+    authorization: Intent,
+    success: () -> Unit,
+    error: () -> Unit
+  ) {
     state().let { state ->
       state.apply {
         update(

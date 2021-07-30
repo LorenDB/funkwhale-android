@@ -1,7 +1,7 @@
 package audio.funkwhale.ffa.repositories
 
 import android.content.Context
-import audio.funkwhale.ffa.utils.OAuth
+import audio.funkwhale.ffa.utils.OAuthFactory
 import audio.funkwhale.ffa.utils.OtterResponse
 import audio.funkwhale.ffa.utils.Playlist
 import audio.funkwhale.ffa.utils.PlaylistsCache
@@ -30,7 +30,8 @@ class PlaylistsRepository(override val context: Context?) : Repository<Playlist,
     context!!,
     HttpUpstream.Behavior.Progressive,
     "/api/v1/playlists/?playable=true&ordering=name",
-    object : TypeToken<PlaylistsResponse>() {}.type
+    object : TypeToken<PlaylistsResponse>() {}.type,
+    OAuthFactory.instance()
   )
 
   override fun cache(data: List<Playlist>) = PlaylistsCache(data)
@@ -41,13 +42,16 @@ class PlaylistsRepository(override val context: Context?) : Repository<Playlist,
 class ManagementPlaylistsRepository(override val context: Context?) :
   Repository<Playlist, PlaylistsCache>() {
 
+  private val oAuth = OAuthFactory.instance()
+
   override val cacheId = "tracks-playlists-management"
 
   override val upstream = HttpUpstream<Playlist, OtterResponse<Playlist>>(
     context,
     HttpUpstream.Behavior.AtOnce,
     "/api/v1/playlists/?scope=me&ordering=name",
-    object : TypeToken<PlaylistsResponse>() {}.type
+    object : TypeToken<PlaylistsResponse>() {}.type,
+    oAuth
   )
 
   override fun cache(data: List<Playlist>) = PlaylistsCache(data)
@@ -62,7 +66,7 @@ class ManagementPlaylistsRepository(override val context: Context?) :
       val request = Fuel.post(mustNormalizeUrl("/api/v1/playlists/")).apply {
         if (!Settings.isAnonymous()) {
           authorize(context)
-          header("Authorization", "Bearer ${OAuth.state().accessToken}")
+          header("Authorization", "Bearer ${oAuth.state().accessToken}")
         }
       }
 
@@ -85,7 +89,7 @@ class ManagementPlaylistsRepository(override val context: Context?) :
       val request = Fuel.post(mustNormalizeUrl("/api/v1/playlists/$id/add/")).apply {
         if (!Settings.isAnonymous()) {
           authorize(context)
-          header("Authorization", "Bearer ${OAuth.state().accessToken}")
+          header("Authorization", "Bearer ${oAuth.state().accessToken}")
         }
       }
 
@@ -106,7 +110,7 @@ class ManagementPlaylistsRepository(override val context: Context?) :
       val request = Fuel.post(mustNormalizeUrl("/api/v1/playlists/$id/remove/")).apply {
         if (!Settings.isAnonymous()) {
           authorize(context)
-          header("Authorization", "Bearer ${OAuth.state().accessToken}")
+          header("Authorization", "Bearer ${oAuth.state().accessToken}")
         }
       }
 
@@ -125,7 +129,7 @@ class ManagementPlaylistsRepository(override val context: Context?) :
       val request = Fuel.post(mustNormalizeUrl("/api/v1/playlists/$id/move/")).apply {
         if (!Settings.isAnonymous()) {
           authorize(context)
-          header("Authorization", "Bearer ${OAuth.state().accessToken}")
+          header("Authorization", "Bearer ${oAuth.state().accessToken}")
         }
       }
 

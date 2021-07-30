@@ -1,51 +1,82 @@
 image: jangrewe/gitlab-ci-android
 
+variables:
+  JACOCO_CSV_LOCATION: '$CI_PROJECT_DIR/app/build/reports/jacoco/testDebugUnitTestCoverage/testDebugUnitTestCoverage.csv'
+
 stages:
-- build
-- deploy
+  - test
+  - visualize
+  - build
+  - deploy
 
-
-.build:
+.gradle-default:
   stage: build
   before_script:
-  - export GRADLE_USER_HOME=$(pwd)/.gradle
-  - chmod +x ./gradlew
-  - mkdir -p .android && touch .android/repositories.cfg
+    - export GRADLE_USER_HOME=$(pwd)/.gradle
+    - chmod +x ./gradlew
+    - mkdir -p .android && touch .android/repositories.cfg
   script:
-  - echo "Overwrite me"
+    - echo "Overwrite me"
 
   cache:
     key: ${CI_PROJECT_ID}
     paths:
-    - .gradle/
+      - .gradle/
 
+.build:
+  extends: .gradle-default
   artifacts:
     paths:
-    - app/build/outputs/apk/debug/app-debug.apk
+      - app/build/outputs/apk/debug/app-debug.apk
+
+test:
+  extends: .gradle-default
+  stage: test
+  script:
+    - ./gradlew test testDebugUnitTestCoverage
+    - awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/", instructions, " instructions covered"; print 100*covered/instructions, "% covered" }' $JACOCO_CSV_LOCATION
+  artifacts:
+    reports:
+      junit: app/build/test-results/test**/TEST-*.xml
+    paths:
+      - app/build/reports/jacoco/testDebugUnitTestCoverage/testDebugUnitTestCoverage.xml
+
+coverage:
+  stage: visualize
+  image: gjrtimmer/jacoco2cobertura:1.0.8
+  script:
+    # convert report from jacoco to cobertura, use relative project path
+    - 'python /opt/cover2cover.py app/build/reports/jacoco/testDebugUnitTestCoverage/testDebugUnitTestCoverage.xml $CI_PROJECT_DIR/app/src/main/java > app/build/reports/cobertura.xml'
+  needs: [ "test" ]
+  dependencies:
+    - test
+  artifacts:
+    reports:
+      cobertura: app/build/reports/cobertura.xml
 
 build-develop:
   extends: .build
   script:
-  - echo -n $SIGNING_KEY_STORE | base64 -d > app/android.keystore
-  - ./gradlew assembleDebug -Psigning.store=android.keystore -Psigning.store_passphrase=$SIGNING_KEY_PASS -Psigning.key_passphrase=$SIGNING_KEY_PASS
+    - echo -n $SIGNING_KEY_STORE | base64 -d > app/android.keystore
+    - ./gradlew assembleDebug -Psigning.store=android.keystore -Psigning.store_passphrase=$SIGNING_KEY_PASS -Psigning.key_passphrase=$SIGNING_KEY_PASS
   only:
-  - develop
+    - develop
 
 build-bleeding-edge:
   extends: .build
   script:
-  - ./gradlew assembleDebug
+    - ./gradlew assembleDebug
   except:
-  - develop
+    - develop
 
 deploy-develop:
   stage: deploy
-  only: 
-  - develop
+  only:
+    - develop
   script:
-  - eval `ssh-agent -s`
-  - ssh-add <(echo "$SSH_PRIVATE_KEY")
-  - scp -o StrictHostKeyChecking=no app/build/outputs/apk/debug/app-debug.apk fdroid@apps.funkwhale.audio:/srv/fdroid/fdroid/develop/repo/audio.funkwhale.ffa.dev-$CI_COMMIT_SHORT_SHA.apk
-  - ssh -o StrictHostKeyChecking=no fdroid@apps.funkwhale.audio 'docker run --rm -u $(id -u):$(id -g) -v /srv/fdroid/fdroid/develop:/repo registry.gitlab.com/fdroid/docker-executable-fdroidserver:master update'
+    - eval `ssh-agent -s`
+    - ssh-add <(echo "$SSH_PRIVATE_KEY")
+    - scp -o StrictHostKeyChecking=no app/build/outputs/apk/debug/app-debug.apk fdroid@apps.funkwhale.audio:/srv/fdroid/fdroid/develop/repo/audio.funkwhale.ffa.dev-$CI_COMMIT_SHORT_SHA.apk
+    - ssh -o StrictHostKeyChecking=no fdroid@apps.funkwhale.audio 'docker run --rm -u $(id -u):$(id -g) -v /srv/fdroid/fdroid/develop:/repo registry.gitlab.com/fdroid/docker-executable-fdroidserver:master update'
   tags:
     - shell

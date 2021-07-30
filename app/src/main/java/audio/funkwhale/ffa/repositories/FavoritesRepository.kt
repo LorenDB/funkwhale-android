@@ -5,7 +5,7 @@ import audio.funkwhale.ffa.FFA
 import audio.funkwhale.ffa.utils.Cache
 import audio.funkwhale.ffa.utils.FavoritedCache
 import audio.funkwhale.ffa.utils.FavoritedResponse
-import audio.funkwhale.ffa.utils.OAuth
+import audio.funkwhale.ffa.utils.OAuthFactory
 import audio.funkwhale.ffa.utils.OtterResponse
 import audio.funkwhale.ffa.utils.Settings
 import audio.funkwhale.ffa.utils.Track
@@ -28,13 +28,16 @@ import java.io.BufferedReader
 
 class FavoritesRepository(override val context: Context?) : Repository<Track, TracksCache>() {
 
+  private var oAuth = OAuthFactory.instance()
+
   override val cacheId = "favorites.v2"
 
   override val upstream = HttpUpstream<Track, OtterResponse<Track>>(
     context!!,
     HttpUpstream.Behavior.AtOnce,
     "/api/v1/tracks/?favorites=true&playable=true&ordering=title",
-    object : TypeToken<TracksResponse>() {}.type
+    object : TypeToken<TracksResponse>() {}.type,
+    oAuth
   )
 
   override fun cache(data: List<Track>) = TracksCache(data)
@@ -67,7 +70,7 @@ class FavoritesRepository(override val context: Context?) : Repository<Track, Tr
       val request = Fuel.post(mustNormalizeUrl("/api/v1/favorites/tracks/")).apply {
         if (!Settings.isAnonymous()) {
           authorize(context)
-          header("Authorization", "Bearer ${OAuth.state().accessToken}")
+          header("Authorization", "Bearer ${oAuth.state().accessToken}")
         }
       }
 
@@ -89,7 +92,7 @@ class FavoritesRepository(override val context: Context?) : Repository<Track, Tr
       val request = Fuel.post(mustNormalizeUrl("/api/v1/favorites/tracks/remove/")).apply {
         if (!Settings.isAnonymous()) {
           authorize(context)
-          request.header("Authorization", "Bearer ${OAuth.state().accessToken}")
+          request.header("Authorization", "Bearer ${oAuth.state().accessToken}")
         }
       }
 
@@ -106,12 +109,16 @@ class FavoritesRepository(override val context: Context?) : Repository<Track, Tr
 }
 
 class FavoritedRepository(override val context: Context?) : Repository<Int, FavoritedCache>() {
+
+  private val oAuth = OAuthFactory.instance()
+
   override val cacheId = "favorited"
   override val upstream = HttpUpstream<Int, OtterResponse<Int>>(
     context,
     HttpUpstream.Behavior.Single,
     "/api/v1/favorites/tracks/all/?playable=true",
-    object : TypeToken<FavoritedResponse>() {}.type
+    object : TypeToken<FavoritedResponse>() {}.type,
+    oAuth
   )
 
   override fun cache(data: List<Int>) = FavoritedCache(data)

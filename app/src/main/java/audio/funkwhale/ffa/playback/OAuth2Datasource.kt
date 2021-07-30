@@ -11,7 +11,8 @@ import com.google.android.exoplayer2.upstream.TransferListener
 
 class OAuthDatasource(
   private val context: Context,
-  private val http: HttpDataSource
+  private val http: HttpDataSource,
+  private val oauth: OAuth
 ) : DataSource {
 
   override fun addTransferListener(transferListener: TransferListener?) {
@@ -19,7 +20,10 @@ class OAuthDatasource(
   }
 
   override fun open(dataSpec: DataSpec?): Long {
-    OAuth.tryRefreshAccessToken(context)
+    oauth.tryRefreshAccessToken(context)
+    http.apply {
+      setRequestProperty("Authorization", "Bearer ${oauth.state().accessToken}")
+    }
     return http.open(dataSpec)
   }
 
@@ -34,15 +38,15 @@ class OAuthDatasource(
   override fun close() {
     http.close()
   }
-
 }
 
 class OAuth2DatasourceFactory(
   private val context: Context,
-  private val http: DefaultHttpDataSourceFactory
+  private val http: DefaultHttpDataSourceFactory,
+  private val oauth: OAuth
 ) : DataSource.Factory {
 
   override fun createDataSource(): DataSource {
-    return OAuthDatasource(context, http.createDataSource())
+    return OAuthDatasource(context, http.createDataSource(), oauth)
   }
 }
