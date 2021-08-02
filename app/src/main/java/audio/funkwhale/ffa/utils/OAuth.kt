@@ -33,15 +33,15 @@ interface OAuth {
 
   fun exchange(context: Activity, authorization: Intent, success: () -> Unit, error: () -> Unit)
 
-  fun init(hostname: String)
+  fun init(hostname: String): AuthState
 
-  fun register(callback: () -> Unit)
+  fun register(authState: AuthState? = null, callback: () -> Unit)
 
   fun authorize(context: Activity)
 
   fun isAuthorized(context: Context): Boolean
 
-  fun tryRefreshAccessToken(context: Context, overrideNeedsTokenRefresh: Boolean = false): Boolean
+  fun tryRefreshAccessToken(context: Context): Boolean
 
   fun tryState(): AuthState?
 
@@ -55,13 +55,20 @@ object OAuthFactory {
   private val oAuth: OAuth
 
   init {
-    oAuth = DefaultOAuth()
+    oAuth = DefaultOAuth(AuthorizationServiceFactory())
   }
 
   fun instance() = oAuth
 }
 
-class DefaultOAuth : OAuth {
+class AuthorizationServiceFactory {
+
+  fun create(context: Context): AuthorizationService {
+    return AuthorizationService(context)
+  }
+}
+
+class DefaultOAuth(private val authorizationServiceFactory: AuthorizationServiceFactory) : OAuth {
 
   companion object {
 
@@ -84,12 +91,13 @@ class DefaultOAuth : OAuth {
     }
   }
 
-  override fun state(): AuthState = tryState()!!
+  override fun state(): AuthState =
+    tryState() ?: throw IllegalStateException("Couldn't find saved state")
 
   override fun isAuthorized(context: Context): Boolean {
     val state = tryState()
     return if (state != null) {
-      state.isAuthorized || tryRefreshAccessToken(context)
+      state.isAuthorized || doTryRefreshAccessToken(state, context)
     } else {
       false
     }.also {
@@ -97,41 +105,53 @@ class DefaultOAuth : OAuth {
     }
   }
 
-  override fun tryRefreshAccessToken(
-    context: Context,
-    overrideNeedsTokenRefresh: Boolean
-  ): Boolean {
+  override fun tryRefreshAccessToken(context: Context): Boolean {
     tryState()?.let { state ->
-      val shouldRefreshAccessToken = overrideNeedsTokenRefresh || state.needsTokenRefresh
-      if (shouldRefreshAccessToken && state.refreshToken != null) {
-        val refreshRequest = state.createTokenRefreshRequest()
-        val auth = ClientSecretPost(state.clientSecret)
-        runBlocking {
-          service(context).performTokenRequest(refreshRequest, auth) { response, e ->
-            state.apply {
-              update(response, e)
-              save()
-            }
+      return doTryRefreshAccessToken(state, context)
+    }
+    return false
+  }
+
+  private fun doTryRefreshAccessToken(
+    state: AuthState,
+    context: Context
+  ): Boolean {
+    if (state.needsTokenRefresh && state.refreshToken != null) {
+      val refreshRequest = state.createTokenRefreshRequest()
+      val auth = ClientSecretPost(state.clientSecret)
+      runBlocking {
+        service(context).performTokenRequest(refreshRequest, auth) { response, e ->
+          state.apply {
+            update(response, e)
+            save()
           }
         }
       }
     }
-
-    return (tryState()?.isAuthorized ?: false)
+    return (state.isAuthorized)
       .also {
         it.log("tryRefreshAccessToken()")
       }
   }
 
-  override fun init(hostname: String) {
-    AuthState(config(hostname)).save()
+  override fun init(hostname: String): AuthState {
+    return AuthState(
+      AuthorizationServiceConfiguration(
+        Uri.parse("$hostname/authorize"),
+        Uri.parse("$hostname/api/v1/oauth/token/"),
+        Uri.parse("$hostname/api/v1/oauth/apps/")
+      )
+    )
+      .also {
+        it.save()
+      }
   }
 
-  override fun service(context: Context): AuthorizationService = AuthorizationService(context)
+  override fun service(context: Context): AuthorizationService =
+    authorizationServiceFactory.create(context)
 
-  override fun register(callback: () -> Unit) {
-    state().authorizationServiceConfiguration?.let { config ->
-
+  override fun register(authState: AuthState?, callback: () -> Unit) {
+    (authState ?: state()).authorizationServiceConfiguration?.let { config ->
       runBlocking {
         val (_, _, result) = Fuel.post(config.registrationEndpoint.toString())
           .header("Content-Type", "application/json")
@@ -214,12 +234,6 @@ class DefaultOAuth : OAuth {
     }
   }
 
-  private fun config(hostname: String) = AuthorizationServiceConfiguration(
-    Uri.parse("$hostname/authorize"),
-    Uri.parse("$hostname/api/v1/oauth/token/"),
-    Uri.parse("$hostname/api/v1/oauth/apps/")
-  )
-
   private fun registration() =
     state().authorizationServiceConfiguration?.let { config ->
       RegistrationRequest.Builder(config, listOf(REDIRECT_URI)).build()
@@ -238,3 +252,5 @@ class DefaultOAuth : OAuth {
     }
   }
 }
+
+
