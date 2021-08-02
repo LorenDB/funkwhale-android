@@ -9,6 +9,7 @@ plugins {
   id("org.jlleitschuh.gradle.ktlint") version "8.1.0"
   id("com.gladed.androidgitversion") version "0.4.14"
   id("com.github.triplet.play") version "2.4.2"
+  id("de.mobilej.unmock")
   jacoco
 }
 
@@ -17,6 +18,12 @@ val props = Properties().apply {
     load(FileInputStream(rootProject.file("local.properties")))
   } catch (e: Exception) {
   }
+}
+
+unMock {
+  keep = listOf("android.net.Uri")
+  //keepStartingWith("org.")
+  //keepStartingWith("libcore.")
 }
 
 jacoco {

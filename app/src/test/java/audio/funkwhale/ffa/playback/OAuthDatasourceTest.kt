@@ -3,21 +3,20 @@ package audio.funkwhale.ffa.playback
 import android.content.Context
 import android.net.Uri
 import audio.funkwhale.ffa.utils.OAuth
-import audio.funkwhale.util.MockKJUnitRunner
 import com.google.android.exoplayer2.upstream.DataSpec
 import com.google.android.exoplayer2.upstream.HttpDataSource
 import com.google.android.exoplayer2.upstream.TransferListener
+import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.verify
+import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 
-@RunWith(MockKJUnitRunner::class)
 class OAuthDatasourceTest {
 
   @InjectMockKs
@@ -34,10 +33,15 @@ class OAuthDatasourceTest {
 
   private var dataSpec: DataSpec = DataSpec(Uri.EMPTY)
 
+  @Before
+  fun setup(){
+    MockKAnnotations.init(this, relaxUnitFun = true)
+  }
+
   @Test
   fun `open() should set accessToken and delegate to http dataSource`() {
     every { http.open(any()) } returns 0
-    every { oAuth.tryRefreshAccessToken(any(), any()) } returns true
+    every { oAuth.tryRefreshAccessToken(any()) } returns true
     every { oAuth.state().accessToken } returns "accessToken"
 
     datasource.open(dataSpec)
