@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.coroutines.awaitObjectResponseResult
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
 import com.github.kittinunf.fuel.gson.jsonBody
@@ -31,13 +32,13 @@ fun AuthState.save() {
 
 interface OAuth {
 
-  fun exchange(context: Activity, authorization: Intent, success: () -> Unit, error: () -> Unit)
+  fun exchange(context: Context, authorization: Intent, success: () -> Unit, error: () -> Unit)
 
   fun init(hostname: String): AuthState
 
   fun register(authState: AuthState? = null, callback: () -> Unit)
 
-  fun authorize(context: Activity)
+  fun authorize(activity: Activity)
 
   fun isAuthorized(context: Context): Boolean
 
@@ -153,7 +154,7 @@ class DefaultOAuth(private val authorizationServiceFactory: AuthorizationService
   override fun register(authState: AuthState?, callback: () -> Unit) {
     (authState ?: state()).authorizationServiceConfiguration?.let { config ->
       runBlocking {
-        val (_, _, result) = Fuel.post(config.registrationEndpoint.toString())
+        val (_, _, result: Result<App, FuelError>) = Fuel.post(config.registrationEndpoint.toString())
           .header("Content-Type", "application/json")
           .jsonBody(registrationBody())
           .awaitObjectResponseResult(gsonDeserializerOf(App::class.java))
@@ -178,6 +179,7 @@ class DefaultOAuth(private val authorizationServiceFactory: AuthorizationService
           }
 
           is Result.Failure -> {
+            result.log("register()")
           }
         }
       }
@@ -192,18 +194,16 @@ class DefaultOAuth(private val authorizationServiceFactory: AuthorizationService
     )
   }
 
-  override fun authorize(context: Activity) {
-    val intent = service(context).run {
-      authorizationRequest()?.let {
-        getAuthorizationRequestIntent(it)
-      }
+  override fun authorize(activity: Activity) {
+    val authService = service(activity)
+    authorizationRequest()?.let { it ->
+      val intent = authService.getAuthorizationRequestIntent(it)
+      activity.startActivityForResult(intent, 0)
     }
-
-    context.startActivityForResult(intent, 0)
   }
 
   override fun exchange(
-    context: Activity,
+    context: Context,
     authorization: Intent,
     success: () -> Unit,
     error: () -> Unit

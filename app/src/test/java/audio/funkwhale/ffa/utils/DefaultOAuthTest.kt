@@ -1,6 +1,8 @@
 package audio.funkwhale.ffa.utils
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import com.github.kittinunf.fuel.core.Client
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Request
@@ -240,7 +242,7 @@ class DefaultOAuthTest {
     val state = oAuth.init("https://example.com")
     oAuth.register(state) { }
 
-    val requestSlot = slot<com.github.kittinunf.fuel.core.Request>()
+    val requestSlot = slot<Request>()
 
     coVerify { mockkClient.awaitRequest(capture(requestSlot)) }
 
@@ -255,6 +257,32 @@ class DefaultOAuthTest {
         "scopes" to "read write"
       )
     )
+  }
+
+  @Test
+  fun `authorize() should start activity for result`() {
+
+    mockkStatic(PowerPreference::class)
+    every { PowerPreference.getFileByName(any()) } returns mockPreference
+    every { mockPreference.getString(any()) } returns "{}"
+    every { mockPreference.setString(any(), any()) } returns true
+
+    mockkStatic(AuthState::class)
+    val authState = mockk<AuthState>()
+    every { AuthState.jsonDeserialize(any<String>()) } returns authState
+    val mockConfig = mockk<AuthorizationServiceConfiguration>()
+    every { authState.authorizationServiceConfiguration } returns mockConfig
+    every { authState.lastRegistrationResponse } returns mockk()
+
+    every { authServiceFactory.create(any()) } returns authService
+    val mockkIntent = mockk<Intent>()
+    every { authService.getAuthorizationRequestIntent(any()) } returns mockkIntent
+
+    val activity = mockk<Activity>(relaxed = true)
+
+    oAuth.authorize(activity)
+
+    verify { activity.startActivityForResult(mockkIntent, 0) }
   }
 
   private fun <T> deserializeJson(
