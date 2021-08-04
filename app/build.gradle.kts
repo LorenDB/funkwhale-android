@@ -11,6 +11,11 @@ plugins {
   id("com.github.triplet.play") version "2.4.2"
   id("de.mobilej.unmock")
   jacoco
+  id("com.vanniktech.android.junit.jacoco")
+}
+
+junitJacoco {
+  jacocoVersion = Versions.jacoco
 }
 
 val props = Properties().apply {
@@ -22,12 +27,6 @@ val props = Properties().apply {
 
 unMock {
   keep = listOf("android.net.Uri")
-  //keepStartingWith("org.")
-  //keepStartingWith("libcore.")
-}
-
-jacoco {
-  toolVersion = "0.8.7"
 }
 
 androidGitVersion {
@@ -88,7 +87,12 @@ android {
   }
 
   testOptions {
-    unitTests.isReturnDefaultValues = true
+    execution = "ANDROID_TEST_ORCHESTRATOR"
+    animationsDisabled = true
+    unitTests {
+      isReturnDefaultValues = true
+      isIncludeAndroidResources = true
+    }
   }
 
   buildTypes {
@@ -99,8 +103,6 @@ android {
       if (project.hasProperty("signing.store")) {
         signingConfig = signingConfigs.getByName("debug")
       }
-
-      isTestCoverageEnabled = true
 
       resValue("string", "debug.hostname", props.getProperty("debug.hostname", ""))
       resValue("string", "debug.username", props.getProperty("debug.username", ""))
@@ -146,11 +148,11 @@ play {
 dependencies {
   implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 
-  implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.5.21")
+  implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:${Versions.kotlin}")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1")
 
-  implementation("androidx.appcompat:appcompat:1.3.0")
+  implementation("androidx.appcompat:appcompat:1.3.1")
   implementation("androidx.core:core-ktx:1.6.0")
   implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.0-alpha02")
   implementation("androidx.coordinatorlayout:coordinatorlayout:1.1.0")
@@ -160,78 +162,39 @@ dependencies {
   implementation("com.google.android.material:material:1.4.0")
   implementation("com.android.support.constraint:constraint-layout:2.0.4")
 
-  implementation("com.google.android.exoplayer:exoplayer-core:2.11.8")
-  implementation("com.google.android.exoplayer:exoplayer-ui:2.11.8")
-  implementation("com.google.android.exoplayer:extension-mediasession:2.11.8")
-  implementation("com.github.PaulWoitaschek.ExoPlayer-Extensions:extension-opus:2.11.4") {
+  implementation("com.google.android.exoplayer:exoplayer-core:${Versions.exoPlayer}")
+  implementation("com.google.android.exoplayer:exoplayer-ui:${Versions.exoPlayer}")
+  implementation("com.google.android.exoplayer:extension-mediasession:${Versions.exoPlayer}")
+  implementation("com.github.PaulWoitaschek.ExoPlayer-Extensions:extension-opus:${Versions.exoPlayerExtensions}") {
     isTransitive = false
   }
-  implementation("com.github.PaulWoitaschek.ExoPlayer-Extensions:extension-flac:2.11.4") {
+  implementation("com.github.PaulWoitaschek.ExoPlayer-Extensions:extension-flac:${Versions.exoPlayerExtensions}") {
     isTransitive = false
   }
 
-  implementation("com.aliassadi:power-preference-lib:2.0.0")
-  implementation("com.github.kittinunf.fuel:fuel:2.3.1")
-  implementation("com.github.kittinunf.fuel:fuel-coroutines:2.3.1")
-  implementation("com.github.kittinunf.fuel:fuel-android:2.3.1")
-  implementation("com.github.kittinunf.fuel:fuel-gson:2.3.1")
-  implementation("com.google.code.gson:gson:2.8.7")
+  implementation("com.aliassadi:power-preference-lib:${Versions.powerPreference}")
+  implementation("com.github.kittinunf.fuel:fuel:${Versions.fuel}")
+  implementation("com.github.kittinunf.fuel:fuel-coroutines:${Versions.fuel}")
+  implementation("com.github.kittinunf.fuel:fuel-android:${Versions.fuel}")
+  implementation("com.github.kittinunf.fuel:fuel-gson:${Versions.fuel}")
+  implementation("com.google.code.gson:gson:${Versions.gson}")
   implementation("com.squareup.picasso:picasso:2.71828")
   implementation("jp.wasabeef:picasso-transformations:2.4.0")
-  implementation("net.openid:appauth:0.9.1")
+  implementation("net.openid:appauth:${Versions.openIdAppAuth}")
   testImplementation("junit:junit:4.13.2")
   testImplementation("io.mockk:mockk:1.12.0")
-  androidTestImplementation("io.mockk:mockk-android:1.12.0")
+  androidTestImplementation("io.mockk:mockk-android:${Versions.mockk}")
   testImplementation("androidx.test:core:1.4.0")
-  testImplementation("io.strikt:strikt-core:0.31.0")
+  testImplementation("io.strikt:strikt-core:${Versions.strikt}")
 }
 
 project.afterEvaluate {
-  android.applicationVariants.forEach { variant ->
-    val testTaskName = "test${variant.name.capitalize()}UnitTest"
-    tasks.create<JacocoReport>(name = "${testTaskName}Coverage") {
 
-      dependsOn(testTaskName)
-
-      group = "Reporting"
-      description = "Generate Jacoco coverage reports after running tests."
-
-      reports {
-        xml.required.set(true)
-        csv.required.set(true)
-        html.required.set(true)
-      }
-
-      val excludes = listOf(
-        "**/R.class",
-        "**/R$*.class",
-        "**/BuildConfig.*",
-        "**/Manifest*.*",
-        "**/*Test*.*",
-        "android/**/*.*"
-      )
-
-      val javaClasses =
-        fileTree(baseDir = variant.javaCompileProvider.get().destinationDirectory).matching {
-          setExcludes(excludes)
-        }
-      val kotlinClasses =
-        fileTree(baseDir = "$buildDir/tmp/kotlin-classes/${variant.name}").matching {
-          setExcludes(excludes)
-        }
-      classDirectories.setFrom(files(listOf(javaClasses, kotlinClasses)))
-
-      val sourceDirectories = files(
-        listOf(
-          "$project.projectDir/src/main/java",
-          "$project.projectDir/src/${variant.name}/java",
-          "$project.projectDir/src/main/kotlin",
-          "$project.projectDir/src/${variant.name}/kotlin"
-        )
-      )
-
-      sourceDirectories.setFrom(files(sourceDirectories))
-      executionData.setFrom(files("${project.buildDir}/jacoco/$testTaskName.exec"))
+  tasks.withType<JacocoReport> {
+    reports {
+      xml.required.set(true)
+      csv.required.set(true)
+      html.required.set(true)
     }
   }
 }

@@ -252,5 +252,3 @@ class DefaultOAuth(private val authorizationServiceFactory: AuthorizationService
     }
   }
 }
-
-

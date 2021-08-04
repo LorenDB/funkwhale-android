@@ -34,7 +34,7 @@ class OAuthDatasourceTest {
   private var dataSpec: DataSpec = DataSpec(Uri.EMPTY)
 
   @Before
-  fun setup(){
+  fun setup() {
     MockKAnnotations.init(this, relaxUnitFun = true)
   }
 
