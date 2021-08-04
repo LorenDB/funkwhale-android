@@ -1,7 +1,7 @@
 image: jangrewe/gitlab-ci-android
 
 variables:
-  JACOCO_CSV_LOCATION: '$CI_PROJECT_DIR/app/build/reports/jacoco/testDebugUnitTestCoverage/testDebugUnitTestCoverage.csv'
+  JACOCO_CSV_LOCATION: '$CI_PROJECT_DIR/app/build/reports/jacoco/debug/jacoco.csv'
 
 stages:
   - test
@@ -33,20 +33,20 @@ test:
   extends: .gradle-default
   stage: test
   script:
-    - ./gradlew test testDebugUnitTestCoverage
+    - ./gradlew test jacocoTestReportDebug
     - awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/", instructions, " instructions covered"; print 100*covered/instructions, "% covered" }' $JACOCO_CSV_LOCATION
   artifacts:
     reports:
       junit: app/build/test-results/test**/TEST-*.xml
     paths:
-      - app/build/reports/jacoco/testDebugUnitTestCoverage/testDebugUnitTestCoverage.xml
+      - app/build/reports/jacoco/debug/jacoco.xml
 
 coverage:
   stage: visualize
   image: gjrtimmer/jacoco2cobertura:1.0.8
   script:
     # convert report from jacoco to cobertura, use relative project path
-    - 'python /opt/cover2cover.py app/build/reports/jacoco/testDebugUnitTestCoverage/testDebugUnitTestCoverage.xml $CI_PROJECT_DIR/app/src/main/java > app/build/reports/cobertura.xml'
+    - 'python /opt/cover2cover.py app/build/reports/jacoco/debug/jacoco.xml $CI_PROJECT_DIR/app/src/main/java > app/build/reports/cobertura.xml'
   needs: [ "test" ]
   dependencies:
     - test

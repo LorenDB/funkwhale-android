@@ -1,4 +1,5 @@
 buildscript {
+
   repositories {
     google()
     mavenCentral()
@@ -6,13 +7,15 @@ buildscript {
   }
 
   dependencies {
-    classpath("com.android.tools.build:gradle:4.2.2")
-    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.21")
-    classpath("com.github.bjoernq:unmockplugin:0.7.8")
+    classpath("com.android.tools.build:gradle:${Versions.androidGradlePlugin}")
+    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}")
+    classpath("com.github.bjoernq:unmockplugin:${Versions.unmock}")
+    classpath("com.vanniktech:gradle-android-junit-jacoco-plugin:${Versions.gradleAndroidJUnitJacocoPlugin}")
   }
 }
 
 allprojects {
+
   repositories {
     google()
     maven(url = "https://jitpack.io")

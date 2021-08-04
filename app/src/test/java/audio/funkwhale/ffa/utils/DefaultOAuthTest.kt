@@ -33,7 +33,6 @@ import strikt.assertions.isNotNull
 import strikt.assertions.isNull
 import strikt.assertions.isTrue
 
-
 class DefaultOAuthTest {
 
   @InjectMockKs
@@ -293,6 +292,4 @@ class DefaultOAuthTest {
       object : TypeToken<T>() {}.type
     )
   }
-
 }
-
