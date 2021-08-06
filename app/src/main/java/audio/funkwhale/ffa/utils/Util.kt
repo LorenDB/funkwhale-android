@@ -73,14 +73,8 @@ fun toDurationString(duration: Long, showSeconds: Boolean = false): String {
 
 object Settings {
 
-  fun hasAccessToken(): Boolean {
-    return PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).contains("access_token")
-  }
-
   fun isAnonymous() =
     PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).getBoolean("anonymous", false)
-
-  fun areExperimentsEnabled() = PowerPreference.getDefaultFile().getBoolean("experiments", false)
 
   fun getScopes() = PowerPreference.getDefaultFile().getString("scope", "all").split(",")
 }

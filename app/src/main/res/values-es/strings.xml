@@ -74,10 +74,6 @@
     <string name="settings_information_repository_description">Funkwhale para Android</string>
     <string name="settings_information_repository_title">Repositorio</string>
     <string name="settings_information">Información</string>
-    <string name="settings_experiments_restart_content">Por favor fuerza la salida y reinicia la app para que surjan efecto los cambios</string>
-    <string name="settings_experiments_restart_title">Reinicio requerido</string>
-    <string name="settings_experiments_description">Úsalo bajo tu propio riesgo, puede congelar o cerrar inesperadamente la app</string>
-    <string name="settings_experiments">Activar opciones experimentales</string>
     <string name="settings_night_mode_system_summary">El modo oscuro seguirá los ajustes del sistema</string>
     <string name="settings_night_mode_system">Seguir los ajustes del sistema</string>
     <string name="settings_night_mode_off_summary">El modo claro siempre estará activado</string>

@@ -75,8 +75,6 @@
     <string name="settings_information_repository_description">Funkwhale dla Androida</string>
     <string name="settings_information_repository_title">Repozytorium</string>
     <string name="settings_information">Informacje</string>
-    <string name="settings_experiments_restart_content">Aby wprowadzić zmiany należy zrestartować aplikację</string>
-    <string name="settings_experiments_restart_title">Restart jest wymagany</string>
     <string name="settings_play_order_in_order">Odtwarzaj utwory w albumach w kolejności</string>
     <string name="settings_play_order_shuffle">Mieszaj albumy</string>
     <string name="search_placeholder">Szukaj wykonawców, albumów i utworów</string>
@@ -104,8 +102,6 @@
     <string name="settings_information_license_description">Licencja MIT</string>
     <string name="settings_information_license_title">Licencja</string>
     <string name="settings_version_title">Wersja</string>
-    <string name="settings_experiments_description">Używasz na własną odpowiedzialność — może powodować problemy</string>
-    <string name="settings_experiments">Włącz funkcje eksperymentalne</string>
     <string name="settings_night_mode_system_summary">Tryb będzie zależny od ustawień telefonu</string>
     <string name="settings_night_mode_system">Respektuj ustawienia systemowe</string>
     <string name="settings_night_mode_off_summary">Tryb jasny będzie zawsze włączony</string>
