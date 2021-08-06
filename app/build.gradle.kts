@@ -10,6 +10,7 @@ plugins {
   id("com.gladed.androidgitversion") version "0.4.14"
   id("com.github.triplet.play") version "2.4.2"
   id("de.mobilej.unmock")
+  id("com.github.ben-manes.versions")
   jacoco
   id("com.vanniktech.android.junit.jacoco")
 }
@@ -48,20 +49,23 @@ android {
     viewBinding = true
   }
 
-  lintOptions {
+  lint {
     disable("MissingTranslation")
   }
 
   compileSdkVersion(30)
 
   defaultConfig {
-    applicationId = "audio.funkwhale.ffa"
 
-    minSdkVersion(24)
-    targetSdkVersion(30)
+    applicationId = "audio.funkwhale.ffa"
 
     versionCode = androidGitVersion.code()
     versionName = androidGitVersion.name()
+
+    minSdk = 24
+    targetSdk = 30
+
+    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
     manifestPlaceholders["appAuthRedirectScheme"] = "urn"
   }
@@ -154,7 +158,7 @@ dependencies {
 
   implementation("androidx.appcompat:appcompat:1.3.1")
   implementation("androidx.core:core-ktx:1.6.0")
-  implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.0-alpha02")
+  implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.0-alpha03")
   implementation("androidx.coordinatorlayout:coordinatorlayout:1.1.0")
   implementation("androidx.preference:preference-ktx:1.1.1")
   implementation("androidx.recyclerview:recyclerview:1.2.1")
@@ -165,6 +169,7 @@ dependencies {
   implementation("com.google.android.exoplayer:exoplayer-core:${Versions.exoPlayer}")
   implementation("com.google.android.exoplayer:exoplayer-ui:${Versions.exoPlayer}")
   implementation("com.google.android.exoplayer:extension-mediasession:${Versions.exoPlayer}")
+
   implementation("com.github.PaulWoitaschek.ExoPlayer-Extensions:extension-opus:${Versions.exoPlayerExtensions}") {
     isTransitive = false
   }
@@ -181,11 +186,13 @@ dependencies {
   implementation("com.squareup.picasso:picasso:2.71828")
   implementation("jp.wasabeef:picasso-transformations:2.4.0")
   implementation("net.openid:appauth:${Versions.openIdAppAuth}")
+
   testImplementation("junit:junit:4.13.2")
   testImplementation("io.mockk:mockk:1.12.0")
-  androidTestImplementation("io.mockk:mockk-android:${Versions.mockk}")
   testImplementation("androidx.test:core:1.4.0")
   testImplementation("io.strikt:strikt-core:${Versions.strikt}")
+
+  androidTestImplementation("io.mockk:mockk-android:${Versions.mockk}")
 }
 
 project.afterEvaluate {
