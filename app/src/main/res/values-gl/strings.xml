@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="settings_experiments">Activar características experimentais</string>
     <string name="settings_night_mode_system_summary">O modo escuro seguirá os axustes do sistema</string>
     <string name="settings_night_mode_system">Seguir axustes do sistema</string>
     <string name="settings_night_mode_off_summary">O modo claro estará activo sempre</string>
@@ -123,7 +122,4 @@
     <string name="settings_information_repository_description">Funkwhale para Android</string>
     <string name="settings_information_repository_title">Repositorio</string>
     <string name="settings_information">Información</string>
-    <string name="settings_experiments_restart_content">Por favor, pecha e reinicia a app para que este cambio sexa aplicado</string>
-    <string name="settings_experiments_restart_title">Require reiniciar</string>
-    <string name="settings_experiments_description">Usa baixo a túa responsabilidade, podería facer fallar a app</string>
 </resources>

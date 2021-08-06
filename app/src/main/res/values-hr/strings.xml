@@ -86,10 +86,6 @@
     <string name="settings_information_repository_description">Funkwhale za Android</string>
     <string name="settings_information_repository_title">Softverski repozitorij</string>
     <string name="settings_information">Informacije</string>
-    <string name="settings_experiments_restart_content">Molimo ugasite i ponovno pokrenite aplikaciju kako bi se promjene primjenile</string>
-    <string name="settings_experiments_restart_title">Potrebno ponovno pokretanje</string>
-    <string name="settings_experiments_description">Koristiti na svoju odgovornost, može zamrznuti ili srušiti aplikaciju</string>
-    <string name="settings_experiments">Omogući eksperimentalne funkcije</string>
     <string name="settings_night_mode_system_summary">Tamni izgled će se prilagoditi postavkama sistema</string>
     <string name="settings_night_mode_system">Prilagodi postavkama sistema</string>
     <string name="settings_night_mode_off">Uvijek isključen (svjetli izgled)</string>

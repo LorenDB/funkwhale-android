@@ -64,16 +64,6 @@ class SettingsFragment :
     when (preference?.key) {
       "oss_licences" -> startActivity(Intent(activity, LicencesActivity::class.java))
 
-      "experiments" -> {
-        context?.let { context ->
-          AlertDialog.Builder(context)
-            .setTitle(context.getString(R.string.settings_experiments_restart_title))
-            .setMessage(context.getString(R.string.settings_experiments_restart_content))
-            .setPositiveButton(android.R.string.yes) { _, _ -> }
-            .show()
-        }
-      }
-
       "crash" -> {
         activity?.let { activity ->
           (activity.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager)?.also { clip ->

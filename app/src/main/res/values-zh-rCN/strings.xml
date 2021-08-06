@@ -65,10 +65,6 @@
     <string name="settings_information_repository_description">安卓版放克鲸</string>
     <string name="settings_information_repository_title">代码库</string>
     <string name="settings_information">信息</string>
-    <string name="settings_experiments_restart_content">请终止并重新启动应用程序，以便此更改生效</string>
-    <string name="settings_experiments_restart_title">需要重新启动</string>
-    <string name="settings_experiments_description">自行承担使用风险，可能会冻结或崩溃应用</string>
-    <string name="settings_experiments">启用实验功能</string>
     <string name="settings_night_mode_system_summary">夜间模式将遵循系统设置</string>
     <string name="settings_night_mode_system">遵循系统设置</string>
     <string name="settings_night_mode_off_summary">明亮模式将始终打开</string>

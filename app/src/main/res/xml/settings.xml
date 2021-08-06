@@ -42,12 +42,6 @@
       android:key="night_mode"
       android:title="@string/settings_night_mode" />
 
-    <CheckBoxPreference
-      android:icon="@drawable/experimental"
-      android:key="experiments"
-      android:summary="@string/settings_experiments_description"
-      android:title="@string/settings_experiments" />
-
     <Preference
       android:icon="@drawable/bug"
       android:key="crash"

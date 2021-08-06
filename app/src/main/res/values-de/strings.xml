@@ -31,10 +31,6 @@
     <string name="settings_night_mode_off_summary">Heller Modus ist immer eingeschaltet</string>
     <string name="settings_night_mode_system">Wie Systemvoreinstellung</string>
     <string name="settings_night_mode_system_summary">Der Nachtmodus wird den Systemeinstellungen folgen</string>
-    <string name="settings_experiments">Experimentielle Funktionen aktivieren</string>
-    <string name="settings_experiments_description">Auf eigenes Risiko, die App kann abstützen oder einfrieren</string>
-    <string name="settings_experiments_restart_title">Neustart erforderlich</string>
-    <string name="settings_experiments_restart_content">Bitte beende die App und starte sie dann neu, um die Einstellungen zu übernehmen</string>
     <string name="settings_information">Informationen</string>
     <string name="settings_version_title">Version</string>
     <string name="settings_information_repository_description">Funkwhale für Android</string>

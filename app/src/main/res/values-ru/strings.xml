@@ -76,10 +76,6 @@
     <string name="settings_information_repository_description">Funkwhale для Android </string>
     <string name="settings_information_repository_title">Репозиторий</string>
     <string name="settings_information">Информация</string>
-    <string name="settings_experiments_restart_content">Пожалуйста, остановите и запустите приложение что бы изменения применились</string>
-    <string name="settings_experiments_restart_title">Требуется перезагрузка</string>
-    <string name="settings_experiments_description">Используйте на свой страх и риск, приложение может подтормаживать или сбоить</string>
-    <string name="settings_experiments">Включить эксперементальные возможности</string>
     <string name="settings_night_mode_system_summary">Тёмный режим будет следовать настройкам системы</string>
     <string name="settings_night_mode_system">Как указано в настройках системы</string>
     <string name="settings_night_mode_off_summary">Светлый режим всегда будет включен</string>
