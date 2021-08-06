@@ -72,6 +72,8 @@ class FFA : Application() {
 
     instance = this
 
+    PowerPreference.init(this)
+
     when (PowerPreference.getDefaultFile().getString("night_mode")) {
       "on" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
       "off" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
