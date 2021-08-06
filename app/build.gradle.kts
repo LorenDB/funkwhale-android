@@ -50,10 +50,10 @@ android {
   }
 
   lint {
-    disable("MissingTranslation")
+    disable += listOf("MissingTranslation","ExtraTranslation")
   }
 
-  compileSdkVersion(30)
+  compileSdk = 30
 
   defaultConfig {
 
