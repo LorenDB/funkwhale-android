@@ -12,11 +12,6 @@ plugins {
   id("de.mobilej.unmock")
   id("com.github.ben-manes.versions")
   jacoco
-  id("com.vanniktech.android.junit.jacoco")
-}
-
-junitJacoco {
-  jacocoVersion = Versions.jacoco
 }
 
 val props = Properties().apply {
@@ -41,6 +36,10 @@ android {
     targetCompatibility = JavaVersion.VERSION_1_8
   }
 
+  testCoverage {
+    version = Versions.jacoco
+  }
+
   kotlinOptions {
     jvmTarget = JavaVersion.VERSION_1_8.toString()
   }
@@ -50,7 +49,7 @@ android {
   }
 
   lint {
-    disable += listOf("MissingTranslation","ExtraTranslation")
+    disable += listOf("MissingTranslation", "ExtraTranslation")
   }
 
   compileSdk = 30
@@ -103,6 +102,8 @@ android {
     getByName("debug") {
       isDebuggable = true
       applicationIdSuffix = ".dev"
+
+      isTestCoverageEnabled = true
 
       if (project.hasProperty("signing.store")) {
         signingConfig = signingConfigs.getByName("debug")
@@ -191,17 +192,58 @@ dependencies {
   testImplementation("io.mockk:mockk:1.12.0")
   testImplementation("androidx.test:core:1.4.0")
   testImplementation("io.strikt:strikt-core:${Versions.strikt}")
+  testImplementation("org.robolectric:robolectric:${Versions.robolectric}")
 
   androidTestImplementation("io.mockk:mockk-android:${Versions.mockk}")
 }
 
 project.afterEvaluate {
 
-  tasks.withType<JacocoReport> {
+  tasks.withType<Test> {
+
+    configure<JacocoTaskExtension> {
+      isIncludeNoLocationClasses = true
+      excludes = listOf("jdk.internal.*")
+    }
+  }
+
+  tasks.create("jacocoTestReport", type = JacocoReport::class) {
+    dependsOn("testDebugUnitTest", "createDebugCoverageReport")
+
+    group = "Verification"
+    description = "Creates a Jacoco Coverage report"
+
     reports {
       xml.required.set(true)
       csv.required.set(true)
       html.required.set(true)
     }
+
+    val fileFilter = listOf(
+      "**/R.class",
+      "**/R$*.class",
+      "**/BuildConfig.*",
+      "**/Manifest*.*",
+      "**/*Test*.*",
+      "android/**/*.*",
+      "**/*$[0-9].*"
+    )
+
+    val debugTree = fileTree("${project.buildDir}/tmp/kotlin-classes/debug") {
+      setExcludes(fileFilter)
+    }
+    val mainSrc = "${project.projectDir}/src/main/java"
+
+    sourceDirectories.setFrom(files(listOf(mainSrc)))
+    classDirectories.setFrom(files(listOf(debugTree)))
+
+    executionData.setFrom(fileTree(project.buildDir) {
+      setIncludes(
+        listOf(
+          "outputs/unit_test_code_coverage/debugUnitTest/*.exec",
+          "outputs/code_coverage/debugAndroidTest/connected/**/*.ec"
+        )
+      )
+    })
   }
 }

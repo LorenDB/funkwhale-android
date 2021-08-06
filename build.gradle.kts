@@ -10,8 +10,8 @@ buildscript {
     classpath("com.android.tools.build:gradle:${Versions.androidGradlePlugin}")
     classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}")
     classpath("com.github.bjoernq:unmockplugin:${Versions.unmock}")
-    classpath("com.vanniktech:gradle-android-junit-jacoco-plugin:${Versions.gradleAndroidJUnitJacocoPlugin}")
     classpath("com.github.ben-manes:gradle-versions-plugin:${Versions.gradleDependencyPlugin}")
+    classpath("org.jacoco:org.jacoco.core:${Versions.jacoco}")
   }
 }
 
@@ -21,6 +21,18 @@ allprojects {
     google()
     maven(url = "https://jitpack.io")
     jcenter()
+  }
+}
+
+subprojects {
+  configurations.all {
+    resolutionStrategy {
+      eachDependency {
+        if (this.requested.group == "org.jacoco") {
+          this.useVersion("0.8.7")
+        }
+      }
+    }
   }
 }
 
