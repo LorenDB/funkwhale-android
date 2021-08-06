@@ -4,6 +4,7 @@ buildscript {
     google()
     mavenCentral()
     jcenter()
+    gradlePluginPortal()
   }
 
   dependencies {
@@ -11,6 +12,7 @@ buildscript {
     classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}")
     classpath("com.github.bjoernq:unmockplugin:${Versions.unmock}")
     classpath("com.vanniktech:gradle-android-junit-jacoco-plugin:${Versions.gradleAndroidJUnitJacocoPlugin}")
+    classpath("com.github.ben-manes:gradle-versions-plugin:${Versions.gradleDependencyPlugin}")
   }
 }
 
