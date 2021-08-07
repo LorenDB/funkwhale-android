@@ -626,6 +626,7 @@ class MainActivity : AppCompatActivity() {
 
   private fun incrementListenCount(track: Track?) {
     track?.let {
+      it.log("Incrementing listen count for track ${track.id}")
       lifecycleScope.launch(IO) {
         try {
           Fuel
@@ -634,7 +635,8 @@ class MainActivity : AppCompatActivity() {
             .header("Content-Type", "application/json")
             .body(Gson().toJson(mapOf("track" to track.id)))
             .awaitStringResponse()
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+          e.log()
         }
       }
     }

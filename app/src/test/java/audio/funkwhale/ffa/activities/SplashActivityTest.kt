@@ -22,6 +22,5 @@ class SplashActivityTest {
       val appContext = Shadows.shadowOf(ApplicationProvider.getApplicationContext<FFA>())
       expectThat(appContext.nextStartedActivity.component).isEqualTo(expectedIntent.component)
     }
-
   }
 }
