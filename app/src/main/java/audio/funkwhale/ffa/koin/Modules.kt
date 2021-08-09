@@ -4,10 +4,13 @@ import android.content.Context
 import audio.funkwhale.ffa.playback.CacheDataSourceFactoryProvider
 import audio.funkwhale.ffa.playback.MediaSession
 import audio.funkwhale.ffa.utils.AuthorizationServiceFactory
-import audio.funkwhale.ffa.utils.DefaultOAuth
 import audio.funkwhale.ffa.utils.OAuth
 import com.google.android.exoplayer2.database.DatabaseProvider
 import com.google.android.exoplayer2.database.ExoDatabaseProvider
+import com.google.android.exoplayer2.offline.DefaultDownloadIndex
+import com.google.android.exoplayer2.offline.DefaultDownloaderFactory
+import com.google.android.exoplayer2.offline.DownloadManager
+import com.google.android.exoplayer2.offline.DownloaderConstructorHelper
 import com.google.android.exoplayer2.upstream.cache.Cache
 import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
 import com.google.android.exoplayer2.upstream.cache.NoOpCacheEvictor
@@ -20,6 +23,19 @@ fun exoplayerModule(context: Context) = module {
 
   single<DatabaseProvider>(named("exoDatabase")) {
     ExoDatabaseProvider(context)
+  }
+
+  single {
+    val cacheDataSourceFactoryProvider = get<CacheDataSourceFactoryProvider>()
+    DownloaderConstructorHelper(
+      get(named("exoDownloadCache")), cacheDataSourceFactoryProvider.create(context)
+    ).run {
+      DownloadManager(
+        context,
+        DefaultDownloadIndex(get(named("exoDatabase"))),
+        DefaultDownloaderFactory(this)
+      )
+    }
   }
 
   single {
@@ -52,7 +68,6 @@ fun exoplayerModule(context: Context) = module {
 }
 
 fun authModule() = module {
-  single<OAuth> { DefaultOAuth(get()) }
-
+  single { OAuth(get()) }
   single { AuthorizationServiceFactory() }
 }
