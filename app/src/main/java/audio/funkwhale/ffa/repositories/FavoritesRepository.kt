@@ -1,34 +1,28 @@
 package audio.funkwhale.ffa.repositories
 
 import android.content.Context
-import audio.funkwhale.ffa.FFA
-import audio.funkwhale.ffa.utils.Cache
-import audio.funkwhale.ffa.utils.FavoritedCache
-import audio.funkwhale.ffa.utils.FavoritedResponse
-import audio.funkwhale.ffa.utils.OAuthFactory
-import audio.funkwhale.ffa.utils.OtterResponse
-import audio.funkwhale.ffa.utils.Settings
-import audio.funkwhale.ffa.utils.Track
-import audio.funkwhale.ffa.utils.TracksCache
-import audio.funkwhale.ffa.utils.TracksResponse
-import audio.funkwhale.ffa.utils.authorize
-import audio.funkwhale.ffa.utils.maybeNormalizeUrl
-import audio.funkwhale.ffa.utils.mustNormalizeUrl
-import audio.funkwhale.ffa.utils.untilNetwork
+import audio.funkwhale.ffa.utils.*
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.coroutines.awaitByteArrayResponseResult
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
+import com.google.android.exoplayer2.offline.DownloadManager
+import com.google.android.exoplayer2.upstream.cache.Cache
+import com.google.android.exoplayer2.upstream.cache.SimpleCache
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.koin.core.qualifier.named
+import org.koin.java.KoinJavaComponent.inject
 import java.io.BufferedReader
 
 class FavoritesRepository(override val context: Context?) : Repository<Track, TracksCache>() {
 
-  private var oAuth = OAuthFactory.instance()
+  private val exoDownloadManager: DownloadManager by inject(DownloadManager::class.java)
+  private val exoCache: Cache by inject(Cache::class.java, named("exoCache"))
+  private val oAuth: OAuth by inject(OAuth::class.java)
 
   override val cacheId = "favorites.v2"
 
@@ -47,7 +41,7 @@ class FavoritesRepository(override val context: Context?) : Repository<Track, Tr
   private val favoritedRepository = FavoritedRepository(context!!)
 
   override fun onDataFetched(data: List<Track>): List<Track> = runBlocking {
-    val downloaded = TracksRepository.getDownloadedIds() ?: listOf()
+    val downloaded = TracksRepository.getDownloadedIds(exoDownloadManager) ?: listOf()
 
     data.map { track ->
       track.favorite = true
@@ -55,7 +49,7 @@ class FavoritesRepository(override val context: Context?) : Repository<Track, Tr
 
       track.bestUpload()?.let { upload ->
         maybeNormalizeUrl(upload.listen_url)?.let { url ->
-          track.cached = FFA.get().exoCache.isCached(url, 0, upload.duration * 1000L)
+          track.cached = exoCache.isCached(url, 0, upload.duration * 1000L)
         }
       }
 
@@ -69,7 +63,7 @@ class FavoritesRepository(override val context: Context?) : Repository<Track, Tr
 
       val request = Fuel.post(mustNormalizeUrl("/api/v1/favorites/tracks/")).apply {
         if (!Settings.isAnonymous()) {
-          authorize(context)
+          authorize(context, oAuth)
           header("Authorization", "Bearer ${oAuth.state().accessToken}")
         }
       }
@@ -91,7 +85,7 @@ class FavoritesRepository(override val context: Context?) : Repository<Track, Tr
 
       val request = Fuel.post(mustNormalizeUrl("/api/v1/favorites/tracks/remove/")).apply {
         if (!Settings.isAnonymous()) {
-          authorize(context)
+          authorize(context, oAuth)
           request.header("Authorization", "Bearer ${oAuth.state().accessToken}")
         }
       }
@@ -110,7 +104,7 @@ class FavoritesRepository(override val context: Context?) : Repository<Track, Tr
 
 class FavoritedRepository(override val context: Context?) : Repository<Int, FavoritedCache>() {
 
-  private val oAuth = OAuthFactory.instance()
+  private val oAuth: OAuth by inject(OAuth::class.java)
 
   override val cacheId = "favorited"
   override val upstream = HttpUpstream<Int, OtterResponse<Int>>(
@@ -127,7 +121,7 @@ class FavoritedRepository(override val context: Context?) : Repository<Int, Favo
 
   fun update(context: Context?, scope: CoroutineScope) {
     fetch(Origin.Network.origin).untilNetwork(scope, IO) { favorites, _, _, _ ->
-      Cache.set(context, cacheId, Gson().toJson(cache(favorites)).toByteArray())
+      FFACache.set(context, cacheId, Gson().toJson(cache(favorites)).toByteArray())
     }
   }
 }

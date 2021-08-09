@@ -2,18 +2,8 @@ package audio.funkwhale.ffa.playback
 
 import android.content.Context
 import android.net.Uri
-import audio.funkwhale.ffa.FFA
 import audio.funkwhale.ffa.R
-import audio.funkwhale.ffa.utils.Cache
-import audio.funkwhale.ffa.utils.Command
-import audio.funkwhale.ffa.utils.CommandBus
-import audio.funkwhale.ffa.utils.Event
-import audio.funkwhale.ffa.utils.EventBus
-import audio.funkwhale.ffa.utils.OAuthFactory
-import audio.funkwhale.ffa.utils.QueueCache
-import audio.funkwhale.ffa.utils.Settings
-import audio.funkwhale.ffa.utils.Track
-import audio.funkwhale.ffa.utils.mustNormalizeUrl
+import audio.funkwhale.ffa.utils.*
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
@@ -22,51 +12,62 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 import com.google.android.exoplayer2.upstream.FileDataSource
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource
 import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory
+import com.google.android.exoplayer2.upstream.cache.Cache
 import com.google.android.exoplayer2.util.Util
 import com.google.gson.Gson
+import org.koin.java.KoinJavaComponent.inject
 
-class QueueManager(val context: Context) {
-  var metadata: MutableList<Track> = mutableListOf()
-  val datasources = ConcatenatingMediaSource()
-  var current = -1
+class CacheDataSourceFactoryProvider(
+  private val oAuth: OAuth,
+  private val exoCache: Cache,
+  private val exoDownloadCache: Cache
+) {
 
-  companion object {
+  fun create(context: Context): CacheDataSourceFactory {
 
-    fun factory(context: Context): CacheDataSourceFactory {
+    val playbackCache =
+      CacheDataSourceFactory(exoCache, createDatasourceFactory(context, oAuth))
 
-      val playbackCache =
-        CacheDataSourceFactory(FFA.get().exoCache, createDatasourceFactory(context))
-
-      return CacheDataSourceFactory(
-        FFA.get().exoDownloadCache,
-        playbackCache,
-        FileDataSource.Factory(),
-        null,
-        CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR,
-        null
-      )
-    }
-
-    private fun createDatasourceFactory(context: Context): DataSource.Factory {
-      val http = DefaultHttpDataSourceFactory(
-        Util.getUserAgent(context, context.getString(R.string.app_name))
-      )
-      return if (!Settings.isAnonymous()) {
-        OAuth2DatasourceFactory(context, http, OAuthFactory.instance())
-      } else {
-        http
-      }
-    }
+    return CacheDataSourceFactory(
+      exoDownloadCache,
+      playbackCache,
+      FileDataSource.Factory(),
+      null,
+      CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR,
+      null
+    )
   }
 
+  private fun createDatasourceFactory(context: Context, oAuth: OAuth): DataSource.Factory {
+    val http = DefaultHttpDataSourceFactory(
+      Util.getUserAgent(context, context.getString(R.string.app_name))
+    )
+    return if (!Settings.isAnonymous()) {
+      OAuth2DatasourceFactory(context, http, oAuth)
+    } else {
+      http
+    }
+  }
+}
+
+class QueueManager(val context: Context) {
+
+  private val cacheDataSourceFactoryProvider: CacheDataSourceFactoryProvider by inject(
+    CacheDataSourceFactoryProvider::class.java
+  )
+
+  var metadata: MutableList<Track> = mutableListOf()
+  val dataSources = ConcatenatingMediaSource()
+  var current = -1
+
   init {
-    Cache.get(context, "queue")?.let { json ->
+    FFACache.get(context, "queue")?.let { json ->
       gsonDeserializerOf(QueueCache::class.java).deserialize(json)?.let { cache ->
         metadata = cache.data.toMutableList()
 
-        val factory = factory(context)
+        val factory = cacheDataSourceFactoryProvider.create(context)
 
-        datasources.addMediaSources(metadata.map { track ->
+        dataSources.addMediaSources(metadata.map { track ->
           val url = mustNormalizeUrl(track.bestUpload()?.listen_url ?: "")
 
           ProgressiveMediaSource.Factory(factory).setTag(track.title)
@@ -75,13 +76,13 @@ class QueueManager(val context: Context) {
       }
     }
 
-    Cache.get(context, "current")?.let { string ->
+    FFACache.get(context, "current")?.let { string ->
       current = string.readLine().toInt()
     }
   }
 
   private fun persist() {
-    Cache.set(
+    FFACache.set(
       context,
       "queue",
       Gson().toJson(QueueCache(metadata)).toByteArray()
@@ -89,8 +90,7 @@ class QueueManager(val context: Context) {
   }
 
   fun replace(tracks: List<Track>) {
-    val factory = factory(context)
-
+    val factory = cacheDataSourceFactoryProvider.create(context)
     val sources = tracks.map { track ->
       val url = mustNormalizeUrl(track.bestUpload()?.listen_url ?: "")
 
@@ -98,8 +98,8 @@ class QueueManager(val context: Context) {
     }
 
     metadata = tracks.toMutableList()
-    datasources.clear()
-    datasources.addMediaSources(sources)
+    dataSources.clear()
+    dataSources.addMediaSources(sources)
 
     persist()
 
@@ -107,7 +107,7 @@ class QueueManager(val context: Context) {
   }
 
   fun append(tracks: List<Track>) {
-    val factory = factory(context)
+    val factory = cacheDataSourceFactoryProvider.create(context)
     val missingTracks = tracks.filter { metadata.indexOf(it) == -1 }
 
     val sources = missingTracks.map { track ->
@@ -117,7 +117,7 @@ class QueueManager(val context: Context) {
     }
 
     metadata.addAll(tracks)
-    datasources.addMediaSources(sources)
+    dataSources.addMediaSources(sources)
 
     persist()
 
@@ -125,12 +125,12 @@ class QueueManager(val context: Context) {
   }
 
   fun insertNext(track: Track) {
-    val factory = factory(context)
+    val factory = cacheDataSourceFactoryProvider.create(context)
     val url = mustNormalizeUrl(track.bestUpload()?.listen_url ?: "")
 
     if (metadata.indexOf(track) == -1) {
       ProgressiveMediaSource.Factory(factory).createMediaSource(Uri.parse(url)).let {
-        datasources.addMediaSource(current + 1, it)
+        dataSources.addMediaSource(current + 1, it)
         metadata.add(current + 1, track)
       }
     } else {
@@ -148,7 +148,7 @@ class QueueManager(val context: Context) {
         return
       }
 
-      datasources.removeMediaSource(it)
+      dataSources.removeMediaSource(it)
       metadata.removeAt(it)
 
       if (it == current) {
@@ -170,7 +170,7 @@ class QueueManager(val context: Context) {
   }
 
   fun move(oldPosition: Int, newPosition: Int) {
-    datasources.moveMediaSource(oldPosition, newPosition)
+    dataSources.moveMediaSource(oldPosition, newPosition)
     metadata.add(newPosition, metadata.removeAt(oldPosition))
 
     persist()
@@ -193,7 +193,7 @@ class QueueManager(val context: Context) {
 
   fun clear() {
     metadata = mutableListOf()
-    datasources.clear()
+    dataSources.clear()
     current = -1
 
     persist()
@@ -214,7 +214,7 @@ class QueueManager(val context: Context) {
           .shuffled()
 
       while (metadata.size > 1) {
-        datasources.removeMediaSource(metadata.size - 1)
+        dataSources.removeMediaSource(metadata.size - 1)
         metadata.removeAt(metadata.size - 1)
       }
 

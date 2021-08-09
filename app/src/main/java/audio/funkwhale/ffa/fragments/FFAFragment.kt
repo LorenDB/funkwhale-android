@@ -142,7 +142,7 @@ abstract class FFAFragment<D : Any, A : FFAAdapter<D, *>>() : Fragment() {
           withContext(IO) {
             try {
               repository.cacheId?.let { cacheId ->
-                Cache.set(
+                FFACache.set(
                   context,
                   cacheId,
                   Gson().toJson(repository.cache(adapter.data)).toByteArray()
@@ -168,7 +168,7 @@ abstract class FFAFragment<D : Any, A : FFAAdapter<D, *>>() : Fragment() {
 
           (repository.upstream as? HttpUpstream<*, *>)?.let { upstream ->
             when (upstream.behavior) {
-              HttpUpstream.Behavior.Progressive -> if (!hasMore || !moreLoading) swiper?.isRefreshing =
+              HttpUpstream.Behavior.Progressive -> if (!hasMore || !moreLoading) swiper.isRefreshing =
                 false
               HttpUpstream.Behavior.AtOnce -> if (!hasMore) swiper.isRefreshing = false
               HttpUpstream.Behavior.Single -> if (!hasMore) swiper.isRefreshing = false

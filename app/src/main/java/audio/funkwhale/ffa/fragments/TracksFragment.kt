@@ -17,21 +17,9 @@ import audio.funkwhale.ffa.databinding.FragmentTracksBinding
 import audio.funkwhale.ffa.repositories.FavoritedRepository
 import audio.funkwhale.ffa.repositories.FavoritesRepository
 import audio.funkwhale.ffa.repositories.TracksRepository
-import audio.funkwhale.ffa.utils.Album
-import audio.funkwhale.ffa.utils.Command
-import audio.funkwhale.ffa.utils.CommandBus
-import audio.funkwhale.ffa.utils.Event
-import audio.funkwhale.ffa.utils.EventBus
-import audio.funkwhale.ffa.utils.Request
-import audio.funkwhale.ffa.utils.RequestBus
-import audio.funkwhale.ffa.utils.Response
-import audio.funkwhale.ffa.utils.Track
-import audio.funkwhale.ffa.utils.getMetadata
-import audio.funkwhale.ffa.utils.maybeLoad
-import audio.funkwhale.ffa.utils.maybeNormalizeUrl
-import audio.funkwhale.ffa.utils.toast
-import audio.funkwhale.ffa.utils.wait
+import audio.funkwhale.ffa.utils.*
 import com.google.android.exoplayer2.offline.Download
+import com.google.android.exoplayer2.offline.DownloadManager
 import com.preference.PowerPreference
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
@@ -40,8 +28,11 @@ import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.java.KoinJavaComponent.inject
 
 class TracksFragment : FFAFragment<Track, TracksAdapter>() {
+
+  private val exoDownloadManager: DownloadManager by inject(DownloadManager::class.java)
 
   override val recycler: RecyclerView get() = binding.tracks
 
@@ -252,7 +243,7 @@ class TracksFragment : FFAFragment<Track, TracksAdapter>() {
   }
 
   private suspend fun refreshDownloadedTracks() {
-    val downloaded = TracksRepository.getDownloadedIds() ?: listOf()
+    val downloaded = TracksRepository.getDownloadedIds(exoDownloadManager) ?: listOf()
 
     withContext(Main) {
       adapter.data = adapter.data.map {

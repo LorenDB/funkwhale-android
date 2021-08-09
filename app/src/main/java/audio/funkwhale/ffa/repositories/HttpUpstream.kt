@@ -32,8 +32,6 @@ class HttpUpstream<D : Any, R : OtterResponse<D>>(
     Progressive
   }
 
-  private val http = HTTP(context)
-
   override fun fetch(size: Int): Flow<Repository.Response<D>> = flow<Repository.Response<D>> {
 
     context?.let {
@@ -89,7 +87,7 @@ class HttpUpstream<D : Any, R : OtterResponse<D>>(
   suspend fun get(context: Context, url: String): Result<R, FuelError> {
     return try {
       val request = Fuel.get(mustNormalizeUrl(url)).apply {
-        authorize(context)
+        authorize(context, oAuth)
       }
       val (_, _, result) = request.awaitObjectResponseResult(GenericDeserializer<R>(type))
       result

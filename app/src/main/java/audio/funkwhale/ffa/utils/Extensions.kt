@@ -76,21 +76,20 @@ fun Picasso.maybeLoad(url: String?): RequestCreator {
   else load(url)
 }
 
-fun Request.authorize(context: Context): Request {
+fun Request.authorize(context: Context, oAuth: OAuth): Request {
   return runBlocking {
     this@authorize.apply {
       if (!Settings.isAnonymous()) {
-        val oauth = OAuthFactory.instance()
-        oauth.state().let { state ->
+        oAuth.state().let { state ->
           val old = state.accessToken
-          val auth = ClientSecretPost(oauth.state().clientSecret)
+          val auth = ClientSecretPost(oAuth.state().clientSecret)
           val done = CompletableDeferred<Boolean>()
 
-          state.performActionWithFreshTokens(oauth.service(context), auth) { token, _, _ ->
+          state.performActionWithFreshTokens(oAuth.service(context), auth) { token, _, _ ->
             if (token != old && token != null) {
               state.save()
             }
-            header("Authorization", "Bearer ${oauth.state().accessToken}")
+            header("Authorization", "Bearer ${oAuth.state().accessToken}")
             done.complete(true)
           }
           done.await()

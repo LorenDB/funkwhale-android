@@ -4,24 +4,26 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import audio.funkwhale.ffa.FFA
 import audio.funkwhale.ffa.adapters.DownloadsAdapter
 import audio.funkwhale.ffa.databinding.ActivityDownloadsBinding
 import audio.funkwhale.ffa.utils.Event
 import audio.funkwhale.ffa.utils.EventBus
 import audio.funkwhale.ffa.utils.getMetadata
 import com.google.android.exoplayer2.offline.Download
+import com.google.android.exoplayer2.offline.DownloadManager
 import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.java.KoinJavaComponent.inject
 
 class DownloadsActivity : AppCompatActivity() {
 
   private lateinit var adapter: DownloadsAdapter
   private lateinit var binding: ActivityDownloadsBinding
+  private val exoDownloadManager: DownloadManager by inject(DownloadManager::class.java)
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -63,7 +65,7 @@ class DownloadsActivity : AppCompatActivity() {
 
   private fun refresh() {
     lifecycleScope.launch(Main) {
-      val cursor = FFA.get().exoDownloadManager.downloadIndex.getDownloads()
+      val cursor = exoDownloadManager.downloadIndex.getDownloads()
 
       adapter.downloads.clear()
 
@@ -99,7 +101,7 @@ class DownloadsActivity : AppCompatActivity() {
   }
 
   private suspend fun refreshProgress() {
-    val cursor = FFA.get().exoDownloadManager.downloadIndex.getDownloads()
+    val cursor = exoDownloadManager.downloadIndex.getDownloads()
 
     while (cursor.moveToNext()) {
       val download = cursor.download

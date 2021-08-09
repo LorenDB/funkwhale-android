@@ -1,26 +1,26 @@
 package audio.funkwhale.ffa.repositories
 
 import android.content.Context
-import audio.funkwhale.ffa.FFA
-import audio.funkwhale.ffa.utils.OAuthFactory
-import audio.funkwhale.ffa.utils.OtterResponse
-import audio.funkwhale.ffa.utils.Track
-import audio.funkwhale.ffa.utils.TracksCache
-import audio.funkwhale.ffa.utils.TracksResponse
-import audio.funkwhale.ffa.utils.getMetadata
-import audio.funkwhale.ffa.utils.mustNormalizeUrl
+import audio.funkwhale.ffa.utils.*
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
 import com.google.android.exoplayer2.offline.Download
+import com.google.android.exoplayer2.offline.DownloadManager
+import com.google.android.exoplayer2.upstream.cache.Cache
+import com.google.android.exoplayer2.upstream.cache.SimpleCache
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
+import org.koin.core.qualifier.named
+import org.koin.java.KoinJavaComponent.inject
 import java.io.BufferedReader
 
 class TracksRepository(override val context: Context?, albumId: Int) :
   Repository<Track, TracksCache>() {
 
-  private val oAuth = OAuthFactory.instance()
+  private val exoCache: Cache by inject(Cache::class.java, named("exoCache"))
+  private val oAuth: OAuth by inject(OAuth::class.java)
+  private val exoDownloadManager: DownloadManager by inject(DownloadManager::class.java)
 
   override val cacheId = "tracks-album-$albumId"
 
@@ -37,8 +37,8 @@ class TracksRepository(override val context: Context?, albumId: Int) :
     gsonDeserializerOf(TracksCache::class.java).deserialize(reader)
 
   companion object {
-    fun getDownloadedIds(): List<Int>? {
-      val cursor = FFA.get().exoDownloadManager.downloadIndex.getDownloads()
+    fun getDownloadedIds(exoDownloadManager: DownloadManager): List<Int>? {
+      val cursor = exoDownloadManager.downloadIndex.getDownloads()
       val ids: MutableList<Int> = mutableListOf()
 
       while (cursor.moveToNext()) {
@@ -61,7 +61,7 @@ class TracksRepository(override val context: Context?, albumId: Int) :
       .toList()
       .flatten()
 
-    val downloaded = getDownloadedIds() ?: listOf()
+    val downloaded = getDownloadedIds(exoDownloadManager) ?: listOf()
 
     data.map { track ->
       track.favorite = favorites.contains(track.id)
@@ -70,7 +70,7 @@ class TracksRepository(override val context: Context?, albumId: Int) :
       track.bestUpload()?.let { upload ->
         val url = mustNormalizeUrl(upload.listen_url)
 
-        track.cached = FFA.get().exoCache.isCached(url, 0, upload.duration * 1000L)
+        track.cached = exoCache.isCached(url, 0, upload.duration * 1000L)
       }
 
       track

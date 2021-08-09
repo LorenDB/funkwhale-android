@@ -115,7 +115,7 @@ object AddToPlaylistDialog {
 
         lifecycleScope.launch(IO) {
           try {
-            Cache.set(
+            FFACache.set(
               context,
               cacheId,
               Gson().toJson(cache(adapter.data)).toByteArray()

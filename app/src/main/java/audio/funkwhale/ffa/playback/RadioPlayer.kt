@@ -4,16 +4,7 @@ import android.content.Context
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.repositories.FavoritedRepository
 import audio.funkwhale.ffa.repositories.Repository
-import audio.funkwhale.ffa.utils.Cache
-import audio.funkwhale.ffa.utils.Command
-import audio.funkwhale.ffa.utils.CommandBus
-import audio.funkwhale.ffa.utils.Event
-import audio.funkwhale.ffa.utils.EventBus
-import audio.funkwhale.ffa.utils.Radio
-import audio.funkwhale.ffa.utils.Track
-import audio.funkwhale.ffa.utils.authorize
-import audio.funkwhale.ffa.utils.mustNormalizeUrl
-import audio.funkwhale.ffa.utils.toast
+import audio.funkwhale.ffa.utils.*
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.coroutines.awaitObjectResponseResult
 import com.github.kittinunf.fuel.coroutines.awaitObjectResult
@@ -27,8 +18,14 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.withContext
+import org.koin.java.KoinJavaComponent.inject
 
-data class RadioSessionBody(val radio_type: String, var custom_radio: Int? = null, var related_object_id: String? = null)
+data class RadioSessionBody(
+  val radio_type: String,
+  var custom_radio: Int? = null,
+  var related_object_id: String? = null
+)
+
 data class RadioSession(val id: Int)
 data class RadioTrackBody(val session: Int)
 data class RadioTrack(val position: Int, val track: RadioTrackID)
@@ -37,6 +34,7 @@ data class RadioTrackID(val id: Int)
 class RadioPlayer(val context: Context, val scope: CoroutineScope) {
   val lock = Semaphore(1)
 
+  private val oAuth: OAuth by inject(OAuth::class.java)
   private var currentRadio: Radio? = null
   private var session: Int? = null
   private var cookie: String? = null
@@ -44,10 +42,10 @@ class RadioPlayer(val context: Context, val scope: CoroutineScope) {
   private val favoritedRepository = FavoritedRepository(context)
 
   init {
-    Cache.get(context, "radio_type")?.readLine()?.let { radio_type ->
-      Cache.get(context, "radio_id")?.readLine()?.toInt()?.let { radio_id ->
-        Cache.get(context, "radio_session")?.readLine()?.toInt()?.let { radio_session ->
-          val cachedCookie = Cache.get(context, "radio_cookie")?.readLine()
+    FFACache.get(context, "radio_type")?.readLine()?.let { radio_type ->
+      FFACache.get(context, "radio_id")?.readLine()?.toInt()?.let { radio_id ->
+        FFACache.get(context, "radio_session")?.readLine()?.toInt()?.let { radio_session ->
+          val cachedCookie = FFACache.get(context, "radio_cookie")?.readLine()
 
           currentRadio = Radio(radio_id, radio_type, "", "")
           session = radio_session
@@ -70,10 +68,10 @@ class RadioPlayer(val context: Context, val scope: CoroutineScope) {
     currentRadio = null
     session = null
 
-    Cache.delete(context, "radio_type")
-    Cache.delete(context, "radio_id")
-    Cache.delete(context, "radio_session")
-    Cache.delete(context, "radio_cookie")
+    FFACache.delete(context, "radio_type")
+    FFACache.delete(context, "radio_id")
+    FFACache.delete(context, "radio_session")
+    FFACache.delete(context, "radio_cookie")
   }
 
   fun isActive() = currentRadio != null && session != null
@@ -81,15 +79,16 @@ class RadioPlayer(val context: Context, val scope: CoroutineScope) {
   private suspend fun createSession() {
     currentRadio?.let { radio ->
       try {
-        val request = RadioSessionBody(radio.radio_type, related_object_id = radio.related_object_id).apply {
-          if (radio_type == "custom") {
-            custom_radio = radio.id
+        val request =
+          RadioSessionBody(radio.radio_type, related_object_id = radio.related_object_id).apply {
+            if (radio_type == "custom") {
+              custom_radio = radio.id
+            }
           }
-        }
 
         val body = Gson().toJson(request)
         val (_, response, result) = Fuel.post(mustNormalizeUrl("/api/v1/radios/sessions/"))
-          .authorize(context)
+          .authorize(context, oAuth)
           .header("Content-Type", "application/json")
           .body(body)
           .awaitObjectResponseResult(gsonDeserializerOf(RadioSession::class.java))
@@ -97,10 +96,10 @@ class RadioPlayer(val context: Context, val scope: CoroutineScope) {
         session = result.get().id
         cookie = response.header("set-cookie").joinToString(";")
 
-        Cache.set(context, "radio_type", radio.radio_type.toByteArray())
-        Cache.set(context, "radio_id", radio.id.toString().toByteArray())
-        Cache.set(context, "radio_session", session.toString().toByteArray())
-        Cache.set(context, "radio_cookie", cookie.toString().toByteArray())
+        FFACache.set(context, "radio_type", radio.radio_type.toByteArray())
+        FFACache.set(context, "radio_id", radio.id.toString().toByteArray())
+        FFACache.set(context, "radio_session", session.toString().toByteArray())
+        FFACache.set(context, "radio_cookie", cookie.toString().toByteArray())
 
         prepareNextTrack(true)
       } catch (e: Exception) {
@@ -116,7 +115,7 @@ class RadioPlayer(val context: Context, val scope: CoroutineScope) {
       try {
         val body = Gson().toJson(RadioTrackBody(session))
         val result = Fuel.post(mustNormalizeUrl("/api/v1/radios/tracks/"))
-          .authorize(context)
+          .authorize(context, oAuth)
           .header("Content-Type", "application/json")
           .apply {
             cookie?.let {
@@ -127,7 +126,7 @@ class RadioPlayer(val context: Context, val scope: CoroutineScope) {
           .awaitObjectResult(gsonDeserializerOf(RadioTrack::class.java))
 
         val trackResponse = Fuel.get(mustNormalizeUrl("/api/v1/tracks/${result.get().track.id}/"))
-          .authorize(context)
+          .authorize(context, oAuth)
           .awaitObjectResult(gsonDeserializerOf(Track::class.java))
 
         val favorites = favoritedRepository.fetch(Repository.Origin.Cache.origin)

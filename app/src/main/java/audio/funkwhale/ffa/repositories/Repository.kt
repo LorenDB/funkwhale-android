@@ -2,8 +2,8 @@ package audio.funkwhale.ffa.repositories
 
 import android.content.Context
 import audio.funkwhale.ffa.utils.AppContext
-import audio.funkwhale.ffa.utils.Cache
 import audio.funkwhale.ffa.utils.CacheItem
+import audio.funkwhale.ffa.utils.FFACache
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Job
@@ -32,16 +32,26 @@ abstract class Repository<D : Any, C : CacheItem<D>> {
   open fun cache(data: List<D>): C? = null
   protected open fun uncache(reader: BufferedReader): C? = null
 
-  fun fetch(upstreams: Int = Origin.Cache.origin and Origin.Network.origin, size: Int = 0): Flow<Response<D>> = flow {
+  fun fetch(
+    upstreams: Int = Origin.Cache.origin and Origin.Network.origin,
+    size: Int = 0
+  ): Flow<Response<D>> = flow {
     if (Origin.Cache.origin and upstreams == upstreams) fromCache().collect { emit(it) }
     if (Origin.Network.origin and upstreams == upstreams) fromNetwork(size).collect { emit(it) }
   }
 
   private fun fromCache() = flow {
     cacheId?.let { cacheId ->
-      Cache.get(context, cacheId)?.let { reader ->
+      FFACache.get(context, cacheId)?.let { reader ->
         uncache(reader)?.let { cache ->
-          return@flow emit(Response(Origin.Cache, cache.data, ceil(cache.data.size / AppContext.PAGE_SIZE.toDouble()).toInt(), false))
+          return@flow emit(
+            Response(
+              Origin.Cache,
+              cache.data,
+              ceil(cache.data.size / AppContext.PAGE_SIZE.toDouble()).toInt(),
+              false
+            )
+          )
         }
       }
 
@@ -52,8 +62,24 @@ abstract class Repository<D : Any, C : CacheItem<D>> {
   private fun fromNetwork(size: Int) = flow {
     upstream
       .fetch(size)
-      .map { response -> Response(Origin.Network, onDataFetched(response.data), response.page, response.hasMore) }
-      .collect { response -> emit(Response(Origin.Network, response.data, response.page, response.hasMore)) }
+      .map { response ->
+        Response(
+          Origin.Network,
+          onDataFetched(response.data),
+          response.page,
+          response.hasMore
+        )
+      }
+      .collect { response ->
+        emit(
+          Response(
+            Origin.Network,
+            response.data,
+            response.page,
+            response.hasMore
+          )
+        )
+      }
   }
 
   protected open fun onDataFetched(data: List<D>) = data

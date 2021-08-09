@@ -1,29 +1,25 @@
 package audio.funkwhale.ffa.repositories
 
 import android.content.Context
-import audio.funkwhale.ffa.FFA
-import audio.funkwhale.ffa.utils.Album
-import audio.funkwhale.ffa.utils.AlbumsCache
-import audio.funkwhale.ffa.utils.AlbumsResponse
-import audio.funkwhale.ffa.utils.Artist
-import audio.funkwhale.ffa.utils.ArtistsCache
-import audio.funkwhale.ffa.utils.ArtistsResponse
-import audio.funkwhale.ffa.utils.OAuthFactory
-import audio.funkwhale.ffa.utils.Track
-import audio.funkwhale.ffa.utils.TracksCache
-import audio.funkwhale.ffa.utils.TracksResponse
-import audio.funkwhale.ffa.utils.mustNormalizeUrl
+import audio.funkwhale.ffa.utils.*
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
+import com.google.android.exoplayer2.offline.DownloadManager
+import com.google.android.exoplayer2.upstream.cache.Cache
+import com.google.android.exoplayer2.upstream.cache.SimpleCache
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
+import org.koin.core.qualifier.named
+import org.koin.java.KoinJavaComponent.inject
 import java.io.BufferedReader
 
 class TracksSearchRepository(override val context: Context?, var query: String) :
   Repository<Track, TracksCache>() {
 
-  private val oAuth = OAuthFactory.instance()
+  private val exoCache: Cache by inject(Cache::class.java, named("exoCache"))
+  private val exoDownloadManager: DownloadManager by inject(DownloadManager::class.java)
+  private val oAuth: OAuth by inject(OAuth::class.java)
 
   override val cacheId: String? = null
 
@@ -46,7 +42,7 @@ class TracksSearchRepository(override val context: Context?, var query: String) 
       .toList()
       .flatten()
 
-    val downloaded = TracksRepository.getDownloadedIds() ?: listOf()
+    val downloaded = TracksRepository.getDownloadedIds(exoDownloadManager) ?: listOf()
 
     data.map { track ->
       track.favorite = favorites.contains(track.id)
@@ -55,7 +51,7 @@ class TracksSearchRepository(override val context: Context?, var query: String) 
       track.bestUpload()?.let { upload ->
         val url = mustNormalizeUrl(upload.listen_url)
 
-        track.cached = FFA.get().exoCache.isCached(url, 0, upload.duration * 1000L)
+        track.cached = exoCache.isCached(url, 0, upload.duration * 1000L)
       }
 
       track
@@ -66,7 +62,7 @@ class TracksSearchRepository(override val context: Context?, var query: String) 
 class ArtistsSearchRepository(override val context: Context?, var query: String) :
   Repository<Artist, ArtistsCache>() {
 
-  private val oAuth = OAuthFactory.instance()
+  private val oAuth: OAuth by inject(OAuth::class.java)
 
   override val cacheId: String? = null
   override val upstream: Upstream<Artist>
@@ -86,7 +82,7 @@ class ArtistsSearchRepository(override val context: Context?, var query: String)
 class AlbumsSearchRepository(override val context: Context?, var query: String) :
   Repository<Album, AlbumsCache>() {
 
-  private val oAuth = OAuthFactory.instance()
+  private val oAuth: OAuth by inject(OAuth::class.java)
 
   override val cacheId: String? = null
   override val upstream: Upstream<Album>
