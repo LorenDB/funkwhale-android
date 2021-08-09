@@ -33,10 +33,10 @@ import strikt.assertions.isNotNull
 import strikt.assertions.isNull
 import strikt.assertions.isTrue
 
-class DefaultOAuthTest {
+class OAuthTest {
 
   @InjectMockKs
-  private lateinit var oAuth: DefaultOAuth
+  private lateinit var oAuth: OAuth
 
   @MockK
   private lateinit var authServiceFactory: AuthorizationServiceFactory

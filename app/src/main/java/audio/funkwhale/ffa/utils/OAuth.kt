@@ -30,27 +30,6 @@ fun AuthState.save() {
   }
 }
 
-interface OAuth {
-
-  fun exchange(context: Context, authorization: Intent, success: () -> Unit, error: () -> Unit)
-
-  fun init(hostname: String): AuthState
-
-  fun register(authState: AuthState? = null, callback: () -> Unit)
-
-  fun authorize(activity: Activity)
-
-  fun isAuthorized(context: Context): Boolean
-
-  fun tryRefreshAccessToken(context: Context): Boolean
-
-  fun tryState(): AuthState?
-
-  fun state(): AuthState
-
-  fun service(context: Context): AuthorizationService
-}
-
 class AuthorizationServiceFactory {
 
   fun create(context: Context): AuthorizationService {
@@ -58,17 +37,16 @@ class AuthorizationServiceFactory {
   }
 }
 
-class DefaultOAuth(private val authorizationServiceFactory: AuthorizationServiceFactory) : OAuth {
+class OAuth(private val authorizationServiceFactory: AuthorizationServiceFactory) {
 
   companion object {
-
     private val REDIRECT_URI =
       Uri.parse("urn:/audio.funkwhale.funkwhale-android/oauth/callback")
   }
 
   data class App(val client_id: String, val client_secret: String)
 
-  override fun tryState(): AuthState? {
+  fun tryState(): AuthState? {
 
     val savedState = PowerPreference
       .getFileByName(AppContext.PREFS_CREDENTIALS)
@@ -81,10 +59,10 @@ class DefaultOAuth(private val authorizationServiceFactory: AuthorizationService
     }
   }
 
-  override fun state(): AuthState =
+  fun state(): AuthState =
     tryState() ?: throw IllegalStateException("Couldn't find saved state")
 
-  override fun isAuthorized(context: Context): Boolean {
+  fun isAuthorized(context: Context): Boolean {
     val state = tryState()
     return if (state != null) {
       state.isAuthorized || doTryRefreshAccessToken(state, context)
@@ -95,7 +73,7 @@ class DefaultOAuth(private val authorizationServiceFactory: AuthorizationService
     }
   }
 
-  override fun tryRefreshAccessToken(context: Context): Boolean {
+  fun tryRefreshAccessToken(context: Context): Boolean {
     tryState()?.let { state ->
       return doTryRefreshAccessToken(state, context)
     }
@@ -124,23 +102,22 @@ class DefaultOAuth(private val authorizationServiceFactory: AuthorizationService
       }
   }
 
-  override fun init(hostname: String): AuthState {
+  fun init(hostname: String): AuthState {
     return AuthState(
       AuthorizationServiceConfiguration(
         Uri.parse("$hostname/authorize"),
         Uri.parse("$hostname/api/v1/oauth/token/"),
         Uri.parse("$hostname/api/v1/oauth/apps/")
       )
-    )
-      .also {
-        it.save()
-      }
+    ).also {
+      it.save()
+    }
   }
 
-  override fun service(context: Context): AuthorizationService =
+  fun service(context: Context): AuthorizationService =
     authorizationServiceFactory.create(context)
 
-  override fun register(authState: AuthState?, callback: () -> Unit) {
+  fun register(authState: AuthState? = null, callback: () -> Unit) {
     (authState ?: state()).authorizationServiceConfiguration?.let { config ->
       runBlocking {
         val (_, _, result: Result<App, FuelError>) = Fuel.post(config.registrationEndpoint.toString())
@@ -183,7 +160,7 @@ class DefaultOAuth(private val authorizationServiceFactory: AuthorizationService
     )
   }
 
-  override fun authorize(activity: Activity) {
+  fun authorize(activity: Activity) {
     val authService = service(activity)
     authorizationRequest()?.let { it ->
       val intent = authService.getAuthorizationRequestIntent(it)
@@ -191,7 +168,7 @@ class DefaultOAuth(private val authorizationServiceFactory: AuthorizationService
     }
   }
 
-  override fun exchange(
+  fun exchange(
     context: Context,
     authorization: Intent,
     success: () -> Unit,
