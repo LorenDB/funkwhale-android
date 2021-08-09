@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.coroutines.awaitObjectResponseResult
@@ -25,8 +26,7 @@ import net.openid.appauth.ResponseTypeValues
 
 fun AuthState.save() {
   PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).apply {
-    val value = jsonSerializeString()
-    setString("state", value)
+    setString("state", jsonSerializeString())
   }
 }
 
@@ -84,12 +84,14 @@ class OAuth(private val authorizationServiceFactory: AuthorizationServiceFactory
     state: AuthState,
     context: Context
   ): Boolean {
-    if (state.needsTokenRefresh && state.refreshToken != null) {
+    if (state.needsTokenRefresh.also { it.log("needsTokenRefresh()") }
+      && state.refreshToken != null) {
       val refreshRequest = state.createTokenRefreshRequest()
       val auth = ClientSecretPost(state.clientSecret)
       runBlocking {
         service(context).performTokenRequest(refreshRequest, auth) { response, e ->
           state.apply {
+            Log.i("OAuth", "applying new autState")
             update(response, e)
             save()
           }

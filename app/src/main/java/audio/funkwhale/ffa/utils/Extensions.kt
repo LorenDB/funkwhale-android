@@ -2,6 +2,8 @@ package audio.funkwhale.ffa.utils
 
 import android.content.Context
 import android.os.Build
+import android.os.SystemClock
+import android.util.Log
 import androidx.fragment.app.Fragment
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.fragments.BrowseFragment
@@ -55,22 +57,6 @@ fun <T, U> Int.onApi(block: () -> T, elseBlock: (() -> U)) {
   }
 }
 
-fun <T> Int.onApiForResult(block: () -> T, elseBlock: (() -> T)): T {
-  return if (Build.VERSION.SDK_INT >= this) {
-    block()
-  } else {
-    elseBlock()
-  }
-}
-
-fun <T> T.applyOnApi(api: Int, block: T.() -> T): T {
-  return if (Build.VERSION.SDK_INT >= api) {
-    block()
-  } else {
-    this
-  }
-}
-
 fun Picasso.maybeLoad(url: String?): RequestCreator {
   return if (url == null) load(R.drawable.cover)
   else load(url)
@@ -81,11 +67,18 @@ fun Request.authorize(context: Context, oAuth: OAuth): Request {
     this@authorize.apply {
       if (!Settings.isAnonymous()) {
         oAuth.state().let { state ->
+          val now = SystemClock.currentThreadTimeMillis()
+          state.accessTokenExpirationTime?.let {
+            Log.i("Request.authorize()", "Accesstoken expiration: ${it - now}")
+          }
           val old = state.accessToken
           val auth = ClientSecretPost(oAuth.state().clientSecret)
           val done = CompletableDeferred<Boolean>()
 
           state.performActionWithFreshTokens(oAuth.service(context), auth) { token, _, _ ->
+            if (token == old) {
+              Log.i("Request.authorize()", "Accesstoken not renewed")
+            }
             if (token != old && token != null) {
               state.save()
             }
