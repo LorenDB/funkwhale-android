@@ -1,6 +1,6 @@
 # Funkwhale for Android
 
-This is the official and native Android music player for [Funkwhale](https://funkwhale.audio), native to both Android (developed in Kotlin) and to Funkwhale (uses its native API instead of Subsonic).
+This is the official Android music player for [Funkwhale](https://funkwhale.audio), native to both Android (developed in Kotlin) and to Funkwhale (uses its native API instead of Subsonic).
 It is based on the amazing [Otter](https://github.com/apognu/otter) made by [apognu](https://github.com/apognu) and would not be possible without his groundwork!
 
 You can get help and discuss Funkwhale on Matrix on [#funkwhale-android:matrix.org](https://matrix.to/#/#funkwhale-android:matrix.org).
