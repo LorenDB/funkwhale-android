@@ -3,6 +3,7 @@ package audio.funkwhale.ffa.activities
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import audio.funkwhale.ffa.FFA
 import audio.funkwhale.ffa.utils.*
@@ -20,12 +21,14 @@ class SplashActivity : AppCompatActivity() {
         when (oAuth.isAuthorized(this@SplashActivity) || Settings.isAnonymous()) {
           true -> Intent(this@SplashActivity, MainActivity::class.java)
             .apply {
+              Log.i("SplashActivity", "Authorized, redirecting to MainActivity")
               flags = Intent.FLAG_ACTIVITY_NO_ANIMATION
               startActivity(this)
             }
 
           false -> Intent(this@SplashActivity, LoginActivity::class.java)
             .apply {
+              Log.i("SplashActivity", "Not authorized, redirecting to LoginActivity")
               FFA.get().deleteAllData(this@SplashActivity)
               flags = Intent.FLAG_ACTIVITY_NO_ANIMATION
               startActivity(this)
