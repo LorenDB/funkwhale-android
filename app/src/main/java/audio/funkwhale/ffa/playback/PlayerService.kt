@@ -15,7 +15,6 @@ import android.support.v4.media.MediaMetadataCompat
 import android.view.KeyEvent
 import androidx.core.app.NotificationManagerCompat
 import androidx.media.session.MediaButtonReceiver
-import audio.funkwhale.ffa.FFA
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.utils.*
 import com.google.android.exoplayer2.C
@@ -29,11 +28,14 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.flow.collect
+import org.koin.java.KoinJavaComponent.inject
 
 class PlayerService : Service() {
   companion object {
     const val INITIAL_COMMAND_KEY = "start_command"
   }
+
+  private val mediaSession: MediaSession by inject(MediaSession::class.java)
 
   private var started = false
   private val scope: CoroutineScope = CoroutineScope(Job() + Main)
@@ -63,12 +65,12 @@ class PlayerService : Service() {
           when (key.keyCode) {
             KeyEvent.KEYCODE_MEDIA_PLAY, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> {
               if (hasAudioFocus(true)) MediaButtonReceiver.handleIntent(
-                FFA.get().mediaSession.session,
+                mediaSession.session,
                 intent
               )
               Unit
             }
-            else -> MediaButtonReceiver.handleIntent(FFA.get().mediaSession.session, intent)
+            else -> MediaButtonReceiver.handleIntent(mediaSession.session, intent)
           }
         }
       }
@@ -108,7 +110,7 @@ class PlayerService : Service() {
       }
     }
 
-    mediaControlsManager = MediaControlsManager(this, scope, FFA.get().mediaSession.session)
+    mediaControlsManager = MediaControlsManager(this, scope, mediaSession.session)
 
     player = SimpleExoPlayer.Builder(this).build().apply {
       playWhenReady = false
@@ -118,9 +120,9 @@ class PlayerService : Service() {
       }
     }
 
-    FFA.get().mediaSession.active = true
+    mediaSession.active = true
 
-    FFA.get().mediaSession.connector.apply {
+    mediaSession.connector.apply {
       setPlayer(player)
 
       setMediaMetadataProvider {
@@ -129,9 +131,9 @@ class PlayerService : Service() {
     }
 
     if (queue.current > -1) {
-      player.prepare(queue.datasources)
+      player.prepare(queue.dataSources)
 
-      Cache.get(this, "progress")?.let { progress ->
+      FFACache.get(this, "progress")?.let { progress ->
         player.seekTo(queue.current, progress.readLine().toLong())
 
         val (current, duration, percent) = getProgress(true)
@@ -161,7 +163,7 @@ class PlayerService : Service() {
             if (!command.fromRadio) radioPlayer.stop()
 
             queue.replace(command.queue)
-            player.prepare(queue.datasources, true, true)
+            player.prepare(queue.dataSources, true, true)
 
             setPlaybackState(true)
 
@@ -271,7 +273,7 @@ class PlayerService : Service() {
     setPlaybackState(false)
     player.release()
 
-    FFA.get().mediaSession.active = false
+    mediaSession.active = false
 
     super.onDestroy()
   }
@@ -280,11 +282,11 @@ class PlayerService : Service() {
     if (!state) {
       val (progress, _, _) = getProgress()
 
-      Cache.set(this@PlayerService, "progress", progress.toString().toByteArray())
+      FFACache.set(this@PlayerService, "progress", progress.toString().toByteArray())
     }
 
     if (state && player.playbackState == Player.STATE_IDLE) {
-      player.prepare(queue.datasources)
+      player.prepare(queue.dataSources)
     }
 
     if (hasAudioFocus(state)) {
@@ -309,7 +311,7 @@ class PlayerService : Service() {
   private fun skipToNextTrack() {
     player.next()
 
-    Cache.set(this@PlayerService, "progress", "0".toByteArray())
+    FFACache.set(this@PlayerService, "progress", "0".toByteArray())
     ProgressBus.send(0, 0, 0)
   }
 
@@ -468,7 +470,7 @@ class PlayerService : Service() {
         }
       }
 
-      Cache.set(this@PlayerService, "current", queue.current.toString().toByteArray())
+      FFACache.set(this@PlayerService, "current", queue.current.toString().toByteArray())
 
       CommandBus.send(Command.RefreshTrack(queue.current()))
     }
@@ -486,7 +488,7 @@ class PlayerService : Service() {
 
       if (player.playWhenReady) {
         queue.current++
-        player.prepare(queue.datasources, true, true)
+        player.prepare(queue.dataSources, true, true)
         player.seekTo(queue.current, 0)
 
         CommandBus.send(Command.RefreshTrack(queue.current()))

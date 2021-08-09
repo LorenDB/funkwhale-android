@@ -1,19 +1,16 @@
 package audio.funkwhale.ffa.repositories
 
 import android.content.Context
-import audio.funkwhale.ffa.utils.OAuthFactory
-import audio.funkwhale.ffa.utils.OtterResponse
-import audio.funkwhale.ffa.utils.Track
-import audio.funkwhale.ffa.utils.TracksCache
-import audio.funkwhale.ffa.utils.TracksResponse
+import audio.funkwhale.ffa.utils.*
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
 import com.google.gson.reflect.TypeToken
+import org.koin.java.KoinJavaComponent.inject
 import java.io.BufferedReader
 
 class ArtistTracksRepository(override val context: Context?, private val artistId: Int) :
   Repository<Track, TracksCache>() {
 
-  private val oAuth = OAuthFactory.instance()
+  private val oAuth: OAuth by inject(OAuth::class.java)
 
   override val cacheId = "tracks-artist-$artistId"
 

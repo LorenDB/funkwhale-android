@@ -4,17 +4,8 @@ import android.app.Notification
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import audio.funkwhale.ffa.FFA
 import audio.funkwhale.ffa.R
-import audio.funkwhale.ffa.utils.AppContext
-import audio.funkwhale.ffa.utils.DownloadInfo
-import audio.funkwhale.ffa.utils.Event
-import audio.funkwhale.ffa.utils.EventBus
-import audio.funkwhale.ffa.utils.Request
-import audio.funkwhale.ffa.utils.RequestBus
-import audio.funkwhale.ffa.utils.Response
-import audio.funkwhale.ffa.utils.Track
-import audio.funkwhale.ffa.utils.mustNormalizeUrl
+import audio.funkwhale.ffa.utils.*
 import com.google.android.exoplayer2.offline.Download
 import com.google.android.exoplayer2.offline.DownloadManager
 import com.google.android.exoplayer2.offline.DownloadRequest
@@ -27,10 +18,13 @@ import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import java.util.Collections
+import org.koin.java.KoinJavaComponent
+import java.util.*
 
 class PinService : DownloadService(AppContext.NOTIFICATION_DOWNLOADS) {
+
   private val scope: CoroutineScope = CoroutineScope(Job() + Main)
+  private val exoDownloadManager: DownloadManager by KoinJavaComponent.inject(DownloadManager::class.java)
 
   companion object {
     fun download(context: Context, track: Track) {
@@ -74,7 +68,7 @@ class PinService : DownloadService(AppContext.NOTIFICATION_DOWNLOADS) {
     return super.onStartCommand(intent, flags, startId)
   }
 
-  override fun getDownloadManager() = FFA.get().exoDownloadManager.apply {
+  override fun getDownloadManager() = exoDownloadManager.apply {
     addListener(DownloadListener())
   }
 

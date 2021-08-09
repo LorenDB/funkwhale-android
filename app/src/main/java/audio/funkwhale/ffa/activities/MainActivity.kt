@@ -47,6 +47,7 @@ import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.java.KoinJavaComponent.inject
 
 class MainActivity : AppCompatActivity() {
   enum class ResultCode(val code: Int) {
@@ -58,6 +59,7 @@ class MainActivity : AppCompatActivity() {
   private var menu: Menu? = null
 
   private lateinit var binding: ActivityMainBinding
+  private val oAuth: OAuth by inject(OAuth::class.java)
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -103,7 +105,7 @@ class MainActivity : AppCompatActivity() {
     CommandBus.send(Command.RefreshService)
 
     lifecycleScope.launch(IO) {
-      Userinfo.get(this@MainActivity)
+      Userinfo.get(this@MainActivity, oAuth)
     }
 
     with(binding) {
@@ -260,7 +262,7 @@ class MainActivity : AppCompatActivity() {
 
     if (resultCode == ResultCode.LOGOUT.code) {
       Intent(this, LoginActivity::class.java).apply {
-        FFA.get().deleteAllData()
+        FFA.get().deleteAllData(this@MainActivity)
 
         flags =
           Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -299,8 +301,7 @@ class MainActivity : AppCompatActivity() {
       EventBus.get().collect { message ->
         when (message) {
           is Event.LogOut -> {
-            FFA.get().deleteAllData()
-
+            FFA.get().deleteAllData(this@MainActivity)
             startActivity(Intent(this@MainActivity, LoginActivity::class.java).apply {
               flags = Intent.FLAG_ACTIVITY_NO_HISTORY
             })
@@ -494,10 +495,10 @@ class MainActivity : AppCompatActivity() {
       }
 
       binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.let { now_playing_details_repeat ->
-        changeRepeatMode(Cache.get(this@MainActivity, "repeat")?.readLine()?.toInt() ?: 0)
+        changeRepeatMode(FFACache.get(this@MainActivity, "repeat")?.readLine()?.toInt() ?: 0)
 
         now_playing_details_repeat.setOnClickListener {
-          val current = Cache.get(this@MainActivity, "repeat")?.readLine()?.toInt() ?: 0
+          val current = FFACache.get(this@MainActivity, "repeat")?.readLine()?.toInt() ?: 0
 
           changeRepeatMode((current + 1) % 3)
         }
@@ -577,7 +578,7 @@ class MainActivity : AppCompatActivity() {
     when (index) {
       // From no repeat to repeat all
       0 -> {
-        Cache.set(this@MainActivity, "repeat", "0".toByteArray())
+        FFACache.set(this@MainActivity, "repeat", "0".toByteArray())
 
         binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.setImageResource(R.drawable.repeat)
         binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.setColorFilter(
@@ -593,7 +594,7 @@ class MainActivity : AppCompatActivity() {
 
       // From repeat all to repeat one
       1 -> {
-        Cache.set(this@MainActivity, "repeat", "1".toByteArray())
+        FFACache.set(this@MainActivity, "repeat", "1".toByteArray())
 
         binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.setImageResource(R.drawable.repeat)
         binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.setColorFilter(
@@ -609,7 +610,7 @@ class MainActivity : AppCompatActivity() {
 
       // From repeat one to no repeat
       2 -> {
-        Cache.set(this@MainActivity, "repeat", "2".toByteArray())
+        FFACache.set(this@MainActivity, "repeat", "2".toByteArray())
         binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.setImageResource(R.drawable.repeat_one)
         binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.setColorFilter(
           ContextCompat.getColor(
@@ -631,7 +632,7 @@ class MainActivity : AppCompatActivity() {
         try {
           Fuel
             .post(mustNormalizeUrl("/api/v1/history/listenings/"))
-            .authorize(this@MainActivity)
+            .authorize(this@MainActivity, oAuth)
             .header("Content-Type", "application/json")
             .body(Gson().toJson(mapOf("track" to track.id)))
             .awaitStringResponse()

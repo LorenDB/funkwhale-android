@@ -1,10 +1,6 @@
 package audio.funkwhale.ffa.activities
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
+import android.content.*
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -17,9 +13,9 @@ import androidx.preference.SeekBarPreference
 import audio.funkwhale.ffa.FFA
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.databinding.ActivitySettingsBinding
-import audio.funkwhale.ffa.utils.Cache
 import audio.funkwhale.ffa.utils.Command
 import audio.funkwhale.ffa.utils.CommandBus
+import audio.funkwhale.ffa.utils.FFACache
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -67,7 +63,7 @@ class SettingsFragment :
       "crash" -> {
         activity?.let { activity ->
           (activity.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager)?.also { clip ->
-            Cache.get(activity, "crashdump")?.readLines()?.joinToString("\n").also {
+            FFACache.get(activity, "crashdump")?.readLines()?.joinToString("\n").also {
               clip.setPrimaryClip(ClipData.newPlainText("Funkwhale logs", it))
 
               Toast.makeText(
@@ -87,9 +83,7 @@ class SettingsFragment :
             .setMessage(context.getString(R.string.logout_content))
             .setPositiveButton(android.R.string.ok) { _, _ ->
               CommandBus.send(Command.ClearQueue)
-
-              FFA.get().deleteAllData()
-
+              FFA.get().deleteAllData(context)
               activity?.setResult(MainActivity.ResultCode.LOGOUT.code)
               activity?.finish()
             }

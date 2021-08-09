@@ -37,7 +37,7 @@ object AppContext {
             cacheId = "$cacheId?$it"
           }
 
-          Cache.set(context, cacheId, response.body().toByteArray())
+          FFACache.set(context, cacheId, response.body().toByteArray())
         }
 
         next(request, response)

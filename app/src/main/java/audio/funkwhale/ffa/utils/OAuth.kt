@@ -51,17 +51,6 @@ interface OAuth {
   fun service(context: Context): AuthorizationService
 }
 
-object OAuthFactory {
-
-  private val oAuth: OAuth
-
-  init {
-    oAuth = DefaultOAuth(AuthorizationServiceFactory())
-  }
-
-  fun instance() = oAuth
-}
-
 class AuthorizationServiceFactory {
 
   fun create(context: Context): AuthorizationService {

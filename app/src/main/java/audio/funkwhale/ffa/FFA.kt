@@ -1,25 +1,19 @@
 package audio.funkwhale.ffa
 
 import android.app.Application
+import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
-import audio.funkwhale.ffa.playback.MediaSession
-import audio.funkwhale.ffa.playback.QueueManager
+import audio.funkwhale.ffa.koin.ffaModule
 import audio.funkwhale.ffa.utils.*
-import com.google.android.exoplayer2.database.ExoDatabaseProvider
-import com.google.android.exoplayer2.offline.DefaultDownloadIndex
-import com.google.android.exoplayer2.offline.DefaultDownloaderFactory
-import com.google.android.exoplayer2.offline.DownloadManager
-import com.google.android.exoplayer2.offline.DownloaderConstructorHelper
-import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
-import com.google.android.exoplayer2.upstream.cache.NoOpCacheEvictor
-import com.google.android.exoplayer2.upstream.cache.SimpleCache
 import com.preference.PowerPreference
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
+import org.koin.core.context.startKoin
 import java.text.SimpleDateFormat
 import java.util.*
 
 class FFA : Application() {
+
   companion object {
     private var instance: FFA = FFA()
 
@@ -33,38 +27,12 @@ class FFA : Application() {
   val requestBus: BroadcastChannel<Request> = BroadcastChannel(10)
   val progressBus: BroadcastChannel<Triple<Int, Int, Int>> = ConflatedBroadcastChannel()
 
-  private val exoDatabase: ExoDatabaseProvider by lazy { ExoDatabaseProvider(this) }
-
-  val exoCache: SimpleCache by lazy {
-    PowerPreference.getDefaultFile().getInt("media_cache_size", 1).toLong().let {
-      val cacheSize = if (it == 0L) 0 else it * 1024 * 1024 * 1024
-
-      SimpleCache(
-        cacheDir.resolve("media"),
-        LeastRecentlyUsedCacheEvictor(cacheSize),
-        exoDatabase
-      )
-    }
-  }
-
-  val exoDownloadCache: SimpleCache by lazy {
-    SimpleCache(
-      cacheDir.resolve("downloads"),
-      NoOpCacheEvictor(),
-      exoDatabase
-    )
-  }
-
-  val exoDownloadManager: DownloadManager by lazy {
-    DownloaderConstructorHelper(exoDownloadCache, QueueManager.factory(this)).run {
-      DownloadManager(this@FFA, DefaultDownloadIndex(exoDatabase), DefaultDownloaderFactory(this))
-    }
-  }
-
-  val mediaSession = MediaSession(this)
-
   override fun onCreate() {
     super.onCreate()
+
+    startKoin {
+      modules(ffaModule(this@FFA))
+    }
 
     defaultExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()
 
@@ -81,14 +49,13 @@ class FFA : Application() {
     }
   }
 
-  fun deleteAllData() {
+  fun deleteAllData(context: Context) {
     PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).clear()
 
-    cacheDir.listFiles()?.forEach {
+    context.cacheDir.listFiles()?.forEach {
       it.delete()
     }
-
-    cacheDir.resolve("picasso-cache").deleteRecursively()
+    context.cacheDir.resolve("picasso-cache").deleteRecursively()
   }
 
   inner class CrashReportHandler : Thread.UncaughtExceptionHandler {
@@ -107,7 +74,7 @@ class FFA : Application() {
 
             builder.appendLine(e.toString())
 
-            Cache.set(this@FFA, "crashdump", builder.toString().toByteArray())
+            FFACache.set(this@FFA, "crashdump", builder.toString().toByteArray())
           }
         }
 

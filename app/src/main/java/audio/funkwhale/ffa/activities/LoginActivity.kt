@@ -13,7 +13,6 @@ import audio.funkwhale.ffa.databinding.ActivityLoginBinding
 import audio.funkwhale.ffa.fragments.LoginDialog
 import audio.funkwhale.ffa.utils.AppContext
 import audio.funkwhale.ffa.utils.OAuth
-import audio.funkwhale.ffa.utils.OAuthFactory
 import audio.funkwhale.ffa.utils.Userinfo
 import audio.funkwhale.ffa.utils.log
 import com.github.kittinunf.fuel.Fuel
@@ -23,19 +22,19 @@ import com.github.kittinunf.result.Result
 import com.preference.PowerPreference
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
+import org.koin.java.KoinJavaComponent.inject
 
 data class FwCredentials(val token: String, val non_field_errors: List<String>?)
 
 class LoginActivity : AppCompatActivity() {
 
   private lateinit var binding: ActivityLoginBinding
-  private lateinit var oAuth: OAuth
+  private val oAuth: OAuth by inject(OAuth::class.java)
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
     binding = ActivityLoginBinding.inflate(layoutInflater)
-    oAuth = OAuthFactory.instance()
     setContentView(binding.root)
     limitContainerWidth()
   }
@@ -53,7 +52,7 @@ class LoginActivity : AppCompatActivity() {
                 .setBoolean("anonymous", false)
 
               lifecycleScope.launch(Main) {
-                Userinfo.get(this@LoginActivity)?.let {
+                Userinfo.get(this@LoginActivity, oAuth)?.let {
                   startActivity(Intent(this@LoginActivity, MainActivity::class.java))
 
                   return@launch finish()

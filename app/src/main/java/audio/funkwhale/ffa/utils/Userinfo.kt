@@ -9,12 +9,12 @@ import com.preference.PowerPreference
 
 object Userinfo {
 
-  suspend fun get(context: Context): User? {
+  suspend fun get(context: Context, oAuth: OAuth): User? {
     try {
       val hostname =
         PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).getString("hostname")
       val (_, _, result) = Fuel.get("$hostname/api/v1/users/users/me/")
-        .authorize(context)
+        .authorize(context, oAuth)
         .awaitObjectResponseResult(gsonDeserializerOf(User::class.java))
 
       return when (result) {

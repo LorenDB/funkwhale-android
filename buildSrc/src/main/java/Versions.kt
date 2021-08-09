@@ -17,4 +17,5 @@ object Versions {
   const val strikt = "0.31.0"
   const val androidXTest = "1.4.0"
   const val robolectric = "4.6.1"
+  const val koin = "3.1.2"
 }

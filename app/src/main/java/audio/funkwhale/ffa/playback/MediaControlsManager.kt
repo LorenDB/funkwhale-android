@@ -10,7 +10,6 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.media.app.NotificationCompat.MediaStyle
 import androidx.media.session.MediaButtonReceiver
-import audio.funkwhale.ffa.FFA
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.activities.MainActivity
 import audio.funkwhale.ffa.utils.AppContext
@@ -20,11 +19,15 @@ import com.squareup.picasso.Picasso
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.launch
+import org.koin.java.KoinJavaComponent.inject
 
 class MediaControlsManager(val context: Service, private val scope: CoroutineScope, private val mediaSession: MediaSessionCompat) {
+
   companion object {
     const val NOTIFICATION_ACTION_OPEN_QUEUE = 0
   }
+
+  private val ffaMediaSession: MediaSession by inject(MediaSession::class.java)
 
   private var notification: Notification? = null
 
@@ -99,7 +102,7 @@ class MediaControlsManager(val context: Service, private val scope: CoroutineSco
           }
         }
 
-        FFA.get().mediaSession.connector.invalidateMediaSessionMetadata()
+        ffaMediaSession.connector.invalidateMediaSessionMetadata()
       }
     }
   }
