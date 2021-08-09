@@ -1,17 +1,21 @@
 # Funkwhale for Android
 
-This is based on the amazing [Otter](https://github.com/apognu/otter) made by
-[apognu](https://github.com/apognu). This project wouldn't be possible without his groundwork!
-
 This is the official and native Android music player for [Funkwhale](https://funkwhale.audio), native to both Android (developed in Kotlin) and to Funkwhale (uses its native API instead of Subsonic).
+It is based on the amazing [Otter](https://github.com/apognu/otter) made by [apognu](https://github.com/apognu) and would not be possible without his groundwork!
 
 You can get help and discuss Funkwhale on Matrix on [#funkwhale-android:matrix.org](https://matrix.to/#/#funkwhale-android:matrix.org).
 
+## Installation
+
+Currently you can install a preview version of Funkwhale for Android through a selfhosted [F-Droid repository](https://fdroid.funkwhale.audio/develop/). 
+You'll have to add this repository to your F-Droid client, please visit the link above for further instructions. Once you added the repository, you can
+use F-Droid as usual and search for "Funkwhale". 
+
 ## State
 
-This is work in Progress. Please bear with it, there **will** be bugs, there **will** be crashes and there **will** be performance or UX issues.
+Funkwhale for Android is work in Progress. Please bear with us, there will be bugs, there will be crashes and there will be performance and UX issues.
 
-Here is the list of Funkwhale for Android features:
+Here is the list of Funkwhale for Android's features:
 
  * Basic collection browsing (artists, albums and tracks)
  * Playlists listing
