@@ -3,7 +3,8 @@ package audio.funkwhale.ffa
 import android.app.Application
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
-import audio.funkwhale.ffa.koin.ffaModule
+import audio.funkwhale.ffa.koin.authModule
+import audio.funkwhale.ffa.koin.exoplayerModule
 import audio.funkwhale.ffa.utils.*
 import com.preference.PowerPreference
 import kotlinx.coroutines.channels.BroadcastChannel
@@ -31,7 +32,10 @@ class FFA : Application() {
     super.onCreate()
 
     startKoin {
-      modules(ffaModule(this@FFA))
+      modules(
+        authModule(),
+        exoplayerModule(this@FFA)
+      )
     }
 
     defaultExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()

@@ -13,6 +13,7 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 
 class MediaSession(private val context: Context) {
+
   var active = false
 
   private val playbackStateBuilder = PlaybackStateCompat.Builder().apply {
