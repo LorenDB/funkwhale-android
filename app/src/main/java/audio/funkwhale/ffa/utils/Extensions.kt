@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.fragments.BrowseFragment
 import audio.funkwhale.ffa.repositories.Repository
+import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Request
 import com.google.android.exoplayer2.offline.Download
 import com.google.gson.Gson
@@ -91,6 +92,10 @@ fun Request.authorize(context: Context, oAuth: OAuth): Request {
       }
     }
   }
+}
+
+fun FuelError.formatResponseMessage(): String {
+  return "${response.statusCode}: ${response.url}"
 }
 
 fun Download.getMetadata(): DownloadInfo? =

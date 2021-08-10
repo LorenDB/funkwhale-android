@@ -13,16 +13,7 @@ import com.github.kittinunf.fuel.gson.jsonBody
 import com.github.kittinunf.result.Result
 import com.preference.PowerPreference
 import kotlinx.coroutines.runBlocking
-import net.openid.appauth.AuthState
-import net.openid.appauth.AuthorizationException
-import net.openid.appauth.AuthorizationRequest
-import net.openid.appauth.AuthorizationResponse
-import net.openid.appauth.AuthorizationService
-import net.openid.appauth.AuthorizationServiceConfiguration
-import net.openid.appauth.ClientSecretPost
-import net.openid.appauth.RegistrationRequest
-import net.openid.appauth.RegistrationResponse
-import net.openid.appauth.ResponseTypeValues
+import net.openid.appauth.*
 
 fun AuthState.save() {
   PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).apply {
@@ -84,8 +75,8 @@ class OAuth(private val authorizationServiceFactory: AuthorizationServiceFactory
     state: AuthState,
     context: Context
   ): Boolean {
-    if (state.needsTokenRefresh.also { it.log("needsTokenRefresh()") }
-      && state.refreshToken != null) {
+    if (state.needsTokenRefresh.also { it.log("needsTokenRefresh()") } &&
+      state.refreshToken != null) {
       val refreshRequest = state.createTokenRefreshRequest()
       val auth = ClientSecretPost(state.clientSecret)
       runBlocking {
@@ -119,39 +110,46 @@ class OAuth(private val authorizationServiceFactory: AuthorizationServiceFactory
   fun service(context: Context): AuthorizationService =
     authorizationServiceFactory.create(context)
 
-  fun register(authState: AuthState? = null, callback: () -> Unit) {
+  fun register(authState: AuthState? = null, callback: () -> Unit): FuelResult {
     (authState ?: state()).authorizationServiceConfiguration?.let { config ->
-      runBlocking {
-        val (_, _, result: Result<App, FuelError>) = Fuel.post(config.registrationEndpoint.toString())
+
+      val (_, _, result: Result<App, FuelError>) = runBlocking {
+        Fuel.post(config.registrationEndpoint.toString())
           .header("Content-Type", "application/json")
           .jsonBody(registrationBody())
           .awaitObjectResponseResult(gsonDeserializerOf(App::class.java))
+      }
 
-        when (result) {
-          is Result.Success -> {
-            val app = result.get()
+      when (result) {
+        is Result.Success -> {
+          Log.i("OAuth", "OAuth client app created.")
+          val app = result.get()
 
-            val response = RegistrationResponse.Builder(registration()!!)
-              .setClientId(app.client_id)
-              .setClientSecret(app.client_secret)
-              .setClientIdIssuedAt(0)
-              .setClientSecretExpiresAt(null)
-              .build()
+          val response = RegistrationResponse.Builder(registration()!!)
+            .setClientId(app.client_id)
+            .setClientSecret(app.client_secret)
+            .setClientIdIssuedAt(0)
+            .setClientSecretExpiresAt(null)
+            .build()
 
-            state().apply {
-              update(response)
-              save()
-
-              callback()
-            }
+          state().apply {
+            update(response)
+            save()
+            callback()
+            return FuelResult.ok()
           }
+        }
 
-          is Result.Failure -> {
-            result.log("register()")
-          }
+        is Result.Failure -> {
+          Log.i(
+            "OAuth", "Couldn't register client application ${result.error.formatResponseMessage()}"
+          )
+          return FuelResult.from(result)
         }
       }
     }
+    Log.i("OAuth", "Missing AuthorizationServiceConfiguration")
+    return FuelResult.failure()
   }
 
   private fun registrationBody(): Map<String, String> {

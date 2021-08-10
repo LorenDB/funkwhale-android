@@ -11,10 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.databinding.ActivityLoginBinding
 import audio.funkwhale.ffa.fragments.LoginDialog
-import audio.funkwhale.ffa.utils.AppContext
-import audio.funkwhale.ffa.utils.OAuth
-import audio.funkwhale.ffa.utils.Userinfo
-import audio.funkwhale.ffa.utils.log
+import audio.funkwhale.ffa.utils.*
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.coroutines.awaitObjectResponseResult
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
@@ -22,6 +19,7 @@ import com.github.kittinunf.result.Result
 import com.preference.PowerPreference
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.koin.java.KoinJavaComponent.inject
 
 data class FwCredentials(val token: String, val non_field_errors: List<String>?)
@@ -74,27 +72,27 @@ class LoginActivity : AppCompatActivity() {
         var hostname = hostname.text.toString().trim()
 
         try {
-          if (hostname.isEmpty()) throw Exception(getString(R.string.login_error_hostname))
+          validateHostname(hostname, cleartext.isChecked)?.let {
+            hostnameField.error = it
+            return@setOnClickListener
+          }
 
-          Uri.parse(hostname).apply {
-            if (!cleartext.isChecked && scheme == "http") {
-              throw Exception(getString(R.string.login_error_hostname_https))
-            }
-
-            if (scheme == null) {
-              hostname = when (cleartext.isChecked) {
-                true -> "http://$hostname"
-                false -> "https://$hostname"
-              }
+          val uri = Uri.parse(hostname)
+          if (uri.scheme == null) {
+            hostname = when (cleartext.isChecked) {
+              true -> "http://$hostname"
+              false -> "https://$hostname"
             }
           }
 
           hostnameField.error = ""
 
-          when (anonymous.isChecked) {
+          val fuelResult = when (anonymous.isChecked) {
             false -> authedLogin(hostname)
             true -> anonymousLogin(hostname)
           }
+
+          hostnameField.error = mapFuelResultToError(fuelResult)
         } catch (e: Exception) {
           val message =
             if (e.message?.isEmpty() == true) getString(R.string.login_error_hostname)
@@ -106,56 +104,66 @@ class LoginActivity : AppCompatActivity() {
     }
   }
 
+  private fun mapFuelResultToError(fuelResult: FuelResult) = when {
+    fuelResult.httpStatus == 404 ->
+      getString(R.string.login_error_funkwhale_not_found)
+
+    !fuelResult.success ->
+      getString(R.string.login_error, fuelResult.message)
+
+    else -> ""
+  }
+
   override fun onConfigurationChanged(newConfig: Configuration) {
     super.onConfigurationChanged(newConfig)
 
     limitContainerWidth()
   }
 
-  private fun authedLogin(hostname: String) {
-    PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).setString("hostname", hostname)
+  private fun validateHostname(hostname: String, cleartext: Boolean): String? {
+    if (hostname.isEmpty()) {
+      return getString(R.string.login_error_hostname)
+    }
+    if (!cleartext && hostname.startsWith("http")) {
+      return getString(R.string.login_error_hostname_https)
+    }
+    return null
+  }
+
+  private fun authedLogin(hostname: String): FuelResult {
     oAuth.init(hostname)
-    oAuth.register {
+    return oAuth.register {
+      PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).setString("hostname", hostname)
       oAuth.authorize(this)
     }
   }
 
-  private fun anonymousLogin(hostname: String) {
+  private fun anonymousLogin(hostname: String): FuelResult {
     val dialog = LoginDialog().apply {
       show(supportFragmentManager, "LoginDialog")
     }
 
-    lifecycleScope.launch(Main) {
-      try {
-        val (_, _, result) = Fuel.get("$hostname/api/v1/tracks/")
-          .awaitObjectResponseResult(gsonDeserializerOf(FwCredentials::class.java))
+    val uri = "$hostname/api/v1/tracks/"
+    val (_, _, result) = runBlocking {
+      Fuel.get(uri).awaitObjectResponseResult(gsonDeserializerOf(FwCredentials::class.java))
+    }
 
-        when (result) {
-          is Result.Success -> {
-            PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).apply {
-              setString("hostname", hostname)
-              setBoolean("anonymous", true)
-            }
-
-            dialog.dismiss()
-            startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-            finish()
-          }
-
-          is Result.Failure -> {
-            dialog.dismiss()
-
-            binding.hostnameField.error = result.error.localizedMessage
-          }
+    when (result) {
+      is Result.Success -> {
+        PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).apply {
+          setString("hostname", hostname)
+          setBoolean("anonymous", true)
         }
-      } catch (e: Exception) {
+
         dialog.dismiss()
+        startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+        finish()
+        return FuelResult.ok()
+      }
 
-        val message =
-          if (e.message?.isEmpty() == true) getString(R.string.login_error_hostname)
-          else e.message
-
-        binding.hostnameField.error = message
+      is Result.Failure -> {
+        dialog.dismiss()
+        return FuelResult.from(result)
       }
     }
   }
