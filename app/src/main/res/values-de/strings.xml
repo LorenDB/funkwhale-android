@@ -7,6 +7,8 @@
     <string name="login_password">Passwort</string>
     <string name="login_submit">Anmelden</string>
     <string name="login_logging_in">Einloggen</string>
+    <string name="login_error">Anmeldung fehlgeschlagen: %s</string>
+    <string name="login_error_funkwhale_not_found">Keine Funkwhale Pod gefunden</string>
     <string name="login_error_hostname">Das ist keine gültige URL</string>
     <string name="login_error_hostname_https">Der Zugriff auf den Funkwhale Server sollte über HTTPS erfolgen</string>
     <string name="toolbar_search">Suche</string>

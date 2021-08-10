@@ -9,6 +9,8 @@
   <string name="login_password">Password</string>
   <string name="login_submit">Log in</string>
   <string name="login_logging_in">Logging in</string>
+  <string name="login_error">Login failed: %s</string>
+  <string name="login_error_funkwhale_not_found">No Funkwhale pod found</string>
   <string name="login_error_hostname">This could not be understood as a valid URL</string>
   <string name="login_error_hostname_https">The Funkwhale hostname should be secure through HTTPS</string>
   <string name="login_error_userinfo">We could not retrieve information about your user</string>
