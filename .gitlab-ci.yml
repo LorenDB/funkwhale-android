@@ -4,6 +4,7 @@ variables:
   COBERTURA_REPORT: '$CI_PROJECT_DIR/app/build/reports/cobertura.xml'
   JACOCO_CSV_LOCATION: '$CI_PROJECT_DIR/app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.csv'
   JACOCO_XML_LOCATION: '$CI_PROJECT_DIR/app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml'
+  GIT_DEPTH: "0"
 
 stages:
   - test
