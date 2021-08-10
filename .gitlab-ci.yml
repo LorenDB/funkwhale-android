@@ -26,6 +26,8 @@ stages:
       - .gradle/
 
 .build:
+  before_script: 
+    - git fetch --tags
   extends: .gradle-default
   artifacts:
     paths:
