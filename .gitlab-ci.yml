@@ -27,7 +27,7 @@ stages:
 
 .build:
   before_script: 
-    - git fetch --tags
+    - git fetch --filter=tree:0 --unshallow --tags
   extends: .gradle-default
   artifacts:
     paths:
