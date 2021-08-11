@@ -40,6 +40,7 @@ stages:
     paths:
       - $apk_file
       - $metadata_file
+      - app/build/outputs/apk/debug/output-metadata.json
 
 test:
   extends: .gradle-default
