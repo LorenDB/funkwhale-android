@@ -12,7 +12,6 @@ stages:
   - deploy
 
 .gradle-default:
-  stage: build
   before_script:
     - export GRADLE_USER_HOME=$(pwd)/.gradle
     - chmod +x ./gradlew
@@ -26,12 +25,21 @@ stages:
       - .gradle/
 
 .build:
+  stage: build
+  variables:
+    apk_file: 'app/build/outputs/apk/debug/app-debug.apk'
+    metadata_file: 'metadata/audio.funkwhale.android.yml'
   before_script: 
     - git fetch --unshallow --tags
+  after_script:
+    - export versionCode=`$ANDROID_HOME/build-tools/30.0.2/aapt dump badging $apk_file | grep versionCode | awk '{print $3}' | sed s/versionCode=//g | sed s/\'//g`
+    - apt update && apt install gettext-base
+    - cat metadata/template.yml | envsubst > $metadata_file
   extends: .gradle-default
   artifacts:
     paths:
-      - app/build/outputs/apk/debug/app-debug.apk
+      - $apk_file
+      - $metadata_file
 
 test:
   extends: .gradle-default
@@ -81,6 +89,7 @@ deploy-develop:
     - eval `ssh-agent -s`
     - ssh-add <(echo "$SSH_PRIVATE_KEY")
     - scp -o StrictHostKeyChecking=no app/build/outputs/apk/debug/app-debug.apk fdroid@apps.funkwhale.audio:/srv/fdroid/fdroid/develop/repo/audio.funkwhale.ffa.dev-$CI_COMMIT_SHORT_SHA.apk
+    - scp -o StrictHostKeyChecking=no metadata/audio.funkwhale.android.yml fdroid@apps.funkwhale.audio:/srv/fdroid/fdroid/develop/metatada/audio.funkwhale.ffa.dev.yml      
     - ssh -o StrictHostKeyChecking=no fdroid@apps.funkwhale.audio 'docker run --rm -u $(id -u):$(id -g) -v /srv/fdroid/fdroid/develop:/repo registry.gitlab.com/fdroid/docker-executable-fdroidserver:master update'
   tags:
     - shell

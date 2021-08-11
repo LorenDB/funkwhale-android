@@ -1,0 +1,20 @@
+Categories:
+  - Multimedia
+  - Funkwhale
+License: MIT
+AuthorName: Funkwhale
+WebSite: https://funkwhale.audio
+SourceCode: https://dev.funkwhale.audio/funkwhale/funkwhale-android/
+IssueTracker: https://dev.funkwhale.audio/funkwhale/funkwhale-android/-/issues
+Translation: https://translate.funkwhale.audio/projects/funkwhale/ffa/
+
+Name: Funkwhale (preview)
+Summary: This is the official and native Android music player for Funkwhale, native
+    to both Android (developed in Kotlin) and to Funkwhale (uses its native API instead
+    of Subsonic).
+
+AutoUpdateMode: None
+UpdateCheckMode: Tags
+UpdateCheckData: output-metadata.json|"version_code":.*"(.*)"|output-metadata.json|"versionName":.*\"(.*)\",
+CurrentVersion: $versionCode
+
