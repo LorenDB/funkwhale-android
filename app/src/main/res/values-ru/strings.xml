@@ -106,7 +106,7 @@
     <string name="login_password">Пароль</string>
     <string name="login_username">Имя пользователя</string>
     <string name="login_anonymous">Анонимная аутентификация</string>
-    <string name="login_cleartext">Разрешить незашифрованный тарфик (HTTP)</string>
+    <string name="login_cleartext">Разрешить незашифрованный трафик (HTTP)</string>
     <string name="login_hostname">Доменное имя</string>
     <string name="login_welcome">Введите данные вашего инстанса Funkwhale для доступа к контенту</string>
     <string name="playlist_add_to_new">Новый плейлист…</string>
@@ -125,4 +125,6 @@
     <string name="settings_play_order_shuffle_summary">Перемешивать трэки в альбомах</string>
     <string name="settings_play_order_shuffle">Перемешать альбомы</string>
     <string name="settings_play_order">Предпочитаемый порядок</string>
+    <string name="login_error">Ошибка входа: %s</string>
+    <string name="login_error_funkwhale_not_found">Сервер Funkwhale не найден</string>
 </resources>
