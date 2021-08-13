@@ -12,6 +12,7 @@ import android.media.MediaMetadata
 import android.os.Build
 import android.os.IBinder
 import android.support.v4.media.MediaMetadataCompat
+import android.util.Log
 import android.view.KeyEvent
 import androidx.core.app.NotificationManagerCompat
 import androidx.media.session.MediaButtonReceiver
@@ -479,7 +480,10 @@ class PlayerService : Service() {
       super.onPositionDiscontinuity(reason)
 
       if (reason == Player.DISCONTINUITY_REASON_PERIOD_TRANSITION) {
-        EventBus.send(Event.TrackFinished(queue.current()))
+        val currentTrack = queue.current().also {
+          it.log("Track finished")
+        }
+        EventBus.send(Event.TrackFinished(currentTrack))
       }
     }
 

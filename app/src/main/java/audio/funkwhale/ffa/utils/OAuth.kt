@@ -60,7 +60,7 @@ class OAuth(private val authorizationServiceFactory: AuthorizationServiceFactory
     } else {
       false
     }.also {
-      it.log("isAuthorized()")
+      it.logInfo("isAuthorized()")
     }
   }
 
@@ -75,7 +75,7 @@ class OAuth(private val authorizationServiceFactory: AuthorizationServiceFactory
     state: AuthState,
     context: Context
   ): Boolean {
-    if (state.needsTokenRefresh.also { it.log("needsTokenRefresh()") } &&
+    if (state.needsTokenRefresh.also { it.logInfo("needsTokenRefresh()") } &&
       state.refreshToken != null) {
       val refreshRequest = state.createTokenRefreshRequest()
       val auth = ClientSecretPost(state.clientSecret)
@@ -91,7 +91,7 @@ class OAuth(private val authorizationServiceFactory: AuthorizationServiceFactory
     }
     return (state.isAuthorized)
       .also {
-        it.log("tryRefreshAccessToken()")
+        it.logInfo("tryRefreshAccessToken()")
       }
   }
 
@@ -171,8 +171,7 @@ class OAuth(private val authorizationServiceFactory: AuthorizationServiceFactory
   fun exchange(
     context: Context,
     authorization: Intent,
-    success: () -> Unit,
-    error: () -> Unit
+    success: () -> Unit
   ) {
     state().let { state ->
       state.apply {
@@ -194,7 +193,7 @@ class OAuth(private val authorizationServiceFactory: AuthorizationServiceFactory
             }
 
           if (response != null) success()
-          else error()
+          else Log.e("FFA", "performTokenRequest() not successful")
         }
       }
     }

@@ -637,7 +637,7 @@ class MainActivity : AppCompatActivity() {
             .body(Gson().toJson(mapOf("track" to track.id)))
             .awaitStringResponse()
         } catch (e: Exception) {
-          e.log()
+          e.logError("incrementListenCount()")
         }
       }
     }

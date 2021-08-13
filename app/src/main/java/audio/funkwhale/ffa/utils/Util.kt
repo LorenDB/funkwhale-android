@@ -3,6 +3,8 @@ package audio.funkwhale.ffa.utils
 import android.content.Context
 import android.widget.Toast
 import com.google.android.exoplayer2.util.Log
+import com.google.android.exoplayer2.util.Log.LOG_LEVEL_ERROR
+import com.google.android.exoplayer2.util.Log.LOG_LEVEL_INFO
 import com.preference.PowerPreference
 import java.net.URI
 
@@ -31,10 +33,23 @@ private fun logClassName(): String {
   return "UNKNOWN"
 }
 
-fun Any?.log(prefix: String? = null) {
-  prefix?.let {
-    Log.d("FFA", "${logClassName()} - $prefix: $this")
-  } ?: Log.d("FFA", "${logClassName()} - $this")
+enum class LogLevel(value: Int) {
+  INFO(LOG_LEVEL_INFO),
+  DEBUG(Log.LOG_LEVEL_ALL),
+  ERROR(LOG_LEVEL_ERROR)
+}
+
+fun Any?.logError(prefix: String? = null) = this.log(prefix, LogLevel.ERROR)
+fun Any?.logInfo(prefix: String? = null) = this.log(prefix, LogLevel.INFO)
+
+fun Any?.log(prefix: String? = null, logLevel: LogLevel = LogLevel.DEBUG) {
+  val tag = "FFA"
+  val message = "${logClassName()} - ${prefix?.let { "$it: " }}$this"
+  when (logLevel) {
+    LogLevel.DEBUG -> Log.d(tag, message)
+    LogLevel.INFO -> Log.i(tag, message)
+    LogLevel.ERROR -> Log.e(tag, message)
+  }
 }
 
 fun maybeNormalizeUrl(rawUrl: String?): String? {
