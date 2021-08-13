@@ -87,7 +87,7 @@ class QueueManager(val context: Context) {
   }
 
   fun insertNext(track: Track) {
-    track.let { it.formatted }.log("Next track")
+    track.formatted.log("Next track")
     val factory = cacheDataSourceFactoryProvider.create(context)
     val url = mustNormalizeUrl(track.bestUpload()?.listen_url ?: "")
 
