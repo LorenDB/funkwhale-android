@@ -2,53 +2,12 @@ package audio.funkwhale.ffa.playback
 
 import android.content.Context
 import android.net.Uri
-import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.utils.*
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.upstream.DataSource
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
-import com.google.android.exoplayer2.upstream.FileDataSource
-import com.google.android.exoplayer2.upstream.cache.CacheDataSource
-import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory
-import com.google.android.exoplayer2.upstream.cache.Cache
-import com.google.android.exoplayer2.util.Util
 import com.google.gson.Gson
 import org.koin.java.KoinJavaComponent.inject
-
-class CacheDataSourceFactoryProvider(
-  private val oAuth: OAuth,
-  private val exoCache: Cache,
-  private val exoDownloadCache: Cache
-) {
-
-  fun create(context: Context): CacheDataSourceFactory {
-
-    val playbackCache =
-      CacheDataSourceFactory(exoCache, createDatasourceFactory(context, oAuth))
-
-    return CacheDataSourceFactory(
-      exoDownloadCache,
-      playbackCache,
-      FileDataSource.Factory(),
-      null,
-      CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR,
-      null
-    )
-  }
-
-  private fun createDatasourceFactory(context: Context, oAuth: OAuth): DataSource.Factory {
-    val http = DefaultHttpDataSourceFactory(
-      Util.getUserAgent(context, context.getString(R.string.app_name))
-    )
-    return if (!Settings.isAnonymous()) {
-      OAuth2DatasourceFactory(context, http, oAuth)
-    } else {
-      http
-    }
-  }
-}
 
 class QueueManager(val context: Context) {
 
@@ -89,7 +48,9 @@ class QueueManager(val context: Context) {
     )
   }
 
+
   fun replace(tracks: List<Track>) {
+    tracks.map { it.formatted }.log("Replacing queue with ${tracks.size} tracks")
     val factory = cacheDataSourceFactoryProvider.create(context)
     val sources = tracks.map { track ->
       val url = mustNormalizeUrl(track.bestUpload()?.listen_url ?: "")
@@ -107,6 +68,7 @@ class QueueManager(val context: Context) {
   }
 
   fun append(tracks: List<Track>) {
+    tracks.map { it.formatted }.log("Appending ${tracks.size} tracks")
     val factory = cacheDataSourceFactoryProvider.create(context)
     val missingTracks = tracks.filter { metadata.indexOf(it) == -1 }
 
@@ -125,6 +87,7 @@ class QueueManager(val context: Context) {
   }
 
   fun insertNext(track: Track) {
+    track.let { it.formatted }.log("Next track")
     val factory = cacheDataSourceFactoryProvider.create(context)
     val url = mustNormalizeUrl(track.bestUpload()?.listen_url ?: "")
 
@@ -143,6 +106,7 @@ class QueueManager(val context: Context) {
   }
 
   fun remove(track: Track) {
+    track.formatted.log("Removing track")
     metadata.indexOf(track).let {
       if (it < 0) {
         return

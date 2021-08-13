@@ -24,35 +24,67 @@ abstract class OtterResponse<D : Any> {
   abstract fun getData(): List<D>
 }
 
-data class UserResponse(override val count: Int, override val next: String?, val results: List<Artist>) : OtterResponse<Artist>() {
+data class UserResponse(
+  override val count: Int,
+  override val next: String?,
+  val results: List<Artist>
+) : OtterResponse<Artist>() {
   override fun getData() = results
 }
 
-data class ArtistsResponse(override val count: Int, override val next: String?, val results: List<Artist>) : OtterResponse<Artist>() {
+data class ArtistsResponse(
+  override val count: Int,
+  override val next: String?,
+  val results: List<Artist>
+) : OtterResponse<Artist>() {
   override fun getData() = results
 }
 
-data class AlbumsResponse(override val count: Int, override val next: String?, val results: AlbumList) : OtterResponse<Album>() {
+data class AlbumsResponse(
+  override val count: Int,
+  override val next: String?,
+  val results: AlbumList
+) : OtterResponse<Album>() {
   override fun getData() = results
 }
 
-data class TracksResponse(override val count: Int, override val next: String?, val results: List<Track>) : OtterResponse<Track>() {
+data class TracksResponse(
+  override val count: Int,
+  override val next: String?,
+  val results: List<Track>
+) : OtterResponse<Track>() {
   override fun getData() = results
 }
 
-data class FavoritedResponse(override val count: Int, override val next: String?, val results: List<Favorited>) : OtterResponse<Int>() {
+data class FavoritedResponse(
+  override val count: Int,
+  override val next: String?,
+  val results: List<Favorited>
+) : OtterResponse<Int>() {
   override fun getData() = results.map { it.track }
 }
 
-data class PlaylistsResponse(override val count: Int, override val next: String?, val results: List<Playlist>) : OtterResponse<Playlist>() {
+data class PlaylistsResponse(
+  override val count: Int,
+  override val next: String?,
+  val results: List<Playlist>
+) : OtterResponse<Playlist>() {
   override fun getData() = results
 }
 
-data class PlaylistTracksResponse(override val count: Int, override val next: String?, val results: List<PlaylistTrack>) : OtterResponse<PlaylistTrack>() {
+data class PlaylistTracksResponse(
+  override val count: Int,
+  override val next: String?,
+  val results: List<PlaylistTrack>
+) : OtterResponse<PlaylistTrack>() {
   override fun getData() = results
 }
 
-data class RadiosResponse(override val count: Int, override val next: String?, val results: List<Radio>) : OtterResponse<Radio>() {
+data class RadiosResponse(
+  override val count: Int,
+  override val next: String?,
+  val results: List<Radio>
+) : OtterResponse<Radio>() {
   override fun getData() = results
 }
 
@@ -148,6 +180,8 @@ data class Track(
   override fun cover() = album?.cover?.urls?.original
   override fun title() = title
   override fun subtitle() = artist.name
+
+  val formatted: String get() = "$id $artist ($album): $title"
 }
 
 data class Favorited(val track: Int)
