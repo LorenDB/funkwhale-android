@@ -43,23 +43,20 @@ class LoginActivity : AppCompatActivity() {
     data?.let {
       when (requestCode) {
         0 -> {
-          oAuth.exchange(this, data,
-            {
-              PowerPreference
-                .getFileByName(AppContext.PREFS_CREDENTIALS)
-                .setBoolean("anonymous", false)
+          oAuth.exchange(this, data) {
+            PowerPreference
+              .getFileByName(AppContext.PREFS_CREDENTIALS)
+              .setBoolean("anonymous", false)
 
-              lifecycleScope.launch(Main) {
-                Userinfo.get(this@LoginActivity, oAuth)?.let {
-                  startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+            lifecycleScope.launch(Main) {
+              Userinfo.get(this@LoginActivity, oAuth)?.let {
+                startActivity(Intent(this@LoginActivity, MainActivity::class.java))
 
-                  return@launch finish()
-                }
-                throw Exception(getString(R.string.login_error_userinfo))
+                return@launch finish()
               }
-            },
-            { "error".log() }
-          )
+              throw Exception(getString(R.string.login_error_userinfo))
+            }
+          }
         }
       }
     }
