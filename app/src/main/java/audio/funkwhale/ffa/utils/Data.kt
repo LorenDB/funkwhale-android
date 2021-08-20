@@ -1,12 +1,92 @@
 package audio.funkwhale.ffa.utils
 
 import android.content.Context
+import audio.funkwhale.ffa.activities.FwCredentials
+import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.coroutines.awaitObjectResponseResult
+import com.github.kittinunf.fuel.coroutines.awaitObjectResult
+import com.github.kittinunf.fuel.gson.gsonDeserializerOf
+import com.github.kittinunf.result.Result
+import com.preference.PowerPreference
 import java.io.BufferedReader
 import java.io.File
 import java.nio.charset.Charset
 import java.security.MessageDigest
 
 object RefreshError : Throwable()
+
+class HTTP(
+  val context: Context?,
+  val oAuth: OAuth
+) {
+
+  suspend fun refresh(): Boolean {
+    context?.let {
+      val body = mapOf(
+        "username" to PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS)
+          .getString("username"),
+        "password" to PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS)
+          .getString("password")
+      ).toList()
+
+      val result = Fuel.post(mustNormalizeUrl("/api/v1/token"), body).apply {
+        if (!Settings.isAnonymous()) {
+          authorize(it, oAuth)
+          header("Authorization", "Bearer ${oAuth.state().accessToken}")
+        }
+      }
+        .awaitObjectResult(gsonDeserializerOf(FwCredentials::class.java))
+
+      return result.fold(
+        { data ->
+          PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS)
+            .setString("access_token", data.token)
+
+          true
+        },
+        { false }
+      )
+    }
+    throw IllegalStateException("Illegal state: context is null")
+  }
+
+  suspend inline fun <reified T : Any> get(url: String): Result<T, FuelError> {
+
+    context?.let {
+      val request = Fuel.get(mustNormalizeUrl(url)).apply {
+        if (!Settings.isAnonymous()) {
+          authorize(it, oAuth)
+          header("Authorization", "Bearer ${oAuth.state().accessToken}")
+        }
+      }
+
+      val (_, response, result) = request.awaitObjectResponseResult(gsonDeserializerOf(T::class.java))
+
+      if (response.statusCode == 401) {
+        return retryGet(url)
+      } else {
+        return result
+      }
+    }
+    throw IllegalStateException("Illegal state: context is null")
+  }
+
+  suspend inline fun <reified T : Any> retryGet(
+    url: String
+  ): Result<T, FuelError> {
+    context?.let {
+      val request = Fuel.get(mustNormalizeUrl(url)).apply {
+        if (!Settings.isAnonymous()) {
+          authorize(context,oAuth)
+          header("Authorization", "Bearer ${oAuth.state().accessToken}")
+        }
+      }
+      request.awaitObjectResult(gsonDeserializerOf(T::class.java))
+    }
+    throw IllegalStateException("Illegal state: context is null")
+  }
+}
 
 object FFACache {
   private fun key(key: String): String {

@@ -7,6 +7,7 @@ import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.coroutines.awaitObjectResponseResult
+import com.github.kittinunf.fuel.coroutines.awaitObjectResult
 import com.github.kittinunf.result.Result
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers.IO
@@ -31,6 +32,8 @@ class HttpUpstream<D : Any, R : OtterResponse<D>>(
     AtOnce,
     Progressive
   }
+
+  private val http = HTTP(context, oAuth)
 
   override fun fetch(size: Int): Flow<Repository.Response<D>> = flow<Repository.Response<D>> {
 
@@ -89,10 +92,36 @@ class HttpUpstream<D : Any, R : OtterResponse<D>>(
       val request = Fuel.get(mustNormalizeUrl(url)).apply {
         authorize(context, oAuth)
       }
-      val (_, _, result) = request.awaitObjectResponseResult(GenericDeserializer<R>(type))
+      val (_, response, result) = request.awaitObjectResponseResult(GenericDeserializer<R>(type))
+
+      if (response.statusCode == 401) {
+        return retryGet(url)
+      }
+
       result
     } catch (e: Exception) {
       Result.error(FuelError.wrap(e))
     }
+  }
+
+  private suspend fun retryGet(url: String): Result<R, FuelError> {
+    context?.let {
+      return try {
+        return if (http.refresh()) {
+          val request = Fuel.get(mustNormalizeUrl(url)).apply {
+            if (!Settings.isAnonymous()) {
+              header("Authorization", "Bearer ${oAuth.state().accessToken}")
+            }
+          }
+
+          request.awaitObjectResult(GenericDeserializer(type))
+        } else {
+          Result.Failure(FuelError.wrap(RefreshError))
+        }
+      } catch (e: Exception) {
+        Result.error(FuelError.wrap(e))
+      }
+    }
+    throw IllegalStateException("Illegal state: context is null")
   }
 }
