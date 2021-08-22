@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.databinding.RowAlbumGridBinding
 import audio.funkwhale.ffa.fragments.FFAAdapter
-import audio.funkwhale.ffa.utils.Album
+import audio.funkwhale.ffa.model.Album
 import audio.funkwhale.ffa.utils.maybeLoad
 import audio.funkwhale.ffa.utils.maybeNormalizeUrl
 import com.squareup.picasso.Picasso

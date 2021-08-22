@@ -13,7 +13,7 @@ import androidx.media.session.MediaButtonReceiver
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.activities.MainActivity
 import audio.funkwhale.ffa.utils.AppContext
-import audio.funkwhale.ffa.utils.Track
+import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.utils.maybeNormalizeUrl
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.CoroutineScope

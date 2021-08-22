@@ -1,6 +1,7 @@
 package audio.funkwhale.ffa.repositories
 
 import android.content.Context
+import audio.funkwhale.ffa.model.*
 import audio.funkwhale.ffa.utils.*
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
 import com.google.android.exoplayer2.offline.DownloadManager

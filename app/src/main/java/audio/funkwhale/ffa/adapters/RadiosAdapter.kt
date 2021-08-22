@@ -12,7 +12,7 @@ import audio.funkwhale.ffa.fragments.FFAAdapter
 import audio.funkwhale.ffa.utils.AppContext
 import audio.funkwhale.ffa.utils.Event
 import audio.funkwhale.ffa.utils.EventBus
-import audio.funkwhale.ffa.utils.Radio
+import audio.funkwhale.ffa.model.Radio
 import audio.funkwhale.ffa.views.LoadingImageView
 import com.preference.PowerPreference
 import kotlinx.coroutines.CoroutineScope

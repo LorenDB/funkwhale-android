@@ -25,6 +25,7 @@ import audio.funkwhale.ffa.FFA
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.databinding.ActivityMainBinding
 import audio.funkwhale.ffa.fragments.*
+import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.playback.MediaControlsManager
 import audio.funkwhale.ffa.playback.PinService
 import audio.funkwhale.ffa.playback.PlayerService

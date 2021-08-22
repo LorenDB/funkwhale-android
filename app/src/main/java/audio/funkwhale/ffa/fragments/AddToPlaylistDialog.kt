@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.adapters.PlaylistsAdapter
 import audio.funkwhale.ffa.databinding.DialogAddToPlaylistBinding
+import audio.funkwhale.ffa.model.Playlist
+import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.repositories.ManagementPlaylistsRepository
 import audio.funkwhale.ffa.utils.*
 import com.google.gson.Gson

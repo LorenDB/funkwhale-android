@@ -1,7 +1,11 @@
 package audio.funkwhale.ffa.repositories
 
 import android.content.Context
-import audio.funkwhale.ffa.utils.*
+import audio.funkwhale.ffa.model.FFAResponse
+import audio.funkwhale.ffa.model.PlaylistTrack
+import audio.funkwhale.ffa.model.PlaylistTracksCache
+import audio.funkwhale.ffa.model.PlaylistTracksResponse
+import audio.funkwhale.ffa.utils.OAuth
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.map
@@ -17,7 +21,7 @@ class PlaylistTracksRepository(override val context: Context?, playlistId: Int) 
 
   override val cacheId = "tracks-playlist-$playlistId"
 
-  override val upstream = HttpUpstream<PlaylistTrack, OtterResponse<PlaylistTrack>>(
+  override val upstream = HttpUpstream<PlaylistTrack, FFAResponse<PlaylistTrack>>(
     context,
     HttpUpstream.Behavior.Single,
     "/api/v1/playlists/$playlistId/tracks/?playable=true",

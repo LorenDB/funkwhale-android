@@ -15,11 +15,11 @@ import androidx.recyclerview.widget.RecyclerView
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.databinding.RowSearchHeaderBinding
 import audio.funkwhale.ffa.databinding.RowTrackBinding
-import audio.funkwhale.ffa.utils.Album
-import audio.funkwhale.ffa.utils.Artist
+import audio.funkwhale.ffa.model.Album
+import audio.funkwhale.ffa.model.Artist
 import audio.funkwhale.ffa.utils.Command
 import audio.funkwhale.ffa.utils.CommandBus
-import audio.funkwhale.ffa.utils.Track
+import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.utils.maybeLoad
 import audio.funkwhale.ffa.utils.maybeNormalizeUrl
 import audio.funkwhale.ffa.utils.onApi

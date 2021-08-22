@@ -17,12 +17,12 @@ import audio.funkwhale.ffa.repositories.ManagementPlaylistsRepository
 import audio.funkwhale.ffa.repositories.PlaylistTracksRepository
 import audio.funkwhale.ffa.utils.Command
 import audio.funkwhale.ffa.utils.CommandBus
-import audio.funkwhale.ffa.utils.Playlist
-import audio.funkwhale.ffa.utils.PlaylistTrack
+import audio.funkwhale.ffa.model.Playlist
+import audio.funkwhale.ffa.model.PlaylistTrack
 import audio.funkwhale.ffa.utils.Request
 import audio.funkwhale.ffa.utils.RequestBus
 import audio.funkwhale.ffa.utils.Response
-import audio.funkwhale.ffa.utils.Track
+import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.utils.maybeLoad
 import audio.funkwhale.ffa.utils.maybeNormalizeUrl
 import audio.funkwhale.ffa.utils.toast

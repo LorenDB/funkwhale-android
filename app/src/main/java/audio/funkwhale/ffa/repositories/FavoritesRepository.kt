@@ -1,6 +1,7 @@
 package audio.funkwhale.ffa.repositories
 
 import android.content.Context
+import audio.funkwhale.ffa.model.*
 import audio.funkwhale.ffa.utils.*
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.coroutines.awaitByteArrayResponseResult
@@ -25,7 +26,7 @@ class FavoritesRepository(override val context: Context?) : Repository<Track, Tr
 
   override val cacheId = "favorites.v2"
 
-  override val upstream = HttpUpstream<Track, OtterResponse<Track>>(
+  override val upstream = HttpUpstream<Track, FFAResponse<Track>>(
     context!!,
     HttpUpstream.Behavior.AtOnce,
     "/api/v1/tracks/?favorites=true&playable=true&ordering=title",
@@ -106,7 +107,7 @@ class FavoritedRepository(override val context: Context?) : Repository<Int, Favo
   private val oAuth: OAuth by inject(OAuth::class.java)
 
   override val cacheId = "favorited"
-  override val upstream = HttpUpstream<Int, OtterResponse<Int>>(
+  override val upstream = HttpUpstream<Int, FFAResponse<Int>>(
     context,
     HttpUpstream.Behavior.Single,
     "/api/v1/favorites/tracks/all/?playable=true",

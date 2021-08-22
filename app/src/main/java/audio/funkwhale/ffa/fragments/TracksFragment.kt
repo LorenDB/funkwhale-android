@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.RecyclerView
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.adapters.TracksAdapter
 import audio.funkwhale.ffa.databinding.FragmentTracksBinding
+import audio.funkwhale.ffa.model.Album
+import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.repositories.FavoritedRepository
 import audio.funkwhale.ffa.repositories.FavoritesRepository
 import audio.funkwhale.ffa.repositories.TracksRepository

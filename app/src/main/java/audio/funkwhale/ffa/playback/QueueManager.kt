@@ -2,6 +2,8 @@ package audio.funkwhale.ffa.playback
 
 import android.content.Context
 import android.net.Uri
+import audio.funkwhale.ffa.model.QueueCache
+import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.utils.*
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
@@ -47,7 +49,6 @@ class QueueManager(val context: Context) {
       Gson().toJson(QueueCache(metadata)).toByteArray()
     )
   }
-
 
   fun replace(tracks: List<Track>) {
     tracks.map { it.formatted }.log("Replacing queue with ${tracks.size} tracks")

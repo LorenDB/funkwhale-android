@@ -1,7 +1,11 @@
 package audio.funkwhale.ffa.repositories
 
 import android.content.Context
-import audio.funkwhale.ffa.utils.*
+import audio.funkwhale.ffa.model.*
+import audio.funkwhale.ffa.utils.OAuth
+import audio.funkwhale.ffa.utils.Settings
+import audio.funkwhale.ffa.utils.authorize
+import audio.funkwhale.ffa.utils.mustNormalizeUrl
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.coroutines.awaitByteArrayResponseResult
 import com.github.kittinunf.fuel.coroutines.awaitObjectResponseResult
@@ -21,7 +25,7 @@ class PlaylistsRepository(override val context: Context?) : Repository<Playlist,
 
   private val oAuth: OAuth by inject(OAuth::class.java)
 
-  override val upstream = HttpUpstream<Playlist, OtterResponse<Playlist>>(
+  override val upstream = HttpUpstream<Playlist, FFAResponse<Playlist>>(
     context!!,
     HttpUpstream.Behavior.Progressive,
     "/api/v1/playlists/?playable=true&ordering=name",
@@ -41,7 +45,7 @@ class ManagementPlaylistsRepository(override val context: Context?) :
 
   override val cacheId = "tracks-playlists-management"
 
-  override val upstream = HttpUpstream<Playlist, OtterResponse<Playlist>>(
+  override val upstream = HttpUpstream<Playlist, FFAResponse<Playlist>>(
     context,
     HttpUpstream.Behavior.AtOnce,
     "/api/v1/playlists/?scope=me&ordering=name",

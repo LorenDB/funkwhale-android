@@ -12,11 +12,11 @@ import android.media.MediaMetadata
 import android.os.Build
 import android.os.IBinder
 import android.support.v4.media.MediaMetadataCompat
-import android.util.Log
 import android.view.KeyEvent
 import androidx.core.app.NotificationManagerCompat
 import androidx.media.session.MediaButtonReceiver
 import audio.funkwhale.ffa.R
+import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.utils.*
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlaybackException

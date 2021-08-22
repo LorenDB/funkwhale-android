@@ -8,6 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import audio.funkwhale.ffa.adapters.FavoritesAdapter
 import audio.funkwhale.ffa.databinding.FragmentFavoritesBinding
+import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.repositories.FavoritesRepository
 import audio.funkwhale.ffa.repositories.TracksRepository
 import audio.funkwhale.ffa.utils.*

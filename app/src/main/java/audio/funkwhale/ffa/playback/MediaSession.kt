@@ -40,7 +40,7 @@ class MediaSession(private val context: Context) {
 
   val connector: MediaSessionConnector by lazy {
     MediaSessionConnector(session).also {
-      it.setQueueNavigator(OtterQueueNavigator())
+      it.setQueueNavigator(FFAQueueNavigator())
 
       it.setMediaButtonEventHandler { _, _, intent ->
         if (!active) {
@@ -59,7 +59,7 @@ class MediaSession(private val context: Context) {
   }
 }
 
-class OtterQueueNavigator : MediaSessionConnector.QueueNavigator {
+class FFAQueueNavigator : MediaSessionConnector.QueueNavigator {
   override fun onSkipToQueueItem(player: Player, controlDispatcher: ControlDispatcher, id: Long) {
     CommandBus.send(Command.PlayTrack(id.toInt()))
   }

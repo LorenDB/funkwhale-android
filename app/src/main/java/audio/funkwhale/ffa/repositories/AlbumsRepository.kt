@@ -1,9 +1,9 @@
 package audio.funkwhale.ffa.repositories
 
 import android.content.Context
-import audio.funkwhale.ffa.utils.Album
-import audio.funkwhale.ffa.utils.AlbumsCache
-import audio.funkwhale.ffa.utils.AlbumsResponse
+import audio.funkwhale.ffa.model.Album
+import audio.funkwhale.ffa.model.AlbumsCache
+import audio.funkwhale.ffa.model.AlbumsResponse
 import audio.funkwhale.ffa.utils.OAuth
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
 import com.google.gson.reflect.TypeToken

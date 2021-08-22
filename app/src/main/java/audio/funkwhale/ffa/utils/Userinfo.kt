@@ -1,6 +1,7 @@
 package audio.funkwhale.ffa.utils
 
 import android.content.Context
+import audio.funkwhale.ffa.model.User
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.coroutines.awaitObjectResponseResult
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf

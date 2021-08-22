@@ -1,6 +1,8 @@
 package audio.funkwhale.ffa.utils
 
 import audio.funkwhale.ffa.FFA
+import audio.funkwhale.ffa.model.Radio
+import audio.funkwhale.ffa.model.Track
 import com.google.android.exoplayer2.offline.Download
 import com.google.android.exoplayer2.offline.DownloadCursor
 import kotlinx.coroutines.Dispatchers.IO

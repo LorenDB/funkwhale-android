@@ -3,6 +3,7 @@ package audio.funkwhale.ffa.repositories
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import audio.funkwhale.ffa.model.FFAResponse
 import audio.funkwhale.ffa.utils.*
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelError
@@ -19,7 +20,7 @@ import java.io.Reader
 import java.lang.reflect.Type
 import kotlin.math.ceil
 
-class HttpUpstream<D : Any, R : OtterResponse<D>>(
+class HttpUpstream<D : Any, R : FFAResponse<D>>(
   val context: Context?,
   val behavior: Behavior,
   private val url: String,
@@ -78,7 +79,7 @@ class HttpUpstream<D : Any, R : OtterResponse<D>>(
     hasMore
   )
 
-  class GenericDeserializer<T : OtterResponse<*>>(val type: Type) : ResponseDeserializable<T> {
+  class GenericDeserializer<T : FFAResponse<*>>(val type: Type) : ResponseDeserializable<T> {
     override fun deserialize(reader: Reader): T? {
       return Gson().fromJson(reader, type)
     }
