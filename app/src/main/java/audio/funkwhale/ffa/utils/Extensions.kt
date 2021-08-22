@@ -22,7 +22,10 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import net.openid.appauth.ClientSecretPost
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.coroutines.CoroutineContext
+
 
 inline fun <D> Flow<Repository.Response<D>>.untilNetwork(
   scope: CoroutineScope,
@@ -68,9 +71,8 @@ fun Request.authorize(context: Context, oAuth: OAuth): Request {
     this@authorize.apply {
       if (!Settings.isAnonymous()) {
         oAuth.state().let { state ->
-          val now = SystemClock.currentThreadTimeMillis()
           state.accessTokenExpirationTime?.let {
-            Log.i("Request.authorize()", "Accesstoken expiration: ${it - now}")
+            Log.i("Request.authorize()", "Accesstoken expiration: ${Date(it).format()}")
           }
           val old = state.accessToken
           val auth = ClientSecretPost(oAuth.state().clientSecret)
@@ -100,3 +102,9 @@ fun FuelError.formatResponseMessage(): String {
 
 fun Download.getMetadata(): DownloadInfo? =
   Gson().fromJson(String(this.request.data), DownloadInfo::class.java)
+
+val ISO_8601_DATE_TIME_FORMAT = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+
+fun Date.format(): String {
+  return ISO_8601_DATE_TIME_FORMAT.format(this)
+}
