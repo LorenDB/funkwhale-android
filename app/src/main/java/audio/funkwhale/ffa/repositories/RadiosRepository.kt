@@ -1,7 +1,11 @@
 package audio.funkwhale.ffa.repositories
 
 import android.content.Context
-import audio.funkwhale.ffa.utils.*
+import audio.funkwhale.ffa.model.FFAResponse
+import audio.funkwhale.ffa.model.Radio
+import audio.funkwhale.ffa.model.RadiosCache
+import audio.funkwhale.ffa.model.RadiosResponse
+import audio.funkwhale.ffa.utils.OAuth
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
 import com.google.gson.reflect.TypeToken
 import org.koin.java.KoinJavaComponent.inject
@@ -13,7 +17,7 @@ class RadiosRepository(override val context: Context?) : Repository<Radio, Radio
 
   override val cacheId = "radios"
 
-  override val upstream = HttpUpstream<Radio, OtterResponse<Radio>>(
+  override val upstream = HttpUpstream<Radio, FFAResponse<Radio>>(
     context,
     HttpUpstream.Behavior.Progressive,
     "/api/v1/radios/radios/?ordering=name",

@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.databinding.RowPlaylistBinding
 import audio.funkwhale.ffa.fragments.FFAAdapter
-import audio.funkwhale.ffa.utils.Playlist
+import audio.funkwhale.ffa.model.Playlist
 import audio.funkwhale.ffa.utils.toDurationString
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation

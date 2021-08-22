@@ -14,7 +14,7 @@ import audio.funkwhale.ffa.utils.Command
 import audio.funkwhale.ffa.utils.CommandBus
 import audio.funkwhale.ffa.utils.Event
 import audio.funkwhale.ffa.utils.EventBus
-import audio.funkwhale.ffa.utils.Radio
+import audio.funkwhale.ffa.model.Radio
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch

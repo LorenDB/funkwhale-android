@@ -11,6 +11,8 @@ import audio.funkwhale.ffa.databinding.ActivitySearchBinding
 import audio.funkwhale.ffa.fragments.AddToPlaylistDialog
 import audio.funkwhale.ffa.fragments.AlbumsFragment
 import audio.funkwhale.ffa.fragments.ArtistsFragment
+import audio.funkwhale.ffa.model.Album
+import audio.funkwhale.ffa.model.Artist
 import audio.funkwhale.ffa.repositories.*
 import audio.funkwhale.ffa.utils.*
 import com.google.android.exoplayer2.offline.Download

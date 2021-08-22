@@ -15,9 +15,9 @@ import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.activities.MainActivity
 import audio.funkwhale.ffa.adapters.ArtistsAdapter
 import audio.funkwhale.ffa.databinding.FragmentArtistsBinding
+import audio.funkwhale.ffa.model.Artist
 import audio.funkwhale.ffa.repositories.ArtistsRepository
 import audio.funkwhale.ffa.utils.AppContext
-import audio.funkwhale.ffa.utils.Artist
 import audio.funkwhale.ffa.utils.onViewPager
 
 class ArtistsFragment : FFAFragment<Artist, ArtistsAdapter>() {

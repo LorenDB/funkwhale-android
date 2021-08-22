@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import audio.funkwhale.ffa.R
+import audio.funkwhale.ffa.model.DownloadInfo
+import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.utils.*
 import com.google.android.exoplayer2.offline.Download
 import com.google.android.exoplayer2.offline.DownloadManager

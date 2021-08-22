@@ -20,6 +20,8 @@ import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.activities.MainActivity
 import audio.funkwhale.ffa.adapters.AlbumsAdapter
 import audio.funkwhale.ffa.databinding.FragmentAlbumsBinding
+import audio.funkwhale.ffa.model.Album
+import audio.funkwhale.ffa.model.Artist
 import audio.funkwhale.ffa.repositories.AlbumsRepository
 import audio.funkwhale.ffa.repositories.ArtistTracksRepository
 import audio.funkwhale.ffa.repositories.Repository

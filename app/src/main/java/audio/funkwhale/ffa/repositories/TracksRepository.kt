@@ -1,7 +1,13 @@
 package audio.funkwhale.ffa.repositories
 
 import android.content.Context
-import audio.funkwhale.ffa.utils.*
+import audio.funkwhale.ffa.model.FFAResponse
+import audio.funkwhale.ffa.model.Track
+import audio.funkwhale.ffa.model.TracksCache
+import audio.funkwhale.ffa.model.TracksResponse
+import audio.funkwhale.ffa.utils.OAuth
+import audio.funkwhale.ffa.utils.getMetadata
+import audio.funkwhale.ffa.utils.mustNormalizeUrl
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
 import com.google.android.exoplayer2.offline.Download
 import com.google.android.exoplayer2.offline.DownloadManager
@@ -23,7 +29,7 @@ class TracksRepository(override val context: Context?, albumId: Int) :
 
   override val cacheId = "tracks-album-$albumId"
 
-  override val upstream = HttpUpstream<Track, OtterResponse<Track>>(
+  override val upstream = HttpUpstream<Track, FFAResponse<Track>>(
     context,
     HttpUpstream.Behavior.AtOnce,
     "/api/v1/tracks/?playable=true&album=$albumId&ordering=disc_number,position",

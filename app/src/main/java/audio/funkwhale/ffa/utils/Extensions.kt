@@ -2,11 +2,11 @@ package audio.funkwhale.ffa.utils
 
 import android.content.Context
 import android.os.Build
-import android.os.SystemClock
 import android.util.Log
 import androidx.fragment.app.Fragment
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.fragments.BrowseFragment
+import audio.funkwhale.ffa.model.DownloadInfo
 import audio.funkwhale.ffa.repositories.Repository
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Request
@@ -25,7 +25,6 @@ import net.openid.appauth.ClientSecretPost
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.coroutines.CoroutineContext
-
 
 inline fun <D> Flow<Repository.Response<D>>.untilNetwork(
   scope: CoroutineScope,

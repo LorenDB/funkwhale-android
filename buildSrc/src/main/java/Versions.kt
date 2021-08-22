@@ -2,7 +2,6 @@ object Versions {
   const val kotlin = "1.5.21"
   const val jacoco = "0.8.7"
   const val unmock = "0.7.8"
-  const val androidGradlePlugin = "7.0.0"
   const val gradleDependencyPlugin = "0.38.0"
 
   const val exoPlayer = "2.11.8"

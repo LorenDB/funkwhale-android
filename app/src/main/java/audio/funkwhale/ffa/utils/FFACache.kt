@@ -7,6 +7,7 @@ import java.nio.charset.Charset
 import java.security.MessageDigest
 
 object FFACache {
+
   private fun key(key: String): String {
     val md = MessageDigest.getInstance("SHA-1")
     val digest = md.digest(key.toByteArray(Charset.defaultCharset()))

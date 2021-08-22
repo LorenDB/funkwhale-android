@@ -9,8 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.databinding.RowDownloadBinding
 import audio.funkwhale.ffa.playback.PinService
-import audio.funkwhale.ffa.utils.DownloadInfo
-import audio.funkwhale.ffa.utils.Track
+import audio.funkwhale.ffa.model.DownloadInfo
+import audio.funkwhale.ffa.model.Track
 import com.google.android.exoplayer2.offline.Download
 import com.google.android.exoplayer2.offline.DownloadService
 

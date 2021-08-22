@@ -2,7 +2,7 @@ package audio.funkwhale.ffa.repositories
 
 import android.content.Context
 import audio.funkwhale.ffa.utils.AppContext
-import audio.funkwhale.ffa.utils.CacheItem
+import audio.funkwhale.ffa.model.CacheItem
 import audio.funkwhale.ffa.utils.FFACache
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO

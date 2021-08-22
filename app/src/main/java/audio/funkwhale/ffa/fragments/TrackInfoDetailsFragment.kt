@@ -12,7 +12,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.databinding.FragmentTrackInfoDetailsBinding
-import audio.funkwhale.ffa.utils.Track
+import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.utils.mustNormalizeUrl
 import audio.funkwhale.ffa.utils.toDurationString
 
