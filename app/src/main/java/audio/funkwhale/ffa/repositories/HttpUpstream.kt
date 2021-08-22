@@ -2,12 +2,12 @@ package audio.funkwhale.ffa.repositories
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import audio.funkwhale.ffa.utils.*
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.coroutines.awaitObjectResponseResult
-import com.github.kittinunf.fuel.coroutines.awaitObjectResult
 import com.github.kittinunf.result.Result
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers.IO
@@ -33,8 +33,6 @@ class HttpUpstream<D : Any, R : OtterResponse<D>>(
     Progressive
   }
 
-  private val http = HTTP(context, oAuth)
-
   override fun fetch(size: Int): Flow<Repository.Response<D>> = flow<Repository.Response<D>> {
 
     context?.let {
@@ -42,14 +40,13 @@ class HttpUpstream<D : Any, R : OtterResponse<D>>(
 
       val page = ceil(size / AppContext.PAGE_SIZE.toDouble()).toInt() + 1
 
-      val url =
-        Uri.parse(url)
-          .buildUpon()
-          .appendQueryParameter("page_size", AppContext.PAGE_SIZE.toString())
-          .appendQueryParameter("page", page.toString())
-          .appendQueryParameter("scope", Settings.getScopes().joinToString(" "))
-          .build()
-          .toString()
+      val url = Uri.parse(url)
+        .buildUpon()
+        .appendQueryParameter("page_size", AppContext.PAGE_SIZE.toString())
+        .appendQueryParameter("page", page.toString())
+        .appendQueryParameter("scope", Settings.getScopes().joinToString(" "))
+        .build()
+        .toString()
 
       get(it, url).fold(
         { response ->
@@ -88,16 +85,16 @@ class HttpUpstream<D : Any, R : OtterResponse<D>>(
   }
 
   suspend fun get(context: Context, url: String): Result<R, FuelError> {
+    Log.i("HttpUpstream", "get() - url: $url")
     return try {
-      val request = Fuel.get(mustNormalizeUrl(url)).apply {
+      val normalizedUrl = mustNormalizeUrl(url)
+      val request = Fuel.get(normalizedUrl).apply {
         authorize(context, oAuth)
       }
       val (_, response, result) = request.awaitObjectResponseResult(GenericDeserializer<R>(type))
-
       if (response.statusCode == 401) {
-        return retryGet(url)
+        return retryGet(normalizedUrl)
       }
-
       result
     } catch (e: Exception) {
       Result.error(FuelError.wrap(e))
@@ -105,19 +102,15 @@ class HttpUpstream<D : Any, R : OtterResponse<D>>(
   }
 
   private suspend fun retryGet(url: String): Result<R, FuelError> {
+    Log.i("HttpUpstream", "retryGet() - url: $url")
     context?.let {
       return try {
-        return if (http.refresh()) {
-          val request = Fuel.get(mustNormalizeUrl(url)).apply {
-            if (!Settings.isAnonymous()) {
-              header("Authorization", "Bearer ${oAuth.state().accessToken}")
-            }
-          }
-
-          request.awaitObjectResult(GenericDeserializer(type))
-        } else {
-          Result.Failure(FuelError.wrap(RefreshError))
+        oAuth.refreshAccessToken(context)
+        val request = Fuel.get(url).apply {
+          authorize(context, oAuth)
         }
+        val (_, _, result) = request.awaitObjectResponseResult(GenericDeserializer<R>(type))
+        result
       } catch (e: Exception) {
         Result.error(FuelError.wrap(e))
       }

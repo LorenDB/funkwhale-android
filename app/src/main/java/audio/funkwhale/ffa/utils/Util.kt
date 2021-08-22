@@ -66,7 +66,6 @@ fun mustNormalizeUrl(rawUrl: String): String {
   val fallbackHost =
     PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).getString("hostname")
   val uri = URI(rawUrl).takeIf { it.host != null } ?: URI("$fallbackHost$rawUrl")
-
   return uri.toString()
 }
 
