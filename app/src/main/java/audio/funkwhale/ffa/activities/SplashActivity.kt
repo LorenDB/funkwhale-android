@@ -18,7 +18,7 @@ class SplashActivity : AppCompatActivity() {
 
     getSharedPreferences(AppContext.PREFS_CREDENTIALS, Context.MODE_PRIVATE)
       .apply {
-        when (oAuth.isAuthorized(this@SplashActivity) || Settings.isAnonymous()) {
+        when (Settings.isAnonymous() || oAuth.isAuthorized(this@SplashActivity)) {
           true -> Intent(this@SplashActivity, MainActivity::class.java)
             .apply {
               Log.i("SplashActivity", "Authorized, redirecting to MainActivity")
