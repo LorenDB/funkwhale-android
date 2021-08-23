@@ -50,13 +50,14 @@ class OAuth(private val authorizationServiceFactory: AuthorizationServiceFactory
     }
   }
 
-  fun state(): AuthState =
-    tryState() ?: throw IllegalStateException("Couldn't find saved state")
+  fun state(): AuthState {
+    return tryState() ?: throw IllegalStateException("Couldn't find saved state")
+  }
 
   fun isAuthorized(context: Context): Boolean {
     val state = tryState()
     return if (state != null) {
-      state.isAuthorized || doTryRefreshAccessToken(state, context)
+      state.isAuthorized || refreshAccessToken(context)
     } else {
       false
     }.also {
@@ -66,7 +67,17 @@ class OAuth(private val authorizationServiceFactory: AuthorizationServiceFactory
 
   fun tryRefreshAccessToken(context: Context): Boolean {
     tryState()?.let { state ->
-      return doTryRefreshAccessToken(state, context)
+      return if (state.needsTokenRefresh && state.refreshToken != null) {
+        Log.i(
+          "OAuth",
+          "needsTokenRefresh()=${state.needsTokenRefresh}, refreshToken=${
+            state.refreshToken!!.subSequence(0, 5)
+          }..."
+        )
+        refreshAccessToken(context)
+      } else {
+        state.isAuthorized
+      }.also { it.logInfo("tryRefreshAccessToken()") }
     }
     return false
   }
@@ -74,13 +85,13 @@ class OAuth(private val authorizationServiceFactory: AuthorizationServiceFactory
   fun refreshAccessToken(context: Context): Boolean {
     Log.i("OAuth", "refreshAccessToken()")
     val state = tryState()
-    return if (state != null) {
+    return if (state != null && state.refreshToken != null) {
       val refreshRequest = state.createTokenRefreshRequest()
       val auth = ClientSecretPost(state.clientSecret)
       runBlocking {
         service(context).performTokenRequest(refreshRequest, auth) { response, e ->
           state.apply {
-            Log.i("OAuth", "applying new autState")
+            Log.i("OAuth", "applying new authState")
             update(response, e)
             save()
           }
@@ -90,30 +101,6 @@ class OAuth(private val authorizationServiceFactory: AuthorizationServiceFactory
     } else {
       false
     }
-  }
-
-  private fun doTryRefreshAccessToken(
-    state: AuthState,
-    context: Context
-  ): Boolean {
-    if (state.needsTokenRefresh.also { it.logInfo("needsTokenRefresh()") } &&
-      state.refreshToken != null) {
-      val refreshRequest = state.createTokenRefreshRequest()
-      val auth = ClientSecretPost(state.clientSecret)
-      runBlocking {
-        service(context).performTokenRequest(refreshRequest, auth) { response, e ->
-          state.apply {
-            Log.i("OAuth", "applying new autState")
-            update(response, e)
-            save()
-          }
-        }
-      }
-    }
-    return (state.isAuthorized)
-      .also {
-        it.logInfo("tryRefreshAccessToken()")
-      }
   }
 
   fun init(hostname: String): AuthState {

@@ -114,7 +114,7 @@ class OAuthTest {
   }
 
   @Test
-  fun `isAuthorized() should return false if existing state is not authorized and token is not refreshed`() {
+  fun `isAuthorized() should return false if existing state is not authorized and refreshToken is missing`() {
     mockkStatic(PowerPreference::class)
     mockkStatic(AuthState::class)
 
@@ -122,6 +122,7 @@ class OAuthTest {
     every { AuthState.jsonDeserialize(any<String>()) } returns authState
     every { authState.isAuthorized } returns false
     every { authState.needsTokenRefresh } returns false
+    every { authState.refreshToken } returns null
 
     every { PowerPreference.getFileByName(any()) } returns mockPreference
     every { mockPreference.getString(any()) } returns "{}"
