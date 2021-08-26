@@ -82,7 +82,7 @@ class ManagementPlaylistsRepository(override val context: Context?) :
   }
 
   fun add(id: Int, tracks: List<Track>) {
-    context?.let {
+    if (context != null) {
       val body = PlaylistAdd(tracks.map { it.id }, false)
 
       val request = Fuel.post(mustNormalizeUrl("/api/v1/playlists/$id/add/")).apply {
@@ -98,8 +98,9 @@ class ManagementPlaylistsRepository(override val context: Context?) :
           .body(Gson().toJson(body))
           .awaitByteArrayResponseResult()
       }
+    } else {
+      throw IllegalStateException("Illegal state: context is null")
     }
-    throw IllegalStateException("Illegal state: context is null")
   }
 
   suspend fun remove(id: Int, track: Track, index: Int) {
