@@ -12,21 +12,13 @@ import androidx.recyclerview.widget.RecyclerView
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.adapters.PlaylistTracksAdapter
 import audio.funkwhale.ffa.databinding.FragmentTracksBinding
+import audio.funkwhale.ffa.model.Playlist
+import audio.funkwhale.ffa.model.PlaylistTrack
+import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.repositories.FavoritesRepository
 import audio.funkwhale.ffa.repositories.ManagementPlaylistsRepository
 import audio.funkwhale.ffa.repositories.PlaylistTracksRepository
-import audio.funkwhale.ffa.utils.Command
-import audio.funkwhale.ffa.utils.CommandBus
-import audio.funkwhale.ffa.model.Playlist
-import audio.funkwhale.ffa.model.PlaylistTrack
-import audio.funkwhale.ffa.utils.Request
-import audio.funkwhale.ffa.utils.RequestBus
-import audio.funkwhale.ffa.utils.Response
-import audio.funkwhale.ffa.model.Track
-import audio.funkwhale.ffa.utils.maybeLoad
-import audio.funkwhale.ffa.utils.maybeNormalizeUrl
-import audio.funkwhale.ffa.utils.toast
-import audio.funkwhale.ffa.utils.wait
+import audio.funkwhale.ffa.utils.*
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import kotlinx.coroutines.Dispatchers.Main
@@ -183,15 +175,14 @@ class PlaylistTracksFragment : FFAFragment<PlaylistTrack, PlaylistTracksAdapter>
         else -> RoundedCornersTransformation.CornerType.TOP_LEFT
       }
 
-      imageView?.let { view ->
-        lifecycleScope.launch(Main) {
-          Picasso.get()
-            .maybeLoad(maybeNormalizeUrl(url))
-            .fit()
-            .centerCrop()
-            .transform(RoundedCornersTransformation(16, 0, corner))
-            .into(view)
-        }
+
+      lifecycleScope.launch(Main) {
+        Picasso.get()
+          .maybeLoad(maybeNormalizeUrl(url))
+          .fit()
+          .centerCrop()
+          .transform(RoundedCornersTransformation(16, 0, corner))
+          .into(imageView)
       }
     }
   }
@@ -229,7 +220,7 @@ class PlaylistTracksFragment : FFAFragment<PlaylistTrack, PlaylistTracksAdapter>
 
     override fun onRemoveTrackFromPlaylist(track: Track, index: Int) {
       lifecycleScope.launch(Main) {
-        playlistsRepository.remove(albumId, track, index)
+        playlistsRepository.remove(albumId, index)
         update()
       }
     }

@@ -230,7 +230,7 @@ class TracksAdapter(
       if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
         context?.let {
           viewHolder?.let {
-            from = viewHolder.adapterPosition
+            from = viewHolder.bindingAdapterPosition
             viewHolder.itemView.background = ColorDrawable(context.getColor(R.color.colorSelected))
           }
         }

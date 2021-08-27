@@ -3,8 +3,6 @@ package audio.funkwhale.ffa.utils
 import android.content.Context
 import android.widget.Toast
 import com.google.android.exoplayer2.util.Log
-import com.google.android.exoplayer2.util.Log.LOG_LEVEL_ERROR
-import com.google.android.exoplayer2.util.Log.LOG_LEVEL_INFO
 import com.preference.PowerPreference
 import java.net.URI
 
@@ -33,10 +31,10 @@ private fun logClassName(): String {
   return "UNKNOWN"
 }
 
-enum class LogLevel(value: Int) {
-  INFO(LOG_LEVEL_INFO),
-  DEBUG(Log.LOG_LEVEL_ALL),
-  ERROR(LOG_LEVEL_ERROR)
+enum class LogLevel {
+  INFO,
+  DEBUG,
+  ERROR
 }
 
 fun Any?.logError(prefix: String? = null) = this.log(prefix, LogLevel.ERROR)

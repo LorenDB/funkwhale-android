@@ -103,11 +103,11 @@ class ManagementPlaylistsRepository(override val context: Context?) :
     }
   }
 
-  suspend fun remove(id: Int, track: Track, index: Int) {
+  suspend fun remove(albumId: Int, index: Int) {
     context?.let {
       val body = mapOf("index" to index)
 
-      val request = Fuel.post(mustNormalizeUrl("/api/v1/playlists/$id/remove/")).apply {
+      val request = Fuel.post(mustNormalizeUrl("/api/v1/playlists/$albumId/remove/")).apply {
         if (!Settings.isAnonymous()) {
           authorize(context, oAuth)
           header("Authorization", "Bearer ${oAuth.state().accessToken}")

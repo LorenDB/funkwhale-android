@@ -106,7 +106,7 @@ class FavoritesAdapter(
         favoriteListener.onToggleFavorite(favorite.id, !favorite.favorite)
 
         data.remove(favorite)
-        notifyItemRemoved(holder.adapterPosition)
+        notifyItemRemoved(holder.bindingAdapterPosition)
       }
     }
 
