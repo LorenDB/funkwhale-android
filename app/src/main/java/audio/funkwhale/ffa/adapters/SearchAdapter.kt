@@ -173,7 +173,9 @@ class SearchAdapter(
         albums[position - artists.size - 2]
       }
 
-      ResultType.Track.ordinal -> tracks[position - artists.size - albums.size - sectionCount]
+      ResultType.Track.ordinal -> {
+        tracks[position - artists.size - albums.size - sectionCount]
+      }
 
       else -> tracks[position]
     }
@@ -207,92 +209,98 @@ class SearchAdapter(
 
     searchHeaderViewHolder?.title?.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
 
-    if (resultType == ResultType.Track.ordinal) {
-      (item as? Track)?.let { track ->
-        context?.let { context ->
-          if (track == currentTrack || track.current) {
-            searchHeaderViewHolder?.title?.setTypeface(
-              searchHeaderViewHolder.title.typeface,
-              Typeface.BOLD
-            )
-            rowTrackViewHolder?.artist?.setTypeface(
-              rowTrackViewHolder.artist.typeface,
-              Typeface.BOLD
-            )
-          }
-
-          when (track.favorite) {
-            true -> rowTrackViewHolder?.favorite?.setColorFilter(context.getColor(R.color.colorFavorite))
-            false -> rowTrackViewHolder?.favorite?.setColorFilter(context.getColor(R.color.colorSelected))
-          }
-
-          rowTrackViewHolder?.favorite?.setOnClickListener {
-            favoriteListener?.let {
-              favoriteListener.onToggleFavorite(track.id, !track.favorite)
-
-              tracks[position - artists.size - albums.size - sectionCount].favorite =
-                !track.favorite
-
-              notifyItemChanged(position)
-            }
-          }
-
-          when (track.cached || track.downloaded) {
-            true -> searchHeaderViewHolder?.title?.setCompoundDrawablesWithIntrinsicBounds(
-              R.drawable.downloaded,
-              0,
-              0,
-              0
-            )
-            false -> searchHeaderViewHolder?.title?.setCompoundDrawablesWithIntrinsicBounds(
-              0,
-              0,
-              0,
-              0
-            )
-          }
-
-          if (track.cached && !track.downloaded) {
-            searchHeaderViewHolder?.title?.compoundDrawables?.forEach {
-              it?.colorFilter =
-                PorterDuffColorFilter(context.getColor(R.color.cached), PorterDuff.Mode.SRC_IN)
-            }
-          }
-
-          if (track.downloaded) {
-            searchHeaderViewHolder?.title?.compoundDrawables?.forEach {
-              it?.colorFilter =
-                PorterDuffColorFilter(context.getColor(R.color.downloaded), PorterDuff.Mode.SRC_IN)
-            }
-          }
-
-          rowTrackViewHolder?.actions?.setOnClickListener {
-            PopupMenu(
-              context,
-              rowTrackViewHolder.actions,
-              Gravity.START,
-              R.attr.actionOverflowMenuStyle,
-              0
-            ).apply {
-              inflate(R.menu.row_track)
-
-              setOnMenuItemClickListener {
-                when (it.itemId) {
-                  R.id.track_add_to_queue -> CommandBus.send(Command.AddToQueue(listOf(track)))
-                  R.id.track_play_next -> CommandBus.send(Command.PlayNext(track))
-                  R.id.track_pin -> CommandBus.send(Command.PinTrack(track))
-                  R.id.track_add_to_playlist -> CommandBus.send(Command.AddToPlaylist(listOf(track)))
-                  R.id.queue_remove -> CommandBus.send(Command.RemoveFromQueue(track))
-                }
-
-                true
+    when (resultType) {
+        ResultType.Artist.ordinal -> {
+          rowTrackViewHolder?.title?.setCompoundDrawablesWithIntrinsicBounds(
+            0, 0, 0, 0
+          )
+        }
+        ResultType.Album.ordinal -> {
+          rowTrackViewHolder?.title?.setCompoundDrawablesWithIntrinsicBounds(
+            0, 0, 0, 0
+          )
+        }
+        ResultType.Track.ordinal -> {
+          (item as? Track)?.let { track ->
+            context?.let { context ->
+              if (track == currentTrack || track.current) {
+                searchHeaderViewHolder?.title?.setTypeface(
+                  searchHeaderViewHolder.title.typeface,
+                  Typeface.BOLD
+                )
+                rowTrackViewHolder?.artist?.setTypeface(
+                  rowTrackViewHolder.artist.typeface,
+                  Typeface.BOLD
+                )
               }
 
-              show()
+              when (track.favorite) {
+                true -> rowTrackViewHolder?.favorite?.setColorFilter(context.getColor(R.color.colorFavorite))
+                false -> rowTrackViewHolder?.favorite?.setColorFilter(context.getColor(R.color.colorSelected))
+              }
+
+              rowTrackViewHolder?.favorite?.setOnClickListener {
+                favoriteListener?.let {
+                  favoriteListener.onToggleFavorite(track.id, !track.favorite)
+
+                  tracks[position - artists.size - albums.size - sectionCount].favorite =
+                    !track.favorite
+
+                  notifyItemChanged(position)
+                }
+              }
+
+              when (track.cached || track.downloaded) {
+                true -> rowTrackViewHolder?.title?.setCompoundDrawablesWithIntrinsicBounds(
+                  R.drawable.downloaded, 0, 0, 0
+                )
+                false -> rowTrackViewHolder?.title?.setCompoundDrawablesWithIntrinsicBounds(
+                  0, 0, 0, 0
+                )
+              }
+
+              if (track.cached && !track.downloaded) {
+                rowTrackViewHolder?.title?.compoundDrawables?.forEach {
+                  it?.colorFilter =
+                    PorterDuffColorFilter(context.getColor(R.color.cached), PorterDuff.Mode.SRC_IN)
+                }
+              }
+
+              if (track.downloaded) {
+                rowTrackViewHolder?.title?.compoundDrawables?.forEach {
+                  it?.colorFilter =
+                    PorterDuffColorFilter(context.getColor(R.color.downloaded), PorterDuff.Mode.SRC_IN)
+                }
+              }
+
+              rowTrackViewHolder?.actions?.setOnClickListener {
+                PopupMenu(
+                  context,
+                  rowTrackViewHolder.actions,
+                  Gravity.START,
+                  R.attr.actionOverflowMenuStyle,
+                  0
+                ).apply {
+                  inflate(R.menu.row_track)
+
+                  setOnMenuItemClickListener {
+                    when (it.itemId) {
+                      R.id.track_add_to_queue -> CommandBus.send(Command.AddToQueue(listOf(track)))
+                      R.id.track_play_next -> CommandBus.send(Command.PlayNext(track))
+                      R.id.track_pin -> CommandBus.send(Command.PinTrack(track))
+                      R.id.track_add_to_playlist -> CommandBus.send(Command.AddToPlaylist(listOf(track)))
+                      R.id.queue_remove -> CommandBus.send(Command.RemoveFromQueue(track))
+                    }
+
+                    true
+                  }
+
+                  show()
+                }
+              }
             }
           }
         }
-      }
     }
   }
 
