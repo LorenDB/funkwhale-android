@@ -199,10 +199,10 @@ class PlaylistTracksAdapter(
       viewHolder: RecyclerView.ViewHolder,
       target: RecyclerView.ViewHolder
     ): Boolean {
-      if (from == -1) from = viewHolder.adapterPosition
-      to = target.adapterPosition
+      if (from == -1) from = viewHolder.bindingAdapterPosition
+      to = target.bindingAdapterPosition
 
-      onItemMove(viewHolder.adapterPosition, target.adapterPosition)
+      onItemMove(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
 
       return true
     }

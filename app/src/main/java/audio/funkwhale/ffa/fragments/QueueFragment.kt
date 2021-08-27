@@ -78,7 +78,7 @@ class QueueFragment : BottomSheetDialogFragment() {
     super.onResume()
 
     binding.included.queue.visibility = View.GONE
-    binding.included.placeholder?.visibility = View.VISIBLE
+    binding.included.placeholder.visibility = View.VISIBLE
 
     binding.included.queueShuffle.setOnClickListener {
       CommandBus.send(Command.ShuffleQueue)
