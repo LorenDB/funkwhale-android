@@ -131,13 +131,35 @@ class OAuthTest {
   }
 
   @Test
-  fun `isAuthorized() should return true if existing state is authorized`() {
+  fun `isAuthorized() should return true if existing state is authorized and token needs no refresh`() {
     mockkStatic(PowerPreference::class)
     mockkStatic(AuthState::class)
 
     val authState = mockk<AuthState>()
     every { AuthState.jsonDeserialize(any<String>()) } returns authState
     every { authState.isAuthorized } returns true
+    every { authState.needsTokenRefresh } returns false
+
+    val mockPref = mockk<Preference>()
+    every { PowerPreference.getFileByName(any()) } returns mockPref
+    every { mockPref.getString(any()) } returns "{}"
+
+    expectThat(oAuth.isAuthorized(context)).isTrue()
+  }
+
+  @Test
+  fun `isAuthorized() should return true if existing state is authorized and token needs refresh`() {
+    mockkStatic(PowerPreference::class)
+    mockkStatic(AuthState::class)
+
+    val authState = mockk<AuthState>()
+    every { AuthState.jsonDeserialize(any<String>()) } returns authState
+    every { authState.isAuthorized } returns true
+    every { authState.needsTokenRefresh } returns true
+    every { authState.refreshToken } returns "refreshToken"
+    every { authState.createTokenRefreshRequest() } returns mockk()
+    every { authState.clientSecret } returns "clientSecret"
+    every { authServiceFactory.create(any()) } returns authService
 
     val mockPref = mockk<Preference>()
     every { PowerPreference.getFileByName(any()) } returns mockPref
