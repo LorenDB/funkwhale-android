@@ -3,7 +3,7 @@ package audio.funkwhale.ffa.playback
 import android.app.Notification
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
+import androidx.core.net.toUri
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.model.DownloadInfo
 import audio.funkwhale.ffa.model.Track
@@ -42,16 +42,12 @@ class PinService : DownloadService(AppContext.NOTIFICATION_DOWNLOADS) {
           )
         ).toByteArray()
 
-        DownloadRequest(
-          url,
-          DownloadRequest.TYPE_PROGRESSIVE,
-          Uri.parse(url),
-          Collections.emptyList(),
-          null,
-          data
-        ).also {
-          sendAddDownload(context, PinService::class.java, it, false)
-        }
+        val request = DownloadRequest.Builder(track.id.toString(), url.toUri())
+          .setData(data)
+          .setStreamKeys(Collections.emptyList())
+          .build()
+
+        sendAddDownload(context, PinService::class.java, request, false)
       }
     }
   }
@@ -83,14 +79,19 @@ class PinService : DownloadService(AppContext.NOTIFICATION_DOWNLOADS) {
     return DownloadNotificationHelper(
       this,
       AppContext.NOTIFICATION_CHANNEL_DOWNLOADS
-    ).buildProgressNotification(R.drawable.downloads, null, description, downloads)
+    ).buildProgressNotification(this, R.drawable.downloads, null, description, downloads)
   }
 
   private fun getDownloads() = downloadManager.downloadIndex.getDownloads()
 
   inner class DownloadListener : DownloadManager.Listener {
-    override fun onDownloadChanged(downloadManager: DownloadManager, download: Download) {
-      super.onDownloadChanged(downloadManager, download)
+
+    override fun onDownloadChanged(
+      downloadManager: DownloadManager,
+      download: Download,
+      finalException: Exception?
+    ) {
+      super.onDownloadChanged(downloadManager, download, finalException)
 
       EventBus.send(Event.DownloadChanged(download))
     }

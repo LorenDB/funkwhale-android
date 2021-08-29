@@ -4,8 +4,8 @@ object Versions {
   const val unmock = "0.7.8"
   const val gradleDependencyPlugin = "0.38.0"
 
-  const val exoPlayer = "2.11.8"
-  const val exoPlayerExtensions = "2.11.4"
+  const val exoPlayer = "2.14.2"
+  const val exoPlayerExtensions = "2.14.0"
   const val fuel = "2.3.1"
   const val gson = "2.8.7"
   const val powerPreference = "2.0.0"
