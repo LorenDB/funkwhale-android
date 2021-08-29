@@ -349,7 +349,7 @@ class MainActivity : AppCompatActivity() {
             when (message.playing) {
               true -> {
                 binding.nowPlayingContainer?.nowPlayingToggle?.icon = getDrawable(R.drawable.pause)
-                binding.nowPlayingContainer?.nowPlayingToggle?.icon = getDrawable(R.drawable.pause)
+                binding.nowPlayingContainer?.nowPlayingDetailsToggle?.icon = getDrawable(R.drawable.pause)
               }
 
               false -> {
