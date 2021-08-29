@@ -28,23 +28,27 @@ stages:
   stage: build
   variables:
     apk_file: 'app/build/outputs/apk/debug/app-debug.apk'
-    metadata_file: 'metadata/audio.funkwhale.android.yml'
+    metadata_file: 'metadata/audio.funkwhale.android.dev.yml'
+    metadata_template: 'metadata/preview.template.yml'
+    output_metadata: 'app/build/outputs/apk/debug/output-metadata.json'
   before_script: 
     - git fetch --unshallow --tags
   after_script:
     - export versionCode=`$ANDROID_HOME/build-tools/30.0.2/aapt dump badging $apk_file | grep versionCode | awk '{print $3}' | sed s/versionCode=//g | sed s/\'//g`
     - apt update && apt install gettext-base
-    - cat metadata/template.yml | envsubst > $metadata_file
+    - cat $metadata_template | envsubst > $metadata_file
   extends: .gradle-default
   artifacts:
     paths:
       - $apk_file
       - $metadata_file
-      - app/build/outputs/apk/debug/output-metadata.json
+      - $output_metadata
 
 test:
   extends: .gradle-default
   stage: test
+  except:
+    - tags
   script:
     - ./gradlew test jacocoTestReport
     - awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/", instructions, " instructions covered"; print 100*covered/instructions, "% covered" }' $JACOCO_CSV_LOCATION
@@ -63,6 +67,8 @@ coverage:
   needs: [ "test" ]
   dependencies:
     - test
+  except:
+    - tags
   artifacts:
     reports:
       cobertura: $COBERTURA_REPORT
@@ -70,10 +76,23 @@ coverage:
 build-develop:
   extends: .build
   script:
-    - echo -n $SIGNING_KEY_STORE | base64 -d > app/android.keystore
-    - ./gradlew assembleDebug -Psigning.store=android.keystore -Psigning.store_passphrase=$SIGNING_KEY_PASS -Psigning.key_passphrase=$SIGNING_KEY_PASS
+    - echo -n $PREVIEW_SIGNING_KEY_STORE | base64 -d > app/android.keystore
+    - ./gradlew assembleDebug -Psigning.store=android.keystore -Psigning.store_passphrase=$PREVIEW_SIGNING_KEY_PASS -Psigning.key_passphrase=$PREVIEW_SIGNING_KEY_PASS
   only:
     - develop
+
+build-release:
+  variables:
+    apk_file: 'app/build/outputs/apk/release/app-release.apk'
+    output_metadata: 'app/build/outputs/apk/release/output-metadata.json'
+    metadata_template: 'metadata/release.template.yml'
+    metadata_file: 'metadata/audio.funkwhale.android.yml'
+  extends: .build
+  script:
+    - echo -n $SIGNING_KEY_STORE | base64 -d > app/android.keystore
+    - ./gradlew assembleRelease -Psigning.store=android.keystore -Psigning.store_passphrase=$SIGNING_KEY_PASS -Psigning.key_passphrase=$SIGNING_KEY_PASS
+  only:
+    - tags
 
 build-bleeding-edge:
   extends: .build
@@ -91,7 +110,22 @@ deploy-develop:
     - ssh-add <(echo "$SSH_PRIVATE_KEY")
     - scp -o StrictHostKeyChecking=no app/build/outputs/apk/debug/app-debug.apk fdroid@apps.funkwhale.audio:/srv/fdroid/fdroid/develop/repo/audio.funkwhale.ffa.dev-$CI_COMMIT_SHORT_SHA.apk
     - scp -o StrictHostKeyChecking=no app/build/outputs/apk/debug/output-metadata.json fdroid@apps.funkwhale.audio:/srv/fdroid/fdroid/develop/output-metadata.json
-    - scp -o StrictHostKeyChecking=no metadata/audio.funkwhale.android.yml fdroid@apps.funkwhale.audio:/srv/fdroid/fdroid/develop/metadata/audio.funkwhale.ffa.dev.yml      
+    - scp -o StrictHostKeyChecking=no metadata/audio.funkwhale.android.dev.yml fdroid@apps.funkwhale.audio:/srv/fdroid/fdroid/develop/metadata/audio.funkwhale.ffa.dev.yml      
+    - ssh -o StrictHostKeyChecking=no fdroid@apps.funkwhale.audio 'docker run --rm -u $(id -u):$(id -g) -v /srv/fdroid/fdroid/develop:/repo registry.gitlab.com/fdroid/docker-executable-fdroidserver:master update'
+  tags:
+    - shell
+
+deploy-release:
+  stage: deploy
+  only:
+    - tags
+  script:
+    - eval `ssh-agent -s`
+    - ssh-add <(echo "$SSH_PRIVATE_KEY")
+      #- scp -o StrictHostKeyChecking=no app/build/outputs/apk/release/app-release.apk fdroid@apps.funkwhale.audio:/srv/fdroid/fdroid/develop/repo/audio.funkwhale.ffa.-$CI_COMMIT_TAG.apk
+    - scp -o StrictHostKeyChecking=no app/build/outputs/apk/release/app-release.apk fdroid@apps.funkwhale.audio:/srv/fdroid/fdroid/develop/repo/audio.funkwhale.ffa.-0.0.1.apk
+    - scp -o StrictHostKeyChecking=no app/build/outputs/apk/release/output-metadata.json fdroid@apps.funkwhale.audio:/srv/fdroid/fdroid/develop/output-metadata.json
+    - scp -o StrictHostKeyChecking=no metadata/audio.funkwhale.android.yml fdroid@apps.funkwhale.audio:/srv/fdroid/fdroid/develop/metadata/audio.funkwhale.ffa.yml      
     - ssh -o StrictHostKeyChecking=no fdroid@apps.funkwhale.audio 'docker run --rm -u $(id -u):$(id -g) -v /srv/fdroid/fdroid/develop:/repo registry.gitlab.com/fdroid/docker-executable-fdroidserver:master update'
   tags:
     - shell
