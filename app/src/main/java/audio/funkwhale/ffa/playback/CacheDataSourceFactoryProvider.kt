@@ -9,7 +9,6 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 import com.google.android.exoplayer2.upstream.FileDataSource
 import com.google.android.exoplayer2.upstream.cache.Cache
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource
-import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 
 class CacheDataSourceFactoryProvider(
@@ -18,19 +17,19 @@ class CacheDataSourceFactoryProvider(
   private val exoDownloadCache: Cache
 ) {
 
-  fun create(context: Context): CacheDataSourceFactory {
+  fun create(context: Context): CacheDataSource.Factory {
 
-    val playbackCache =
-      CacheDataSourceFactory(exoCache, createDatasourceFactory(context, oAuth))
+    val playbackCache = CacheDataSource.Factory().apply {
+      setCache(exoCache)
+      setUpstreamDataSourceFactory(createDatasourceFactory(context, oAuth))
+    }
 
-    return CacheDataSourceFactory(
-      exoDownloadCache,
-      playbackCache,
-      FileDataSource.Factory(),
-      null,
-      CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR,
-      null
-    )
+    return CacheDataSource.Factory().apply {
+      setCache(exoDownloadCache)
+      setUpstreamDataSourceFactory(playbackCache)
+      setCacheReadDataSourceFactory(FileDataSource.Factory())
+      setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
+    }
   }
 
   private fun createDatasourceFactory(context: Context, oAuth: OAuth): DataSource.Factory {

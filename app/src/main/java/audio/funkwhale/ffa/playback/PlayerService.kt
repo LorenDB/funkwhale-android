@@ -476,10 +476,13 @@ class PlayerService : Service() {
       CommandBus.send(Command.RefreshTrack(queue.current()))
     }
 
-    override fun onPositionDiscontinuity(reason: Int) {
-      super.onPositionDiscontinuity(reason)
-
-      if (reason == Player.DISCONTINUITY_REASON_PERIOD_TRANSITION) {
+    override fun onPositionDiscontinuity(
+      oldPosition: Player.PositionInfo,
+      newPosition: Player.PositionInfo,
+      reason: Int
+    ) {
+      super.onPositionDiscontinuity(oldPosition, newPosition, reason)
+      if (reason == Player.DISCONTINUITY_REASON_AUTO_TRANSITION) {
         val currentTrack = queue.current().also {
           it.log("Track finished")
         }
