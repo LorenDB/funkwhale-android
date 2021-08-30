@@ -105,7 +105,7 @@ build-bleeding-edge:
 .deploy:
   image: debian
   before_script: 
-    - apt -y install openssh-server
+    - apt update && apt -y install openssh-server
 
 deploy-develop:
   extends: .deploy
