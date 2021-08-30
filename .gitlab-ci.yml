@@ -102,7 +102,13 @@ build-bleeding-edge:
     - develop
     - tags
 
+.deploy:
+  image: debian
+  before_script: 
+    - apt -y install openssh-server
+
 deploy-develop:
+  extends: .deploy
   stage: deploy
   only:
     - develop
@@ -113,10 +119,9 @@ deploy-develop:
     - scp -o StrictHostKeyChecking=no app/build/outputs/apk/debug/output-metadata.json fdroid@apps.funkwhale.audio:/srv/fdroid/fdroid/develop/output-metadata.json
     - scp -o StrictHostKeyChecking=no metadata/audio.funkwhale.android.dev.yml fdroid@apps.funkwhale.audio:/srv/fdroid/fdroid/develop/metadata/audio.funkwhale.ffa.dev.yml      
     - ssh -o StrictHostKeyChecking=no fdroid@apps.funkwhale.audio 'docker run --rm -u $(id -u):$(id -g) -v /srv/fdroid/fdroid/develop:/repo registry.gitlab.com/fdroid/docker-executable-fdroidserver:master update'
-  tags:
-    - shell
 
 deploy-release:
+  extends: .deploy
   stage: deploy
   only:
     - tags
@@ -128,5 +133,3 @@ deploy-release:
     - scp -o StrictHostKeyChecking=no app/build/outputs/apk/release/output-metadata.json fdroid@apps.funkwhale.audio:/srv/fdroid/fdroid/develop/output-metadata.json
     - scp -o StrictHostKeyChecking=no metadata/audio.funkwhale.android.yml fdroid@apps.funkwhale.audio:/srv/fdroid/fdroid/develop/metadata/audio.funkwhale.ffa.yml      
     - ssh -o StrictHostKeyChecking=no fdroid@apps.funkwhale.audio 'docker run --rm -u $(id -u):$(id -g) -v /srv/fdroid/fdroid/develop:/repo registry.gitlab.com/fdroid/docker-executable-fdroidserver:master update'
-  tags:
-    - shell
