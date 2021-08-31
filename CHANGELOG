@@ -1,0 +1,28 @@
+0.1.1 (2021-08-31)
+Features:
+
+- Display if the whole album is offline available (#50)
+- Implement OAuth as Funkwhale's new authentication system (#48)
+- Increase size of buttons in queue (#39)
+- Migrate from deprecated Kotlin synthetics to Jetpack view binding (#67)
+- Rebrand Otter to Funkwhale for Android (#3)
+- Show error messages to user when login failes (#80)
+- Stretch timeline of the "now playing" view to entire width (#25)
+
+
+Bugfixes:
+
+- Artist, Album and Track title is missing in search results (#70)
+- Fix application crash when adding song to playlist (#83)
+- Show pause icon when song is playing (#87)
+
+
+Other:
+
+- Host a F-Droid repository for development artefacts (#5)
+- Initial testing support, test coverage calculation and integration with gitlab (#7)
+- Migrate open Otter issues to the Funkwhale for Android Gitlab repository (#2)
+- Rename debug build to Funkwhale (preview) (#71)
+- Show Funkwhale logo on the selfhosted F-Droid repository application page (#69)
+- Upgrade ExoPlayer version to 2.14.2 (#65)
+- Use towncrier to manage changelog (#6)
