@@ -1,7 +1,6 @@
 package audio.funkwhale.ffa.koin
 
 import android.content.Context
-import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.playback.CacheDataSourceFactoryProvider
 import audio.funkwhale.ffa.playback.MediaSession
 import audio.funkwhale.ffa.utils.AuthorizationServiceFactory

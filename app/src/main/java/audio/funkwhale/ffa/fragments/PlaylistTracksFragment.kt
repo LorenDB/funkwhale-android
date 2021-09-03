@@ -175,7 +175,6 @@ class PlaylistTracksFragment : FFAFragment<PlaylistTrack, PlaylistTracksAdapter>
         else -> RoundedCornersTransformation.CornerType.TOP_LEFT
       }
 
-
       lifecycleScope.launch(Main) {
         Picasso.get()
           .maybeLoad(maybeNormalizeUrl(url))
