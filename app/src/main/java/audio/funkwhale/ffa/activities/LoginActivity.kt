@@ -121,7 +121,7 @@ class LoginActivity : AppCompatActivity() {
     if (hostname.isEmpty()) {
       return getString(R.string.login_error_hostname)
     }
-    if (!cleartext && hostname.startsWith("http")) {
+    if (!cleartext && hostname.startsWith("http://")) {
       return getString(R.string.login_error_hostname_https)
     }
     return null

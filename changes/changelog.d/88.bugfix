@@ -1,0 +1,1 @@
+Fix handling of hostname 'https://' scheme prefix (#88)
