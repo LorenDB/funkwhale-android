@@ -122,4 +122,6 @@
     <string name="radio_playback_error">There was an error while trying to play this radio</string>
     <string name="radio_random_description">Totally random picks, maybe you\'ll discover new things\?</string>
     <string name="playlist_add_to_create">Create playlist</string>
+    <string name="login_error_funkwhale_not_found">No Funkwhale pod found</string>
+    <string name="login_error">Login failed: %s</string>
 </resources>
