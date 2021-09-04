@@ -125,4 +125,6 @@
     <string name="login_cleartext">Dozvoli cleartext promet (HTTP)</string>
     <string name="login_hostname">Ime operatera</string>
     <string name="login_welcome">Molimo unesite detalje vaše Funkwhale \'instance\' kako bi pristupili njenom sadržaju</string>
+    <string name="login_error">Neuspješna prijava: %s</string>
+    <string name="login_error_funkwhale_not_found">Funkwhale Pod nije nađen</string>
 </resources>
