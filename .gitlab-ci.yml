@@ -128,8 +128,7 @@ deploy-release:
   script:
     - eval `ssh-agent -s`
     - ssh-add <(echo "$SSH_PRIVATE_KEY")
-      #- scp -o StrictHostKeyChecking=no app/build/outputs/apk/release/app-release.apk fdroid@apps.funkwhale.audio:/srv/fdroid/fdroid/develop/repo/audio.funkwhale.ffa.-$CI_COMMIT_TAG.apk
-    - scp -o StrictHostKeyChecking=no app/build/outputs/apk/release/app-release.apk fdroid@apps.funkwhale.audio:/srv/fdroid/fdroid/develop/repo/audio.funkwhale.ffa.-0.0.1.apk
+    - scp -o StrictHostKeyChecking=no app/build/outputs/apk/release/app-release.apk fdroid@apps.funkwhale.audio:/srv/fdroid/fdroid/develop/repo/audio.funkwhale.ffa-$CI_COMMIT_TAG.apk
     - scp -o StrictHostKeyChecking=no app/build/outputs/apk/release/output-metadata.json fdroid@apps.funkwhale.audio:/srv/fdroid/fdroid/develop/output-metadata.json
     - scp -o StrictHostKeyChecking=no metadata/audio.funkwhale.android.yml fdroid@apps.funkwhale.audio:/srv/fdroid/fdroid/develop/metadata/audio.funkwhale.ffa.yml      
     - ssh -o StrictHostKeyChecking=no fdroid@apps.funkwhale.audio 'docker run --rm -u $(id -u):$(id -g) -v /srv/fdroid/fdroid/develop:/repo registry.gitlab.com/fdroid/docker-executable-fdroidserver:master update'
