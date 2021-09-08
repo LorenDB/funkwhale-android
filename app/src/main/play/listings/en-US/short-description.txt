@@ -1,1 +1,1 @@
-Music player for Funkwhale
+The official Android client for Funkwhale

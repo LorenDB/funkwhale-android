@@ -38,7 +38,7 @@
     <string name="settings_night_mode">ダークモード</string>
     <string name="settings_information">情報</string>
     <string name="settings_information_repository_title">Gitリポジトリ</string>
-    <string name="settings_information_repository_description">Funkwhale for Android</string>
+    <string name="settings_information_repository_description">Funkwhale for Android™</string>
     <string name="settings_version_title">バージョン</string>
     <string name="settings_information_license_title">ライセンス</string>
     <string name="settings_information_license_description">MIT License</string>
