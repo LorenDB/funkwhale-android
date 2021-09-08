@@ -8,7 +8,7 @@ plugins {
 
   id("org.jlleitschuh.gradle.ktlint") version "10.1.0"
   id("com.gladed.androidgitversion") version "0.4.14"
-  id("com.github.triplet.play") version "2.8.1"
+  id("com.github.triplet.play") version "3.6.0"
   id("de.mobilej.unmock")
   id("com.github.ben-manes.versions")
   jacoco
@@ -141,12 +141,12 @@ ktlint {
 }
 
 play {
-  isEnabled = props.hasProperty("play.credentials")
+  enabled.set(props.hasProperty("play.credentials"))
 
-  if (isEnabled) {
-    serviceAccountCredentials = file(props.getProperty("play.credentials"))
-    defaultToAppBundles = true
-    track = "beta"
+  if (enabled.get()) {
+    serviceAccountCredentials.set(file(props.getProperty("play.credentials")))
+    defaultToAppBundles.set(true)
+    track.set("beta")
   }
 }
 
