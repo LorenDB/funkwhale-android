@@ -1,12 +1,3 @@
----
-name: Bug report
-about: Create a report to help us improve
-title: ''
-labels: ''
-assignees: ''
-
----
-
 **Describe the bug**
 
 A clear and concise description of what the bug is.
@@ -22,6 +13,10 @@ A clear and concise description of what the bug is.
 
 A clear and concise description of what you expected to happen.
 
+**Actual behavior**
+
+A clear and consise description of what actually happened, instead.
+
 **Screenshots**
 
 If applicable, add screenshots to help explain your problem.
@@ -36,3 +31,5 @@ If applicable, add screenshots to help explain your problem.
 **Logs**
 
 Add any related logs from ADB or from the "Copy logs" setting.
+
+/label ~"Type: Bug"
