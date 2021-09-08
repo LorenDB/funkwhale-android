@@ -105,6 +105,7 @@ class RadioPlayer(val context: Context, val scope: CoroutineScope) {
 
         prepareNextTrack(true)
       } catch (e: Exception) {
+        e.logError()
         withContext(Main) {
           context.toast(context.getString(R.string.radio_playback_error))
         }

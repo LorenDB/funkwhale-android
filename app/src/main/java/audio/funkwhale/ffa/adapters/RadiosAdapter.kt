@@ -56,7 +56,7 @@ class RadiosAdapter(
         else -> listOf(
           Radio(
             0,
-            "actor_content",
+            "actor-content",
             context.getString(R.string.radio_your_content_title),
             context.getString(R.string.radio_your_content_description),
             username
