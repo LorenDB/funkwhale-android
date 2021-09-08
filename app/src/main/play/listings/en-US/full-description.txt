@@ -1,8 +1,8 @@
-Otter is a simple music player that allows you to stream the audio content of your self-hosted Funkwhale pod.
+Funkwhale for Android™ is an Android client for Funkwhale, a music streaming server that you can self-host. It uses Funkwhale's native API instead of the subsonic API.
 
 This app requires an account on a Funkwhale instance to work.
 
-You can get support or take a part in Otter's development by visiting our GitHub project or join us on Matrix.
+You can get support or take a part in Funkwhale's development by visiting our Gitlab project. You can also join us on Matrix.
 
 Source code : https://dev.funkwhale.audio/funkwhale/funkwhale-android
 Matrix room: https://matrix.to/#/#funkwhale-android:matrix.org

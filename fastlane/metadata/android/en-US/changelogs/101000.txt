@@ -1,0 +1,6 @@
+Our initial release.
+
+Review the complete changelog here: https://dev.funkwhale.audio/funkwhale/funkwhale-android/-/blob/0.1.1/CHANGELOG
+
+ * Implements a new authentication system
+ * Various bugfixes and improvements.

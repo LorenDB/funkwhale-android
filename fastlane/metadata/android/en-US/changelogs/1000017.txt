@@ -1,7 +1,0 @@
-Several usability and UX improvements, bug fixes:
-
- * Playback position is now cached.
- * Now Playing view now provide links to current artist, album and track details.
- * Added support for repeat modes.
- * Search for artists and albums, on top of tracks.
- * Experimental radios support (behind Experiments flag)
