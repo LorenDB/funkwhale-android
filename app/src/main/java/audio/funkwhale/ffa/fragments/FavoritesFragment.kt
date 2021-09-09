@@ -11,7 +11,15 @@ import audio.funkwhale.ffa.databinding.FragmentFavoritesBinding
 import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.repositories.FavoritesRepository
 import audio.funkwhale.ffa.repositories.TracksRepository
-import audio.funkwhale.ffa.utils.*
+import audio.funkwhale.ffa.utils.Command
+import audio.funkwhale.ffa.utils.CommandBus
+import audio.funkwhale.ffa.utils.Event
+import audio.funkwhale.ffa.utils.EventBus
+import audio.funkwhale.ffa.utils.Request
+import audio.funkwhale.ffa.utils.RequestBus
+import audio.funkwhale.ffa.utils.Response
+import audio.funkwhale.ffa.utils.getMetadata
+import audio.funkwhale.ffa.utils.wait
 import com.google.android.exoplayer2.offline.Download
 import com.google.android.exoplayer2.offline.DownloadManager
 import kotlinx.coroutines.Dispatchers.IO

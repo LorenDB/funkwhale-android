@@ -17,7 +17,19 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.media.session.MediaButtonReceiver
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.model.Track
-import audio.funkwhale.ffa.utils.*
+import audio.funkwhale.ffa.utils.Command
+import audio.funkwhale.ffa.utils.CommandBus
+import audio.funkwhale.ffa.utils.Event
+import audio.funkwhale.ffa.utils.EventBus
+import audio.funkwhale.ffa.utils.FFACache
+import audio.funkwhale.ffa.utils.HeadphonesUnpluggedReceiver
+import audio.funkwhale.ffa.utils.ProgressBus
+import audio.funkwhale.ffa.utils.Request
+import audio.funkwhale.ffa.utils.RequestBus
+import audio.funkwhale.ffa.utils.Response
+import audio.funkwhale.ffa.utils.log
+import audio.funkwhale.ffa.utils.maybeNormalizeUrl
+import audio.funkwhale.ffa.utils.onApi
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlaybackException
 import com.google.android.exoplayer2.Player
@@ -25,10 +37,15 @@ import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import com.squareup.picasso.Picasso
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.koin.java.KoinJavaComponent.inject
 
 class PlayerService : Service() {
@@ -97,15 +114,17 @@ class PlayerService : Service() {
 
     Build.VERSION_CODES.O.onApi {
       audioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN).run {
-        setAudioAttributes(AudioAttributes.Builder().run {
-          setUsage(AudioAttributes.USAGE_MEDIA)
-          setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+        setAudioAttributes(
+          AudioAttributes.Builder().run {
+            setUsage(AudioAttributes.USAGE_MEDIA)
+            setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
 
-          setAcceptsDelayedFocusGain(true)
-          setOnAudioFocusChangeListener(audioFocusChangeListener)
+            setAcceptsDelayedFocusGain(true)
+            setOnAudioFocusChangeListener(audioFocusChangeListener)
 
-          build()
-        })
+            build()
+          }
+        )
 
         build()
       }
@@ -268,7 +287,8 @@ class PlayerService : Service() {
       {
         @Suppress("DEPRECATION")
         audioManager.abandonAudioFocus(audioFocusChangeListener)
-      })
+      }
+    )
 
     player.removeListener(playerEventListener)
     setPlaybackState(false)
@@ -461,7 +481,7 @@ class PlayerService : Service() {
       }
 
       if (queue.get().isNotEmpty() && queue.current() == queue.get()
-          .last() && radioPlayer.isActive()
+        .last() && radioPlayer.isActive()
       ) {
         scope.launch(IO) {
           if (radioPlayer.lock.tryAcquire()) {

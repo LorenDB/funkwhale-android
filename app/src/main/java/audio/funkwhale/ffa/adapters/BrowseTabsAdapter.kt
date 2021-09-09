@@ -4,9 +4,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import audio.funkwhale.ffa.R
-import audio.funkwhale.ffa.fragments.*
+import audio.funkwhale.ffa.fragments.AlbumsGridFragment
+import audio.funkwhale.ffa.fragments.ArtistsFragment
+import audio.funkwhale.ffa.fragments.FavoritesFragment
+import audio.funkwhale.ffa.fragments.PlaylistsFragment
+import audio.funkwhale.ffa.fragments.RadiosFragment
 
-class BrowseTabsAdapter(val context: Fragment, manager: FragmentManager) : FragmentPagerAdapter(manager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+class BrowseTabsAdapter(val context: Fragment, manager: FragmentManager) :
+  FragmentPagerAdapter(manager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
   var tabs = mutableListOf<Fragment>()
 
   override fun getCount() = 5

@@ -4,7 +4,13 @@ import android.content.Context
 import android.net.Uri
 import audio.funkwhale.ffa.model.QueueCache
 import audio.funkwhale.ffa.model.Track
-import audio.funkwhale.ffa.utils.*
+import audio.funkwhale.ffa.utils.Command
+import audio.funkwhale.ffa.utils.CommandBus
+import audio.funkwhale.ffa.utils.Event
+import audio.funkwhale.ffa.utils.EventBus
+import audio.funkwhale.ffa.utils.FFACache
+import audio.funkwhale.ffa.utils.log
+import audio.funkwhale.ffa.utils.mustNormalizeUrl
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
@@ -28,12 +34,14 @@ class QueueManager(val context: Context) {
 
         val factory = cacheDataSourceFactoryProvider.create(context)
 
-        dataSources.addMediaSources(metadata.map { track ->
-          val url = mustNormalizeUrl(track.bestUpload()?.listen_url ?: "")
+        dataSources.addMediaSources(
+          metadata.map { track ->
+            val url = mustNormalizeUrl(track.bestUpload()?.listen_url ?: "")
 
-          ProgressiveMediaSource.Factory(factory).setTag(track.title)
-            .createMediaSource(Uri.parse(url))
-        })
+            ProgressiveMediaSource.Factory(factory).setTag(track.title)
+              .createMediaSource(Uri.parse(url))
+          }
+        )
       }
     }
 

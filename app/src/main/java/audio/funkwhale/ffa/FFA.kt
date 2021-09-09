@@ -5,13 +5,18 @@ import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import audio.funkwhale.ffa.koin.authModule
 import audio.funkwhale.ffa.koin.exoplayerModule
-import audio.funkwhale.ffa.utils.*
+import audio.funkwhale.ffa.utils.AppContext
+import audio.funkwhale.ffa.utils.Command
+import audio.funkwhale.ffa.utils.Event
+import audio.funkwhale.ffa.utils.FFACache
+import audio.funkwhale.ffa.utils.Request
 import com.preference.PowerPreference
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import org.koin.core.context.startKoin
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 class FFA : Application() {
 

@@ -13,8 +13,8 @@ import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.activities.MainActivity
 import audio.funkwhale.ffa.adapters.AlbumsGridAdapter
 import audio.funkwhale.ffa.databinding.FragmentAlbumsGridBinding
-import audio.funkwhale.ffa.repositories.AlbumsRepository
 import audio.funkwhale.ffa.model.Album
+import audio.funkwhale.ffa.repositories.AlbumsRepository
 import audio.funkwhale.ffa.utils.AppContext
 
 class AlbumsGridFragment : FFAFragment<Album, AlbumsGridAdapter>() {

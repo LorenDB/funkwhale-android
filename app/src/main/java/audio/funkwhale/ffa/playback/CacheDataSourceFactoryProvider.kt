@@ -5,7 +5,7 @@ import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.utils.OAuth
 import audio.funkwhale.ffa.utils.Settings
 import com.google.android.exoplayer2.upstream.DataSource
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.upstream.FileDataSource
 import com.google.android.exoplayer2.upstream.cache.Cache
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource
@@ -33,9 +33,9 @@ class CacheDataSourceFactoryProvider(
   }
 
   private fun createDatasourceFactory(context: Context, oAuth: OAuth): DataSource.Factory {
-    val http = DefaultHttpDataSourceFactory(
-      Util.getUserAgent(context, context.getString(R.string.app_name))
-    )
+    val http = DefaultHttpDataSource.Factory().apply {
+      setUserAgent(Util.getUserAgent(context, context.getString(R.string.app_name)))
+    }
     return if (!Settings.isAnonymous()) {
       OAuth2DatasourceFactory(context, http, oAuth)
     } else {

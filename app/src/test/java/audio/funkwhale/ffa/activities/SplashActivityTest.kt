@@ -8,7 +8,10 @@ import audio.funkwhale.ffa.KoinTestApp
 import audio.funkwhale.ffa.utils.OAuth
 import com.preference.PowerPreference
 import com.preference.Preference
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.verify
 import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith

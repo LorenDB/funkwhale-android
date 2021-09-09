@@ -4,7 +4,14 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import audio.funkwhale.ffa.model.FFAResponse
-import audio.funkwhale.ffa.utils.*
+import audio.funkwhale.ffa.utils.AppContext
+import audio.funkwhale.ffa.utils.Event
+import audio.funkwhale.ffa.utils.EventBus
+import audio.funkwhale.ffa.utils.OAuth
+import audio.funkwhale.ffa.utils.RefreshError
+import audio.funkwhale.ffa.utils.Settings
+import audio.funkwhale.ffa.utils.authorize
+import audio.funkwhale.ffa.utils.mustNormalizeUrl
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.ResponseDeserializable

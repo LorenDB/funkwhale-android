@@ -13,7 +13,16 @@ import com.github.kittinunf.fuel.gson.jsonBody
 import com.github.kittinunf.result.Result
 import com.preference.PowerPreference
 import kotlinx.coroutines.runBlocking
-import net.openid.appauth.*
+import net.openid.appauth.AuthState
+import net.openid.appauth.AuthorizationException
+import net.openid.appauth.AuthorizationRequest
+import net.openid.appauth.AuthorizationResponse
+import net.openid.appauth.AuthorizationService
+import net.openid.appauth.AuthorizationServiceConfiguration
+import net.openid.appauth.ClientSecretPost
+import net.openid.appauth.RegistrationRequest
+import net.openid.appauth.RegistrationResponse
+import net.openid.appauth.ResponseTypeValues
 
 fun AuthState.save() {
   PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).apply {
@@ -56,11 +65,13 @@ class OAuth(private val authorizationServiceFactory: AuthorizationServiceFactory
 
   fun isAuthorized(context: Context): Boolean {
     val state = tryState()
-    return (if (state != null) {
-      state.validAuthorization() || refreshAccessToken(state, context)
-    } else {
-      false
-    }).also {
+    return (
+      if (state != null) {
+        state.validAuthorization() || refreshAccessToken(state, context)
+      } else {
+        false
+      }
+      ).also {
       it.logInfo("isAuthorized()")
     }
   }

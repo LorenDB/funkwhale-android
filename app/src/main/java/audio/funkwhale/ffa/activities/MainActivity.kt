@@ -9,7 +9,11 @@ import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
 import android.util.DisplayMetrics
-import android.view.*
+import android.view.Gravity
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
@@ -24,7 +28,13 @@ import androidx.lifecycle.lifecycleScope
 import audio.funkwhale.ffa.FFA
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.databinding.ActivityMainBinding
-import audio.funkwhale.ffa.fragments.*
+import audio.funkwhale.ffa.fragments.AddToPlaylistDialog
+import audio.funkwhale.ffa.fragments.AlbumsFragment
+import audio.funkwhale.ffa.fragments.ArtistsFragment
+import audio.funkwhale.ffa.fragments.BrowseFragment
+import audio.funkwhale.ffa.fragments.LandscapeQueueFragment
+import audio.funkwhale.ffa.fragments.QueueFragment
+import audio.funkwhale.ffa.fragments.TrackInfoDetailsFragment
 import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.playback.MediaControlsManager
 import audio.funkwhale.ffa.playback.PinService
@@ -32,7 +42,25 @@ import audio.funkwhale.ffa.playback.PlayerService
 import audio.funkwhale.ffa.repositories.FavoritedRepository
 import audio.funkwhale.ffa.repositories.FavoritesRepository
 import audio.funkwhale.ffa.repositories.Repository
-import audio.funkwhale.ffa.utils.*
+import audio.funkwhale.ffa.utils.AppContext
+import audio.funkwhale.ffa.utils.Command
+import audio.funkwhale.ffa.utils.CommandBus
+import audio.funkwhale.ffa.utils.Event
+import audio.funkwhale.ffa.utils.EventBus
+import audio.funkwhale.ffa.utils.FFACache
+import audio.funkwhale.ffa.utils.OAuth
+import audio.funkwhale.ffa.utils.ProgressBus
+import audio.funkwhale.ffa.utils.Settings
+import audio.funkwhale.ffa.utils.Userinfo
+import audio.funkwhale.ffa.utils.authorize
+import audio.funkwhale.ffa.utils.log
+import audio.funkwhale.ffa.utils.logError
+import audio.funkwhale.ffa.utils.maybeLoad
+import audio.funkwhale.ffa.utils.maybeNormalizeUrl
+import audio.funkwhale.ffa.utils.mustNormalizeUrl
+import audio.funkwhale.ffa.utils.onApi
+import audio.funkwhale.ffa.utils.toast
+import audio.funkwhale.ffa.utils.untilNetwork
 import audio.funkwhale.ffa.views.DisableableFrameLayout
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.coroutines.awaitStringResponse
@@ -132,17 +160,17 @@ class MainActivity : AppCompatActivity() {
       }
 
       binding.nowPlayingContainer?.nowPlayingDetailsProgress?.setOnSeekBarChangeListener(object :
-        SeekBar.OnSeekBarChangeListener {
-        override fun onStopTrackingTouch(view: SeekBar?) {}
+          SeekBar.OnSeekBarChangeListener {
+          override fun onStopTrackingTouch(view: SeekBar?) {}
 
-        override fun onStartTrackingTouch(view: SeekBar?) {}
+          override fun onStartTrackingTouch(view: SeekBar?) {}
 
-        override fun onProgressChanged(view: SeekBar?, progress: Int, fromUser: Boolean) {
-          if (fromUser) {
-            CommandBus.send(Command.Seek(progress))
+          override fun onProgressChanged(view: SeekBar?, progress: Int, fromUser: Boolean) {
+            if (fromUser) {
+              CommandBus.send(Command.Seek(progress))
+            }
           }
-        }
-      })
+        })
 
       landscapeQueue?.let {
         supportFragmentManager.beginTransaction()
@@ -303,9 +331,11 @@ class MainActivity : AppCompatActivity() {
         when (message) {
           is Event.LogOut -> {
             FFA.get().deleteAllData(this@MainActivity)
-            startActivity(Intent(this@MainActivity, LoginActivity::class.java).apply {
-              flags = Intent.FLAG_ACTIVITY_NO_HISTORY
-            })
+            startActivity(
+              Intent(this@MainActivity, LoginActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NO_HISTORY
+              }
+            )
 
             finish()
           }
@@ -385,12 +415,15 @@ class MainActivity : AppCompatActivity() {
                     PlayerService::class.java
                   ).apply {
                     putExtra(PlayerService.INITIAL_COMMAND_KEY, command.command.toString())
-                  })
+                  }
+                )
               },
               {
-                startService(Intent(this@MainActivity, PlayerService::class.java).apply {
-                  putExtra(PlayerService.INITIAL_COMMAND_KEY, command.command.toString())
-                })
+                startService(
+                  Intent(this@MainActivity, PlayerService::class.java).apply {
+                    putExtra(PlayerService.INITIAL_COMMAND_KEY, command.command.toString())
+                  }
+                )
               }
             )
           }

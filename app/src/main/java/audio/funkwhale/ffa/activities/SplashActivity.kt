@@ -6,7 +6,9 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import audio.funkwhale.ffa.FFA
-import audio.funkwhale.ffa.utils.*
+import audio.funkwhale.ffa.utils.AppContext
+import audio.funkwhale.ffa.utils.OAuth
+import audio.funkwhale.ffa.utils.Settings
 import org.koin.java.KoinJavaComponent.inject
 
 class SplashActivity : AppCompatActivity() {

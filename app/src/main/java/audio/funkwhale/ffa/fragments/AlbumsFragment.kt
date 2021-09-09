@@ -25,7 +25,12 @@ import audio.funkwhale.ffa.model.Artist
 import audio.funkwhale.ffa.repositories.AlbumsRepository
 import audio.funkwhale.ffa.repositories.ArtistTracksRepository
 import audio.funkwhale.ffa.repositories.Repository
-import audio.funkwhale.ffa.utils.*
+import audio.funkwhale.ffa.utils.AppContext
+import audio.funkwhale.ffa.utils.Command
+import audio.funkwhale.ffa.utils.CommandBus
+import audio.funkwhale.ffa.utils.maybeLoad
+import audio.funkwhale.ffa.utils.maybeNormalizeUrl
+import audio.funkwhale.ffa.utils.onViewPager
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import kotlinx.coroutines.Dispatchers.IO

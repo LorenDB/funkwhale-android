@@ -1,13 +1,17 @@
 package audio.funkwhale.ffa.repositories
 
 import android.content.Context
-import audio.funkwhale.ffa.utils.AppContext
 import audio.funkwhale.ffa.model.CacheItem
+import audio.funkwhale.ffa.utils.AppContext
 import audio.funkwhale.ffa.utils.FFACache
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import java.io.BufferedReader
 import kotlin.math.ceil
 
@@ -59,7 +63,7 @@ abstract class Repository<D : Any, C : CacheItem<D>> {
     }
   }.flowOn(IO)
 
-  private fun fromNetwork(size: Int) = flow {
+  private fun fromNetwork(size: Int): Flow<Response<D>> = flow {
     upstream
       .fetch(size)
       .map { response ->

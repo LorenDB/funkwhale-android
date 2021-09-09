@@ -7,7 +7,13 @@ import androidx.core.net.toUri
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.model.DownloadInfo
 import audio.funkwhale.ffa.model.Track
-import audio.funkwhale.ffa.utils.*
+import audio.funkwhale.ffa.utils.AppContext
+import audio.funkwhale.ffa.utils.Event
+import audio.funkwhale.ffa.utils.EventBus
+import audio.funkwhale.ffa.utils.Request
+import audio.funkwhale.ffa.utils.RequestBus
+import audio.funkwhale.ffa.utils.Response
+import audio.funkwhale.ffa.utils.mustNormalizeUrl
 import com.google.android.exoplayer2.offline.Download
 import com.google.android.exoplayer2.offline.DownloadManager
 import com.google.android.exoplayer2.offline.DownloadRequest
@@ -21,7 +27,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent
-import java.util.*
+import java.util.Collections
 
 class PinService : DownloadService(AppContext.NOTIFICATION_DOWNLOADS) {
 
