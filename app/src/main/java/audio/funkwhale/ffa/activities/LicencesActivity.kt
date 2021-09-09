@@ -90,7 +90,8 @@ class LicencesActivity : AppCompatActivity() {
       holder.licence.text = item.licence
     }
 
-    inner class ViewHolder(binding: RowLicenceBinding) : RecyclerView.ViewHolder(binding.root),
+    inner class ViewHolder(binding: RowLicenceBinding) :
+      RecyclerView.ViewHolder(binding.root),
       View.OnClickListener {
       val name = binding.name
       val licence = binding.licence

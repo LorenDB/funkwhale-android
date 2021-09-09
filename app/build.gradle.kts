@@ -241,13 +241,15 @@ project.afterEvaluate {
     sourceDirectories.setFrom(files(listOf(mainSrc)))
     classDirectories.setFrom(files(listOf(debugTree)))
 
-    executionData.setFrom(fileTree(project.buildDir) {
-      setIncludes(
-        listOf(
-          "outputs/unit_test_code_coverage/debugUnitTest/*.exec",
-          "outputs/code_coverage/debugAndroidTest/connected/**/*.ec"
+    executionData.setFrom(
+      fileTree(project.buildDir) {
+        setIncludes(
+          listOf(
+            "outputs/unit_test_code_coverage/debugUnitTest/*.exec",
+            "outputs/code_coverage/debugAndroidTest/connected/**/*.ec"
+          )
         )
-      )
-    })
+      }
+    )
   }
 }

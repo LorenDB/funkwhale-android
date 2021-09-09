@@ -9,10 +9,10 @@ import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.databinding.RowRadioBinding
 import audio.funkwhale.ffa.databinding.RowRadioHeaderBinding
 import audio.funkwhale.ffa.fragments.FFAAdapter
+import audio.funkwhale.ffa.model.Radio
 import audio.funkwhale.ffa.utils.AppContext
 import audio.funkwhale.ffa.utils.Event
 import audio.funkwhale.ffa.utils.EventBus
-import audio.funkwhale.ffa.model.Radio
 import audio.funkwhale.ffa.views.LoadingImageView
 import com.preference.PowerPreference
 import kotlinx.coroutines.CoroutineScope
@@ -42,8 +42,10 @@ class RadiosAdapter(
 
   private val instanceRadios: List<Radio> by lazy {
     context?.let {
-      return@lazy when (val username =
-        PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).getString("actor_username")) {
+      return@lazy when (
+        val username =
+          PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).getString("actor_username")
+      ) {
         "" -> listOf(
           Radio(
             0,
@@ -133,8 +135,9 @@ class RadiosAdapter(
         context?.let {
           when (position) {
             0 -> holder.label.text = context.getString(R.string.radio_instance_radios)
-            instanceRadios.size + 1 -> holder.label.text =
-              context.getString(R.string.radio_user_radios)
+            instanceRadios.size + 1 ->
+              holder.label.text =
+                context.getString(R.string.radio_user_radios)
           }
         }
       }

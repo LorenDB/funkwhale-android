@@ -73,9 +73,9 @@ class DownloadsActivity : AppCompatActivity() {
         val download = cursor.download
 
         download.getMetadata()?.let { info ->
-          adapter.downloads.add(info.apply {
-            this.download = download
-          })
+          adapter.downloads.add(
+            info.apply { this.download = download }
+          )
         }
       }
 

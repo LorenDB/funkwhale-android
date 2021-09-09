@@ -17,9 +17,9 @@ import audio.funkwhale.ffa.databinding.RowSearchHeaderBinding
 import audio.funkwhale.ffa.databinding.RowTrackBinding
 import audio.funkwhale.ffa.model.Album
 import audio.funkwhale.ffa.model.Artist
+import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.utils.Command
 import audio.funkwhale.ffa.utils.CommandBus
-import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.utils.maybeLoad
 import audio.funkwhale.ffa.utils.maybeNormalizeUrl
 import audio.funkwhale.ffa.utils.onApi
@@ -73,20 +73,19 @@ class SearchAdapter(
 
       ResultType.Artist.ordinal -> artists[position].id.toLong()
       ResultType.Artist.ordinal -> albums[position - artists.size - 2].id.toLong()
-      ResultType.Track.ordinal -> tracks[position - artists.size - albums.size - sectionCount].id.toLong()
+      ResultType.Track.ordinal ->
+        tracks[position - artists.size - albums.size - sectionCount].id.toLong()
       else -> 0
     }
   }
 
-  override fun getItemViewType(position: Int): Int {
-    if (position == 0) return ResultType.Header.ordinal // Artists header
-    if (position == (artists.size + 1)) return ResultType.Header.ordinal // Albums header
-    if (position == (artists.size + albums.size + 2)) return ResultType.Header.ordinal // Tracks header
-
-    if (position <= artists.size) return ResultType.Artist.ordinal
-    if (position <= artists.size + albums.size + 2) return ResultType.Album.ordinal
-
-    return ResultType.Track.ordinal
+  override fun getItemViewType(position: Int): Int = when {
+    position == 0 ||
+      position == (artists.size + 1) ||
+      position == (artists.size + albums.size + 2) -> ResultType.Header.ordinal
+    position <= artists.size -> ResultType.Artist.ordinal
+    position <= artists.size + albums.size + 2 -> ResultType.Album.ordinal
+    else -> ResultType.Track.ordinal
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -205,102 +204,112 @@ class SearchAdapter(
           Typeface.create(searchHeaderViewHolder?.title?.typeface, Typeface.NORMAL)
         rowTrackViewHolder?.artist?.typeface =
           Typeface.create(rowTrackViewHolder?.artist?.typeface, Typeface.NORMAL)
-      })
+      }
+    )
 
     searchHeaderViewHolder?.title?.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
 
     when (resultType) {
-        ResultType.Artist.ordinal -> {
-          rowTrackViewHolder?.title?.setCompoundDrawablesWithIntrinsicBounds(
-            0, 0, 0, 0
-          )
-        }
-        ResultType.Album.ordinal -> {
-          rowTrackViewHolder?.title?.setCompoundDrawablesWithIntrinsicBounds(
-            0, 0, 0, 0
-          )
-        }
-        ResultType.Track.ordinal -> {
-          (item as? Track)?.let { track ->
-            context?.let { context ->
-              if (track == currentTrack || track.current) {
-                searchHeaderViewHolder?.title?.setTypeface(
-                  searchHeaderViewHolder.title.typeface,
-                  Typeface.BOLD
-                )
-                rowTrackViewHolder?.artist?.setTypeface(
-                  rowTrackViewHolder.artist.typeface,
-                  Typeface.BOLD
-                )
+      ResultType.Artist.ordinal -> {
+        rowTrackViewHolder?.title?.setCompoundDrawablesWithIntrinsicBounds(
+          0, 0, 0, 0
+        )
+      }
+      ResultType.Album.ordinal -> {
+        rowTrackViewHolder?.title?.setCompoundDrawablesWithIntrinsicBounds(
+          0, 0, 0, 0
+        )
+      }
+      ResultType.Track.ordinal -> {
+        (item as? Track)?.let { track ->
+          context?.let { context ->
+            if (track == currentTrack || track.current) {
+              searchHeaderViewHolder?.title?.setTypeface(
+                searchHeaderViewHolder.title.typeface,
+                Typeface.BOLD
+              )
+              rowTrackViewHolder?.artist?.setTypeface(
+                rowTrackViewHolder.artist.typeface,
+                Typeface.BOLD
+              )
+            }
+
+            when (track.favorite) {
+              true -> rowTrackViewHolder?.favorite?.setColorFilter(
+                context.getColor(R.color.colorFavorite)
+              )
+              false -> rowTrackViewHolder?.favorite?.setColorFilter(
+                context.getColor(R.color.colorSelected)
+              )
+            }
+
+            rowTrackViewHolder?.favorite?.setOnClickListener {
+              favoriteListener?.let {
+                favoriteListener.onToggleFavorite(track.id, !track.favorite)
+
+                tracks[position - artists.size - albums.size - sectionCount].favorite =
+                  !track.favorite
+
+                notifyItemChanged(position)
               }
+            }
 
-              when (track.favorite) {
-                true -> rowTrackViewHolder?.favorite?.setColorFilter(context.getColor(R.color.colorFavorite))
-                false -> rowTrackViewHolder?.favorite?.setColorFilter(context.getColor(R.color.colorSelected))
+            when (track.cached || track.downloaded) {
+              true -> rowTrackViewHolder?.title?.setCompoundDrawablesWithIntrinsicBounds(
+                R.drawable.downloaded, 0, 0, 0
+              )
+              false -> rowTrackViewHolder?.title?.setCompoundDrawablesWithIntrinsicBounds(
+                0, 0, 0, 0
+              )
+            }
+
+            if (track.cached && !track.downloaded) {
+              rowTrackViewHolder?.title?.compoundDrawables?.forEach {
+                it?.colorFilter =
+                  PorterDuffColorFilter(context.getColor(R.color.cached), PorterDuff.Mode.SRC_IN)
               }
+            }
 
-              rowTrackViewHolder?.favorite?.setOnClickListener {
-                favoriteListener?.let {
-                  favoriteListener.onToggleFavorite(track.id, !track.favorite)
-
-                  tracks[position - artists.size - albums.size - sectionCount].favorite =
-                    !track.favorite
-
-                  notifyItemChanged(position)
-                }
+            if (track.downloaded) {
+              rowTrackViewHolder?.title?.compoundDrawables?.forEach {
+                it?.colorFilter =
+                  PorterDuffColorFilter(
+                    context.getColor(R.color.downloaded),
+                    PorterDuff.Mode.SRC_IN
+                  )
               }
+            }
 
-              when (track.cached || track.downloaded) {
-                true -> rowTrackViewHolder?.title?.setCompoundDrawablesWithIntrinsicBounds(
-                  R.drawable.downloaded, 0, 0, 0
-                )
-                false -> rowTrackViewHolder?.title?.setCompoundDrawablesWithIntrinsicBounds(
-                  0, 0, 0, 0
-                )
-              }
+            rowTrackViewHolder?.actions?.setOnClickListener {
+              PopupMenu(
+                context,
+                rowTrackViewHolder.actions,
+                Gravity.START,
+                R.attr.actionOverflowMenuStyle,
+                0
+              ).apply {
+                inflate(R.menu.row_track)
 
-              if (track.cached && !track.downloaded) {
-                rowTrackViewHolder?.title?.compoundDrawables?.forEach {
-                  it?.colorFilter =
-                    PorterDuffColorFilter(context.getColor(R.color.cached), PorterDuff.Mode.SRC_IN)
-                }
-              }
-
-              if (track.downloaded) {
-                rowTrackViewHolder?.title?.compoundDrawables?.forEach {
-                  it?.colorFilter =
-                    PorterDuffColorFilter(context.getColor(R.color.downloaded), PorterDuff.Mode.SRC_IN)
-                }
-              }
-
-              rowTrackViewHolder?.actions?.setOnClickListener {
-                PopupMenu(
-                  context,
-                  rowTrackViewHolder.actions,
-                  Gravity.START,
-                  R.attr.actionOverflowMenuStyle,
-                  0
-                ).apply {
-                  inflate(R.menu.row_track)
-
-                  setOnMenuItemClickListener {
-                    when (it.itemId) {
-                      R.id.track_add_to_queue -> CommandBus.send(Command.AddToQueue(listOf(track)))
-                      R.id.track_play_next -> CommandBus.send(Command.PlayNext(track))
-                      R.id.track_pin -> CommandBus.send(Command.PinTrack(track))
-                      R.id.track_add_to_playlist -> CommandBus.send(Command.AddToPlaylist(listOf(track)))
-                      R.id.queue_remove -> CommandBus.send(Command.RemoveFromQueue(track))
-                    }
-
-                    true
+                setOnMenuItemClickListener {
+                  when (it.itemId) {
+                    R.id.track_add_to_queue -> CommandBus.send(Command.AddToQueue(listOf(track)))
+                    R.id.track_play_next -> CommandBus.send(Command.PlayNext(track))
+                    R.id.track_pin -> CommandBus.send(Command.PinTrack(track))
+                    R.id.track_add_to_playlist -> CommandBus.send(
+                      Command.AddToPlaylist(listOf(track))
+                    )
+                    R.id.queue_remove -> CommandBus.send(Command.RemoveFromQueue(track))
                   }
 
-                  show()
+                  true
                 }
+
+                show()
               }
             }
           }
         }
+      }
     }
   }
 

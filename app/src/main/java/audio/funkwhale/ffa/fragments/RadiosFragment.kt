@@ -9,12 +9,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import audio.funkwhale.ffa.adapters.RadiosAdapter
 import audio.funkwhale.ffa.databinding.FragmentRadiosBinding
+import audio.funkwhale.ffa.model.Radio
 import audio.funkwhale.ffa.repositories.RadiosRepository
 import audio.funkwhale.ffa.utils.Command
 import audio.funkwhale.ffa.utils.CommandBus
 import audio.funkwhale.ffa.utils.Event
 import audio.funkwhale.ffa.utils.EventBus
-import audio.funkwhale.ffa.model.Radio
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch

@@ -44,11 +44,13 @@ class MediaSession(private val context: Context) {
 
       it.setMediaButtonEventHandler { _, _, intent ->
         if (!active) {
-          context.startService(Intent(context, PlayerService::class.java).apply {
-            action = intent.action
+          context.startService(
+            Intent(context, PlayerService::class.java).apply {
+              action = intent.action
 
-            intent.extras?.let { extras -> putExtras(extras) }
-          })
+              intent.extras?.let { extras -> putExtras(extras) }
+            }
+          )
 
           return@setMediaButtonEventHandler true
         }

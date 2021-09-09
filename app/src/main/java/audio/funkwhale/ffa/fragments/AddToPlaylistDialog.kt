@@ -14,7 +14,8 @@ import audio.funkwhale.ffa.databinding.DialogAddToPlaylistBinding
 import audio.funkwhale.ffa.model.Playlist
 import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.repositories.ManagementPlaylistsRepository
-import audio.funkwhale.ffa.utils.*
+import audio.funkwhale.ffa.utils.FFACache
+import audio.funkwhale.ffa.utils.untilNetwork
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -80,19 +81,22 @@ object AddToPlaylistDialog {
     }
 
     val adapter =
-      PlaylistsAdapter(layoutInflater, activity, object : PlaylistsAdapter.OnPlaylistClickListener {
-        override fun onClick(holder: View?, playlist: Playlist) {
-          repository.add(playlist.id, tracks)
+      PlaylistsAdapter(
+        layoutInflater, activity,
+        object : PlaylistsAdapter.OnPlaylistClickListener {
+          override fun onClick(holder: View?, playlist: Playlist) {
+            repository.add(playlist.id, tracks)
 
-          Toast.makeText(
-            activity,
-            activity.getString(R.string.playlist_added_to, playlist.name),
-            Toast.LENGTH_SHORT
-          ).show()
+            Toast.makeText(
+              activity,
+              activity.getString(R.string.playlist_added_to, playlist.name),
+              Toast.LENGTH_SHORT
+            ).show()
 
-          dialog.dismiss()
+            dialog.dismiss()
+          }
         }
-      })
+      )
 
     binding.playlists.layoutManager = LinearLayoutManager(activity)
     binding.playlists.adapter = adapter

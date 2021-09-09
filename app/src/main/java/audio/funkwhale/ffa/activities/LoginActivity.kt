@@ -11,7 +11,10 @@ import androidx.lifecycle.lifecycleScope
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.databinding.ActivityLoginBinding
 import audio.funkwhale.ffa.fragments.LoginDialog
-import audio.funkwhale.ffa.utils.*
+import audio.funkwhale.ffa.utils.AppContext
+import audio.funkwhale.ffa.utils.FuelResult
+import audio.funkwhale.ffa.utils.OAuth
+import audio.funkwhale.ffa.utils.Userinfo
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.coroutines.awaitObjectResponseResult
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf

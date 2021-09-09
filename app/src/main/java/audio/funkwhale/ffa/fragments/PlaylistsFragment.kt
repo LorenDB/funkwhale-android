@@ -12,9 +12,9 @@ import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.activities.MainActivity
 import audio.funkwhale.ffa.adapters.PlaylistsAdapter
 import audio.funkwhale.ffa.databinding.FragmentPlaylistsBinding
+import audio.funkwhale.ffa.model.Playlist
 import audio.funkwhale.ffa.repositories.PlaylistsRepository
 import audio.funkwhale.ffa.utils.AppContext
-import audio.funkwhale.ffa.model.Playlist
 
 class PlaylistsFragment : FFAFragment<Playlist, PlaylistsAdapter>() {
 

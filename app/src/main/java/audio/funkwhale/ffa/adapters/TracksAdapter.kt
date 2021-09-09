@@ -18,9 +18,9 @@ import androidx.recyclerview.widget.RecyclerView
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.databinding.RowTrackBinding
 import audio.funkwhale.ffa.fragments.FFAAdapter
+import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.utils.Command
 import audio.funkwhale.ffa.utils.CommandBus
-import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.utils.maybeLoad
 import audio.funkwhale.ffa.utils.maybeNormalizeUrl
 import audio.funkwhale.ffa.utils.toast

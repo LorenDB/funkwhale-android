@@ -13,15 +13,24 @@ import audio.funkwhale.ffa.fragments.AlbumsFragment
 import audio.funkwhale.ffa.fragments.ArtistsFragment
 import audio.funkwhale.ffa.model.Album
 import audio.funkwhale.ffa.model.Artist
-import audio.funkwhale.ffa.repositories.*
-import audio.funkwhale.ffa.utils.*
+import audio.funkwhale.ffa.repositories.AlbumsSearchRepository
+import audio.funkwhale.ffa.repositories.ArtistsSearchRepository
+import audio.funkwhale.ffa.repositories.FavoritesRepository
+import audio.funkwhale.ffa.repositories.Repository
+import audio.funkwhale.ffa.repositories.TracksSearchRepository
+import audio.funkwhale.ffa.utils.Command
+import audio.funkwhale.ffa.utils.CommandBus
+import audio.funkwhale.ffa.utils.Event
+import audio.funkwhale.ffa.utils.EventBus
+import audio.funkwhale.ffa.utils.getMetadata
+import audio.funkwhale.ffa.utils.untilNetwork
 import com.google.android.exoplayer2.offline.Download
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.net.URLEncoder
-import java.util.*
+import java.util.Locale
 
 class SearchActivity : AppCompatActivity() {
   private lateinit var adapter: SearchAdapter
@@ -82,58 +91,58 @@ class SearchActivity : AppCompatActivity() {
     favoritesRepository = FavoritesRepository(this@SearchActivity)
 
     binding.search.setOnQueryTextListener(object :
-      androidx.appcompat.widget.SearchView.OnQueryTextListener {
-      override fun onQueryTextSubmit(rawQuery: String?): Boolean {
-        binding.search.clearFocus()
+        androidx.appcompat.widget.SearchView.OnQueryTextListener {
+        override fun onQueryTextSubmit(rawQuery: String?): Boolean {
+          binding.search.clearFocus()
 
-        rawQuery?.let {
-          done = 0
+          rawQuery?.let {
+            done = 0
 
-          val query = URLEncoder.encode(it, "UTF-8")
+            val query = URLEncoder.encode(it, "UTF-8")
 
-          artistsRepository.query = query.lowercase(Locale.ROOT)
-          albumsRepository.query = query.lowercase(Locale.ROOT)
-          tracksRepository.query = query.lowercase(Locale.ROOT)
+            artistsRepository.query = query.lowercase(Locale.ROOT)
+            albumsRepository.query = query.lowercase(Locale.ROOT)
+            tracksRepository.query = query.lowercase(Locale.ROOT)
 
-          binding.searchSpinner.visibility = View.VISIBLE
-          binding.searchEmpty.visibility = View.GONE
-          binding.searchNoResults.visibility = View.GONE
+            binding.searchSpinner.visibility = View.VISIBLE
+            binding.searchEmpty.visibility = View.GONE
+            binding.searchNoResults.visibility = View.GONE
 
-          adapter.artists.clear()
-          adapter.albums.clear()
-          adapter.tracks.clear()
-          adapter.notifyDataSetChanged()
+            adapter.artists.clear()
+            adapter.albums.clear()
+            adapter.tracks.clear()
+            adapter.notifyDataSetChanged()
 
-          artistsRepository.fetch(Repository.Origin.Network.origin)
-            .untilNetwork(lifecycleScope) { artists, _, _, _ ->
-              done++
+            artistsRepository.fetch(Repository.Origin.Network.origin)
+              .untilNetwork(lifecycleScope) { artists, _, _, _ ->
+                done++
 
-              adapter.artists.addAll(artists)
-              refresh()
-            }
+                adapter.artists.addAll(artists)
+                refresh()
+              }
 
-          albumsRepository.fetch(Repository.Origin.Network.origin)
-            .untilNetwork(lifecycleScope) { albums, _, _, _ ->
-              done++
+            albumsRepository.fetch(Repository.Origin.Network.origin)
+              .untilNetwork(lifecycleScope) { albums, _, _, _ ->
+                done++
 
-              adapter.albums.addAll(albums)
-              refresh()
-            }
+                adapter.albums.addAll(albums)
+                refresh()
+              }
 
-          tracksRepository.fetch(Repository.Origin.Network.origin)
-            .untilNetwork(lifecycleScope) { tracks, _, _, _ ->
-              done++
+            tracksRepository.fetch(Repository.Origin.Network.origin)
+              .untilNetwork(lifecycleScope) { tracks, _, _, _ ->
+                done++
 
-              adapter.tracks.addAll(tracks)
-              refresh()
-            }
+                adapter.tracks.addAll(tracks)
+                refresh()
+              }
+          }
+
+          return true
         }
 
-        return true
-      }
-
-      override fun onQueryTextChange(newText: String?) = true
-    })
+        override fun onQueryTextChange(newText: String?) = true
+      })
   }
 
   private fun refresh() {
