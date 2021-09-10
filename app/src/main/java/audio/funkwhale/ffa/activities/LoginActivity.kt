@@ -69,7 +69,7 @@ class LoginActivity : AppCompatActivity() {
     super.onResume()
     with(binding) {
       login.setOnClickListener {
-        var hostname = hostname.text.toString().trim()
+        var hostname = hostname.text.toString().trim().trim('/')
 
         try {
           validateHostname(hostname, cleartext.isChecked)?.let {
