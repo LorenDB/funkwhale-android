@@ -21,7 +21,8 @@
         <activity
             android:name=".activities.SplashActivity"
             android:launchMode="singleInstance"
-            android:noHistory="true">
+            android:noHistory="true"
+            android:screenOrientation="portrait">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -35,19 +36,28 @@
         <activity
             android:name=".activities.LoginActivity"
             android:configChanges="screenSize|orientation"
-            android:launchMode="singleInstance" />
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait" />
 
-        <activity android:name=".activities.MainActivity" />
+        <activity
+            android:name=".activities.MainActivity"
+            android:screenOrientation="portrait" />
 
         <activity
             android:name=".activities.SearchActivity"
             android:launchMode="singleTop" />
 
-        <activity android:name=".activities.DownloadsActivity" />
+        <activity
+            android:name=".activities.DownloadsActivity"
+            android:screenOrientation="portrait" />
 
-        <activity android:name=".activities.SettingsActivity" />
+        <activity
+            android:name=".activities.SettingsActivity"
+            android:screenOrientation="portrait" />
 
-        <activity android:name=".activities.LicencesActivity" />
+        <activity
+            android:name=".activities.LicencesActivity"
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".playback.PlayerService"
