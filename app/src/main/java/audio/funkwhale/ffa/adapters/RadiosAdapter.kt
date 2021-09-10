@@ -27,6 +27,10 @@ class RadiosAdapter(
   private val listener: OnRadioClickListener
 ) : FFAAdapter<Radio, RadiosAdapter.ViewHolder>() {
 
+  init {
+    this.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
+  }
+
   interface OnRadioClickListener {
     fun onClick(holder: RowRadioViewHolder, radio: Radio)
   }
