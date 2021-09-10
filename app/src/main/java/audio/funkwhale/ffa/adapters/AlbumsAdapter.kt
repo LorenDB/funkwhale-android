@@ -19,6 +19,10 @@ class AlbumsAdapter(
   private val listener: OnAlbumClickListener
 ) : FFAAdapter<Album, AlbumsAdapter.ViewHolder>() {
 
+  init {
+    this.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
+  }
+
   interface OnAlbumClickListener {
     fun onClick(view: View?, album: Album)
   }

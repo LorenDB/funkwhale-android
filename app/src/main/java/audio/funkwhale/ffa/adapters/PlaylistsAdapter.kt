@@ -20,6 +20,10 @@ class PlaylistsAdapter(
   private val listener: OnPlaylistClickListener
 ) : FFAAdapter<Playlist, PlaylistsAdapter.ViewHolder>() {
 
+  init {
+    this.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
+  }
+
   interface OnPlaylistClickListener {
     fun onClick(holder: View?, playlist: Playlist)
   }

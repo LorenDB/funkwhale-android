@@ -42,6 +42,8 @@ class ArtistsAdapter(
         super.onItemRangeInserted(positionStart, itemCount)
       }
     })
+
+    this.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
   }
 
   override fun getItemCount() = active.size

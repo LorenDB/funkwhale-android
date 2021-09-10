@@ -30,6 +30,10 @@ class FavoritesAdapter(
   val fromQueue: Boolean = false
 ) : FFAAdapter<Track, FavoritesAdapter.ViewHolder>() {
 
+  init {
+    this.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
+  }
+
   interface OnFavoriteListener {
     fun onToggleFavorite(id: Int, state: Boolean)
   }
