@@ -30,13 +30,9 @@ import java.util.Collections
 class PlaylistTracksAdapter(
   private val layoutInflater: LayoutInflater,
   private val context: Context?,
-  private val favoriteListener: OnFavoriteListener? = null,
-  private val playlistListener: OnPlaylistListener? = null
+  private val favoriteListener: FavoriteListener,
+  private val playlistListener: OnPlaylistListener
 ) : FFAAdapter<PlaylistTrack, PlaylistTracksAdapter.ViewHolder>() {
-
-  interface OnFavoriteListener {
-    fun onToggleFavorite(id: Int, state: Boolean)
-  }
 
   private lateinit var binding: RowTrackBinding
 
@@ -103,7 +99,7 @@ class PlaylistTracksAdapter(
       }
 
       holder.favorite.setOnClickListener {
-        favoriteListener?.let {
+        favoriteListener.let {
           favoriteListener.onToggleFavorite(track.track.id, !track.track.favorite)
 
           track.track.favorite = !track.track.favorite
@@ -124,7 +120,7 @@ class PlaylistTracksAdapter(
               R.id.track_add_to_queue -> CommandBus.send(Command.AddToQueue(listOf(track.track)))
               R.id.track_play_next -> CommandBus.send(Command.PlayNext(track.track))
               R.id.queue_remove -> CommandBus.send(Command.RemoveFromQueue(track.track))
-              R.id.track_remove_from_playlist -> playlistListener?.onRemoveTrackFromPlaylist(
+              R.id.track_remove_from_playlist -> playlistListener.onRemoveTrackFromPlaylist(
                 track.track,
                 position
               )
@@ -223,7 +219,7 @@ class PlaylistTracksAdapter(
       viewHolder.itemView.background = ColorDrawable(Color.TRANSPARENT)
 
       if (from != -1 && to != -1 && from != to) {
-        playlistListener?.onMoveTrack(from, to)
+        playlistListener.onMoveTrack(from, to)
 
         from = -1
         to = -1

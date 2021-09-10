@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
+import audio.funkwhale.ffa.adapters.FavoriteListener
 import audio.funkwhale.ffa.adapters.FavoritesAdapter
 import audio.funkwhale.ffa.databinding.FragmentFavoritesBinding
 import audio.funkwhale.ffa.model.Track
@@ -41,8 +42,8 @@ class FavoritesFragment : FFAFragment<Track, FavoritesAdapter>() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    adapter = FavoritesAdapter(layoutInflater, context, FavoriteListener())
     repository = FavoritesRepository(context)
+    adapter = FavoritesAdapter(layoutInflater, context, FavoriteListener(repository()))
     watchEventBus()
   }
 
@@ -72,6 +73,7 @@ class FavoritesFragment : FFAFragment<Track, FavoritesAdapter>() {
         }
       }
 
+      refreshFavoritedTracks()
       refreshDownloadedTracks()
     }
 
@@ -95,6 +97,12 @@ class FavoritesFragment : FFAFragment<Track, FavoritesAdapter>() {
           is Command.RefreshTrack -> refreshCurrentTrack(command.track)
         }
       }
+    }
+  }
+
+  private fun refreshFavoritedTracks() {
+    lifecycleScope.launch(Main) {
+      update()
     }
   }
 
@@ -132,17 +140,6 @@ class FavoritesFragment : FFAFragment<Track, FavoritesAdapter>() {
         current = true
       }
       adapter.notifyDataSetChanged()
-    }
-  }
-
-  inner class FavoriteListener : FavoritesAdapter.OnFavoriteListener {
-    override fun onToggleFavorite(id: Int, state: Boolean) {
-      (repository as? FavoritesRepository)?.let { repository ->
-        when (state) {
-          true -> repository.addFavorite(id)
-          false -> repository.deleteFavorite(id)
-        }
-      }
     }
   }
 }

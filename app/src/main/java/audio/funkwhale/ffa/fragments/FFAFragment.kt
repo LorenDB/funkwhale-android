@@ -48,6 +48,8 @@ abstract class FFAFragment<D : Any, A : FFAAdapter<D, *>>() : Fragment() {
   private var moreLoading = false
   private var listener: Job? = null
 
+  fun <T> repository() = repository as T
+
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 

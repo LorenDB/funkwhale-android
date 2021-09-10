@@ -26,16 +26,12 @@ import java.util.Collections
 class FavoritesAdapter(
   private val layoutInflater: LayoutInflater,
   private val context: Context?,
-  private val favoriteListener: OnFavoriteListener,
-  val fromQueue: Boolean = false
+  private val favoriteListener: FavoriteListener,
+  val fromQueue: Boolean = false,
 ) : FFAAdapter<Track, FavoritesAdapter.ViewHolder>() {
 
   init {
     this.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
-  }
-
-  interface OnFavoriteListener {
-    fun onToggleFavorite(id: Int, state: Boolean)
   }
 
   private lateinit var binding: RowTrackBinding

@@ -9,6 +9,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import audio.funkwhale.ffa.R
+import audio.funkwhale.ffa.adapters.FavoriteListener
 import audio.funkwhale.ffa.adapters.TracksAdapter
 import audio.funkwhale.ffa.databinding.FragmentQueueBinding
 import audio.funkwhale.ffa.repositories.FavoritesRepository
@@ -62,7 +63,12 @@ class QueueFragment : BottomSheetDialogFragment() {
   ): View {
     _binding = FragmentQueueBinding.inflate(inflater)
     return binding.root.apply {
-      adapter = TracksAdapter(layoutInflater, context, FavoriteListener(), fromQueue = true).also {
+      adapter = TracksAdapter(
+        layoutInflater,
+        context,
+        FavoriteListener(favoritesRepository),
+        fromQueue = true
+      ).also {
         binding.included.queue.layoutManager = LinearLayoutManager(context)
         binding.included.queue.adapter = it
       }
@@ -132,15 +138,6 @@ class QueueFragment : BottomSheetDialogFragment() {
         when (command) {
           is Command.RefreshTrack -> refresh()
         }
-      }
-    }
-  }
-
-  inner class FavoriteListener : TracksAdapter.OnFavoriteListener {
-    override fun onToggleFavorite(id: Int, state: Boolean) {
-      when (state) {
-        true -> favoritesRepository.addFavorite(id)
-        false -> favoritesRepository.deleteFavorite(id)
       }
     }
   }
