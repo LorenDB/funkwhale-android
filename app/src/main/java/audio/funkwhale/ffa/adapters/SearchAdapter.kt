@@ -30,17 +30,13 @@ import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 class SearchAdapter(
   private val layoutInflater: LayoutInflater,
   private val context: Context?,
-  private val listener: OnSearchResultClickListener? = null,
-  private val favoriteListener: OnFavoriteListener? = null
+  private val listener: OnSearchResultClickListener,
+  private val favoriteListener: FavoriteListener
 ) : RecyclerView.Adapter<SearchAdapter.ViewHolder>() {
 
   interface OnSearchResultClickListener {
     fun onArtistClick(holder: View?, artist: Artist)
     fun onAlbumClick(holder: View?, album: Album)
-  }
-
-  interface OnFavoriteListener {
-    fun onToggleFavorite(id: Int, state: Boolean)
   }
 
   enum class ResultType {
@@ -244,7 +240,7 @@ class SearchAdapter(
             }
 
             rowTrackViewHolder?.favorite?.setOnClickListener {
-              favoriteListener?.let {
+              favoriteListener.let {
                 favoriteListener.onToggleFavorite(track.id, !track.favorite)
 
                 tracks[position - artists.size - albums.size - sectionCount].favorite =
@@ -341,13 +337,13 @@ class SearchAdapter(
         ResultType.Artist.ordinal -> {
           val position = layoutPosition - 1
 
-          listener?.onArtistClick(view, artists[position])
+          listener.onArtistClick(view, artists[position])
         }
 
         ResultType.Album.ordinal -> {
           val position = layoutPosition - artists.size - 2
 
-          listener?.onAlbumClick(view, albums[position])
+          listener.onAlbumClick(view, albums[position])
         }
 
         ResultType.Track.ordinal -> {

@@ -7,8 +7,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import audio.funkwhale.ffa.adapters.FavoriteListener
 import audio.funkwhale.ffa.adapters.TracksAdapter
 import audio.funkwhale.ffa.databinding.PartialQueueBinding
+import audio.funkwhale.ffa.repositories.FavoritesRepository
 import audio.funkwhale.ffa.utils.Command
 import audio.funkwhale.ffa.utils.CommandBus
 import audio.funkwhale.ffa.utils.Event
@@ -26,6 +28,8 @@ class LandscapeQueueFragment : Fragment() {
   private var _binding: PartialQueueBinding? = null
   private val binding get() = _binding!!
 
+  lateinit var favoritesRepository: FavoritesRepository
+
   private var adapter: TracksAdapter? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,7 +45,12 @@ class LandscapeQueueFragment : Fragment() {
   ): View {
     _binding = PartialQueueBinding.inflate(inflater)
     return binding.root.apply {
-      adapter = TracksAdapter(layoutInflater, context, fromQueue = true).also {
+      adapter = TracksAdapter(
+        layoutInflater,
+        context,
+        fromQueue = true,
+        favoriteListener = FavoriteListener(favoritesRepository)
+      ).also {
         binding.queue.layoutManager = LinearLayoutManager(context)
         binding.queue.adapter = it
       }

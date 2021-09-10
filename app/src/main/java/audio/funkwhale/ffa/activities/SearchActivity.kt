@@ -3,9 +3,11 @@ package audio.funkwhale.ffa.activities
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import audio.funkwhale.ffa.adapters.FavoriteListener
 import audio.funkwhale.ffa.adapters.SearchAdapter
 import audio.funkwhale.ffa.databinding.ActivitySearchBinding
 import audio.funkwhale.ffa.fragments.AddToPlaylistDialog
@@ -51,7 +53,12 @@ class SearchActivity : AppCompatActivity() {
     setContentView(binding.root)
 
     adapter =
-      SearchAdapter(layoutInflater, this, SearchResultClickListener(), FavoriteListener()).also {
+      SearchAdapter(
+        layoutInflater,
+        this,
+        SearchResultClickListener(),
+        FavoriteListener(favoritesRepository)
+      ).also {
         binding.results.layoutManager = LinearLayoutManager(this)
         binding.results.adapter = it
       }
@@ -90,59 +97,59 @@ class SearchActivity : AppCompatActivity() {
     tracksRepository = TracksSearchRepository(this@SearchActivity, "")
     favoritesRepository = FavoritesRepository(this@SearchActivity)
 
-    binding.search.setOnQueryTextListener(object :
-        androidx.appcompat.widget.SearchView.OnQueryTextListener {
-        override fun onQueryTextSubmit(rawQuery: String?): Boolean {
-          binding.search.clearFocus()
+    binding.search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
-          rawQuery?.let {
-            done = 0
+      override fun onQueryTextSubmit(rawQuery: String?): Boolean {
+        binding.search.clearFocus()
 
-            val query = URLEncoder.encode(it, "UTF-8")
+        rawQuery?.let {
+          done = 0
 
-            artistsRepository.query = query.lowercase(Locale.ROOT)
-            albumsRepository.query = query.lowercase(Locale.ROOT)
-            tracksRepository.query = query.lowercase(Locale.ROOT)
+          val query = URLEncoder.encode(it, "UTF-8")
 
-            binding.searchSpinner.visibility = View.VISIBLE
-            binding.searchEmpty.visibility = View.GONE
-            binding.searchNoResults.visibility = View.GONE
+          artistsRepository.query = query.lowercase(Locale.ROOT)
+          albumsRepository.query = query.lowercase(Locale.ROOT)
+          tracksRepository.query = query.lowercase(Locale.ROOT)
 
-            adapter.artists.clear()
-            adapter.albums.clear()
-            adapter.tracks.clear()
-            adapter.notifyDataSetChanged()
+          binding.searchSpinner.visibility = View.VISIBLE
+          binding.searchEmpty.visibility = View.GONE
+          binding.searchNoResults.visibility = View.GONE
 
-            artistsRepository.fetch(Repository.Origin.Network.origin)
-              .untilNetwork(lifecycleScope) { artists, _, _, _ ->
-                done++
+          adapter.artists.clear()
+          adapter.albums.clear()
+          adapter.tracks.clear()
+          adapter.notifyDataSetChanged()
 
-                adapter.artists.addAll(artists)
-                refresh()
-              }
+          artistsRepository.fetch(Repository.Origin.Network.origin)
+            .untilNetwork(lifecycleScope) { artists, _, _, _ ->
+              done++
 
-            albumsRepository.fetch(Repository.Origin.Network.origin)
-              .untilNetwork(lifecycleScope) { albums, _, _, _ ->
-                done++
+              adapter.artists.addAll(artists)
+              refresh()
+            }
 
-                adapter.albums.addAll(albums)
-                refresh()
-              }
+          albumsRepository.fetch(Repository.Origin.Network.origin)
+            .untilNetwork(lifecycleScope) { albums, _, _, _ ->
+              done++
 
-            tracksRepository.fetch(Repository.Origin.Network.origin)
-              .untilNetwork(lifecycleScope) { tracks, _, _, _ ->
-                done++
+              adapter.albums.addAll(albums)
+              refresh()
+            }
 
-                adapter.tracks.addAll(tracks)
-                refresh()
-              }
-          }
+          tracksRepository.fetch(Repository.Origin.Network.origin)
+            .untilNetwork(lifecycleScope) { tracks, _, _, _ ->
+              done++
 
-          return true
+              adapter.tracks.addAll(tracks)
+              refresh()
+            }
         }
 
-        override fun onQueryTextChange(newText: String?) = true
-      })
+        return true
+      }
+
+      override fun onQueryTextChange(newText: String?) = true
+    })
   }
 
   private fun refresh() {
@@ -185,15 +192,6 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onAlbumClick(holder: View?, album: Album) {
       AlbumsFragment.openTracks(this@SearchActivity, album)
-    }
-  }
-
-  inner class FavoriteListener : SearchAdapter.OnFavoriteListener {
-    override fun onToggleFavorite(id: Int, state: Boolean) {
-      when (state) {
-        true -> favoritesRepository.addFavorite(id)
-        false -> favoritesRepository.deleteFavorite(id)
-      }
     }
   }
 }

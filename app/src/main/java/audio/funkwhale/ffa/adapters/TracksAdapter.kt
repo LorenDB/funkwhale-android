@@ -31,16 +31,12 @@ import java.util.Collections
 class TracksAdapter(
   private val layoutInflater: LayoutInflater,
   private val context: Context?,
-  private val favoriteListener: OnFavoriteListener? = null,
+  private val favoriteListener: FavoriteListener,
   val fromQueue: Boolean = false
 ) : FFAAdapter<Track, TracksAdapter.ViewHolder>() {
 
   init {
     this.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
-  }
-
-  interface OnFavoriteListener {
-    fun onToggleFavorite(id: Int, state: Boolean)
   }
 
   private lateinit var binding: RowTrackBinding
@@ -101,7 +97,7 @@ class TracksAdapter(
       }
 
       holder.favorite.setOnClickListener {
-        favoriteListener?.let {
+        favoriteListener.let {
           favoriteListener.onToggleFavorite(track.id, !track.favorite)
 
           data[position].favorite = !track.favorite

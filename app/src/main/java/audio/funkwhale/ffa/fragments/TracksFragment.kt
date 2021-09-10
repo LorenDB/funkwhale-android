@@ -12,6 +12,7 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import audio.funkwhale.ffa.R
+import audio.funkwhale.ffa.adapters.FavoriteListener
 import audio.funkwhale.ffa.adapters.TracksAdapter
 import audio.funkwhale.ffa.databinding.FragmentTracksBinding
 import audio.funkwhale.ffa.model.Album
@@ -83,10 +84,11 @@ class TracksFragment : FFAFragment<Track, TracksAdapter>() {
       albumCover = getString("albumCover") ?: ""
     }
 
-    adapter = TracksAdapter(layoutInflater, context, FavoriteListener())
-    repository = TracksRepository(context, albumId)
     favoritesRepository = FavoritesRepository(context)
     favoritedRepository = FavoritedRepository(context)
+    repository = TracksRepository(context, albumId)
+
+    adapter = TracksAdapter(layoutInflater, context, FavoriteListener(favoritesRepository))
 
     watchEventBus()
   }
@@ -292,15 +294,6 @@ class TracksFragment : FFAFragment<Track, TracksAdapter>() {
       }
 
       adapter.notifyDataSetChanged()
-    }
-  }
-
-  inner class FavoriteListener : TracksAdapter.OnFavoriteListener {
-    override fun onToggleFavorite(id: Int, state: Boolean) {
-      when (state) {
-        true -> favoritesRepository.addFavorite(id)
-        false -> favoritesRepository.deleteFavorite(id)
-      }
     }
   }
 }
