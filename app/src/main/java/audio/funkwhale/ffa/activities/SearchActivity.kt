@@ -52,17 +52,6 @@ class SearchActivity : AppCompatActivity() {
 
     setContentView(binding.root)
 
-    adapter =
-      SearchAdapter(
-        layoutInflater,
-        this,
-        SearchResultClickListener(),
-        FavoriteListener(favoritesRepository)
-      ).also {
-        binding.results.layoutManager = LinearLayoutManager(this)
-        binding.results.adapter = it
-      }
-
     binding.search.requestFocus()
   }
 
@@ -96,6 +85,17 @@ class SearchActivity : AppCompatActivity() {
     albumsRepository = AlbumsSearchRepository(this@SearchActivity, "")
     tracksRepository = TracksSearchRepository(this@SearchActivity, "")
     favoritesRepository = FavoritesRepository(this@SearchActivity)
+
+    adapter =
+      SearchAdapter(
+        layoutInflater,
+        this,
+        SearchResultClickListener(),
+        FavoriteListener(favoritesRepository)
+      ).also {
+        binding.results.layoutManager = LinearLayoutManager(this)
+        binding.results.adapter = it
+      }
 
     binding.search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
