@@ -48,6 +48,11 @@ class SearchActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
+    artistsRepository = ArtistsSearchRepository(this@SearchActivity, "")
+    albumsRepository = AlbumsSearchRepository(this@SearchActivity, "")
+    tracksRepository = TracksSearchRepository(this@SearchActivity, "")
+    favoritesRepository = FavoritesRepository(this@SearchActivity)
+
     binding = ActivitySearchBinding.inflate(layoutInflater)
 
     setContentView(binding.root)
@@ -80,11 +85,6 @@ class SearchActivity : AppCompatActivity() {
         }
       }
     }
-
-    artistsRepository = ArtistsSearchRepository(this@SearchActivity, "")
-    albumsRepository = AlbumsSearchRepository(this@SearchActivity, "")
-    tracksRepository = TracksSearchRepository(this@SearchActivity, "")
-    favoritesRepository = FavoritesRepository(this@SearchActivity)
 
     adapter =
       SearchAdapter(

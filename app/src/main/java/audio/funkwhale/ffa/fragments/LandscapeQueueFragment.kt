@@ -35,6 +35,8 @@ class LandscapeQueueFragment : Fragment() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
+    favoritesRepository = FavoritesRepository(context)
+
     watchEventBus()
   }
 
@@ -44,6 +46,7 @@ class LandscapeQueueFragment : Fragment() {
     savedInstanceState: Bundle?
   ): View {
     _binding = PartialQueueBinding.inflate(inflater)
+
     return binding.root.apply {
       adapter = TracksAdapter(
         layoutInflater,

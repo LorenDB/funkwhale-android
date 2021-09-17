@@ -72,10 +72,11 @@ class PlaylistTracksFragment : FFAFragment<PlaylistTrack, PlaylistTracksAdapter>
       albumCover = getString("albumCover") ?: ""
     }
 
-    adapter = PlaylistTracksAdapter(layoutInflater, context, FavoriteListener(favoritesRepository), PlaylistListener())
-    repository = PlaylistTracksRepository(context, albumId)
     favoritesRepository = FavoritesRepository(context)
     playlistsRepository = ManagementPlaylistsRepository(context)
+
+    adapter = PlaylistTracksAdapter(layoutInflater, context, FavoriteListener(favoritesRepository), PlaylistListener())
+    repository = PlaylistTracksRepository(context, albumId)
 
     watchEventBus()
   }
