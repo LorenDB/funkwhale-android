@@ -61,18 +61,18 @@ fi
 TAG="$1"
 MESSAGE="Creating release version $TAG"
 
-echo "Compiling the changelog..."
-towncrier build --version "$TAG" --date $(date +"%Y-%m-%d")
-
-git add CHANGELOG
-git comit --message "Update changelog for version $TAG"
-
 # Validate that git tag doesn't already exist
 git fetch --all --tags
 if [ "$(git tag -l | grep -e "^$TAG$")" != '' ]; then
   echo "ERROR: tag $TAG already exists." >&2
   exit 1
 fi
+
+echo "Compiling the changelog..."
+towncrier build --version "$TAG" --date $(date +"%Y-%m-%d")
+
+git add CHANGELOG
+git commit --message "Update changelog for version $TAG"
 
 # Write versionCode and versionName to a file that F-Droid can parse
 echo "versionCode = $(version_code "${TOKENS[@]}")
