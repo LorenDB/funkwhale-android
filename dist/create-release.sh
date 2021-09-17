@@ -77,9 +77,10 @@ git commit --message "Update changelog for version $TAG"
 # Write versionCode and versionName to a file that F-Droid can parse
 echo "versionCode = $(version_code "${TOKENS[@]}")
 versionName = $TAG" > fdroidversion.txt
-
-echo "Tagging the application..."
+git add fdroidversion.txt
+git commit --message "Update version information for F-Droid"
 
 # Create and push tag
+echo "Tagging the application..."
 git tag -a -s -m "$MESSAGE" "$TAG"
 git push --tags
