@@ -26,7 +26,7 @@ unMock {
 }
 
 androidGitVersion {
-  codeFormat = "MMNNPPBBB"
+  codeFormat = "MMNNPPBBB" // Keep in sync with version_code() in dist/create_release.sh
   format = "%tag%%-count%%-commit%%-branch%"
 }
 
