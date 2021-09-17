@@ -27,7 +27,7 @@ function version_code() {
     ((leadingZeros=2-${#token}))
     for _ in $(seq 1 "$leadingZeros")
     do
-      token="${token}0"
+      token="0${token}"
     done
     result="$result$token"
   done
@@ -69,7 +69,11 @@ if [ "$(git tag -l | grep -e "^$TAG$")" != '' ]; then
 fi
 
 echo "Compiling the changelog..."
-towncrier build --version "$TAG" --date $(date +"%Y-%m-%d")
+towncrier build --version="$TAG"
+
+# Manually fixing the release date in the changelog,
+# as towncrier's --date param doesn't seem to work
+sed -i '' "s/$TAG (unreleased)/$TAG ($(date +"%Y-%m-%d"))/g" CHANGELOG
 
 git add CHANGELOG
 git commit --message "Update changelog for version $TAG"
@@ -79,6 +83,8 @@ echo "versionCode = $(version_code "${TOKENS[@]}")
 versionName = $TAG" > fdroidversion.txt
 git add fdroidversion.txt
 git commit --message "Update version information for F-Droid"
+
+git push
 
 # Create and push tag
 echo "Tagging the application..."
