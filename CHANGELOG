@@ -1,3 +1,20 @@
+0.1.3 (unreleased)
+Bugfixes:
+
+- Disable landscape mode to avoid application crashes (#93)
+- Fix handling of hostname 'https://' scheme prefix (#88)
+- Remember scroll positions in list views (Artists/Albums/...) (#95)
+- Remove trailing slash from hostname (#92)
+- Use correct radio identifier for user radio (#90)
+
+
+Other:
+
+- Add hard coded version information for F-Droid deployment (#97)
+- Automatically update the favorites list view (#28)
+- Update Fastlane metadata for app store deployments (#89)
+
+
 0.1.1 (2021-08-31)
 Features:
 
