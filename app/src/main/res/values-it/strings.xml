@@ -4,7 +4,7 @@
         <item quantity="one">%d album</item>
         <item quantity="other">%d album</item>
     </plurals>
-    <string name="playback_shuffle">Shuffle</string>
+    <string name="playback_shuffle">Casuale</string>
     <string name="playback_play">Riproduci</string>
     <string name="alt_artist_art">Immagine dell\'artista</string>
     <string name="playback_queue_clear">Pulisci</string>
@@ -80,7 +80,7 @@
     <string name="settings_information_license_description">Licenza MIT</string>
     <string name="settings_information_license_title">Licenza</string>
     <string name="settings_version_title">Versione</string>
-    <string name="settings_information_repository_description">Funkwhale per Android</string>
+    <string name="settings_information_repository_description">Funkwhale per Android™</string>
     <string name="settings_information_repository_title">Repository</string>
     <string name="settings_information">Informazione</string>
     <string name="settings_night_mode_system_summary">La modalità notturna seguirà le impostazioni di sistema</string>
@@ -122,4 +122,6 @@
     <string name="login_cleartext">Consenti traffico in chiaro (HTTP)</string>
     <string name="login_hostname">Nome dell\'host</string>
     <string name="login_welcome">Inserisci i dettagli della tua istanza di Funkwhale per accedere al suo contenuto</string>
+    <string name="login_error">Accesso non riuscito: %s</string>
+    <string name="login_error_funkwhale_not_found">Nessun pod Funkwhale trovato</string>
 </resources>
