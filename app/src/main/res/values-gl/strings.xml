@@ -119,7 +119,7 @@
     <string name="settings_information_license_description">Licenza MIT</string>
     <string name="settings_information_license_title">Licenza</string>
     <string name="settings_version_title">Versión</string>
-    <string name="settings_information_repository_description">Funkwhale para Android</string>
+    <string name="settings_information_repository_description">Funkwhale para Android™</string>
     <string name="settings_information_repository_title">Repositorio</string>
     <string name="settings_information">Información</string>
     <string name="login_error_funkwhale_not_found">Non se atopa o nodo Funkwhale</string>
