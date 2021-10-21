@@ -103,4 +103,5 @@
         <item quantity="other">%1$d曲をダウンロードしています</item>
     </plurals>
     <string name="logout_content">本当にこのFunkwhaleポッドからサインアウトしますか？</string>
+    <string name="login_error_funkwhale_not_found">Funkwhaleのポッドが見つかりませんでした</string>
 </resources>
