@@ -71,7 +71,7 @@
     <string name="settings_information_license_description">licencia MIT</string>
     <string name="settings_information_license_title">Licencia</string>
     <string name="settings_version_title">Versión</string>
-    <string name="settings_information_repository_description">Funkwhale para Android</string>
+    <string name="settings_information_repository_description">Funkwhale para Android™</string>
     <string name="settings_information_repository_title">Repositorio</string>
     <string name="settings_information">Información</string>
     <string name="settings_night_mode_system_summary">El modo oscuro seguirá los ajustes del sistema</string>
@@ -98,7 +98,7 @@
     <string name="search_no_results">No se han encontrado resultados para tu búsqueda</string>
     <string name="search_welcome">Introduce los términos de búsqueda arriba y pulsa enter para buscar en tu colección</string>
     <string name="search_placeholder">Buscar artistas, álbumes y pistas</string>
-    <string name="title_oss_licences">Abrir licencias de código abierto</string>
+    <string name="title_oss_licences">Licencias de código abierto</string>
     <string name="title_settings">Ajustes</string>
     <string name="title_downloads">Descargas</string>
     <string name="toolbar_search">Buscar</string>
@@ -122,4 +122,6 @@
     <string name="playlist_add_to_new">Nueva lista de reproducción…</string>
     <string name="playlist_add_to">Añadir a la lista de reproducción</string>
     <string name="playback_queue_save">Guardar</string>
+    <string name="login_error">Error en inicio de sesión: %s</string>
+    <string name="login_error_funkwhale_not_found">Nodo funkwhale no encontrado</string>
 </resources>
