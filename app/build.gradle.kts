@@ -8,7 +8,7 @@ plugins {
 
   id("org.jlleitschuh.gradle.ktlint") version "10.1.0"
   id("com.gladed.androidgitversion") version "0.4.14"
-  id("com.github.triplet.play") version "3.6.0"
+  id("com.github.triplet.play") version "3.7.0"
   id("de.mobilej.unmock")
   id("com.github.ben-manes.versions")
   jacoco
