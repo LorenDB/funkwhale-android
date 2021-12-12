@@ -1,2 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="settings_media_quality_summary_size">Spår med minsta möjliga storlek kommer spelas</string>
+    <string name="settings_media_cache_size">Cachningsstorlek för media</string>
+    <string name="login_hostname">Servernamn</string>
+    <string name="login_anonymous">Anonym autentisering</string>
+    <string name="login_username">Användarnamn</string>
+    <string name="login_logging_in">Loggar in</string>
+    <string name="login_error">Inloggning misslyckades: %s</string>
+    <string name="login_error_hostname_https">Funkwhaleservernamnet ska vara säkert över HTTPS</string>
+    <string name="toolbar_search">Sök</string>
+    <string name="title_downloads">Nedladdningar</string>
+    <string name="title_oss_licences">Open source-licens</string>
+    <string name="search_placeholder">Sök artister, album och låtar</string>
+    <string name="search_no_results">Inget resultat hittades för din sökterm</string>
+    <string name="settings_media_quality">Mediakvalitet</string>
+    <string name="settings_media_quality_quality">Bäst kvalitet</string>
+    <string name="settings_media_quality_size">Minsta storlek</string>
+    <string name="settings_media_cache_size_summary">%d GB kommer användas för att lagra spår för offlineuppspelning</string>
+    <string name="login_cleartext">Tillåt klartexttraffik (HTTP)</string>
+    <string name="login_password">Lösenord</string>
+    <string name="login_submit">Logga in</string>
+    <string name="login_error_funkwhale_not_found">Ingen Funkwhalepodd hittades</string>
+    <string name="login_error_hostname">Detta kunde inte tolkas som en giltig URL</string>
+    <string name="login_error_userinfo">Vi kunde inte hitta information om din användare</string>
+    <string name="title_settings">Inställningar</string>
+    <string name="settings_general">Generellt</string>
+    <string name="settings_media_quality_summary_quality">Bästa möjliga versionen kommer spelas</string>
+    <string name="login_welcome">Var god och skriv in detaljarna kring din Funkwhaleinstans för att komma åt dess innehåll</string>
+    <string name="search_welcome">Skriv in dina söktermer ovanför och tryck på enter för att söka igenom ditt bibliotek</string>
+</resources>
