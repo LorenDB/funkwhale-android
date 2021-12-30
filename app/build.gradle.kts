@@ -193,7 +193,7 @@ dependencies {
   implementation("net.openid:appauth:${Versions.openIdAppAuth}")
 
   testImplementation("junit:junit:4.13.2")
-  testImplementation("io.mockk:mockk:1.12.1")
+  testImplementation("io.mockk:mockk:1.12.2")
   testImplementation("androidx.test:core:1.4.0")
   testImplementation("io.strikt:strikt-core:${Versions.strikt}")
   testImplementation("org.robolectric:robolectric:${Versions.robolectric}")
