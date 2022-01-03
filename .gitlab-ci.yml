@@ -32,6 +32,12 @@ build_ci_image:
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
 
+cache: &global_cache
+  key: ${CI_PIPELINE_ID}
+  paths:
+    - .gradle/wrapper
+    - .gradle/caches
+  policy: pull
 
 .gradle-default:
   before_script:
@@ -40,11 +46,6 @@ build_ci_image:
     - mkdir -p .android && touch .android/repositories.cfg
   script:
     - echo "Overwrite me"
-
-  cache:
-    key: ${CI_PROJECT_ID}
-    paths:
-      - .gradle/
 
 .build:
   stage: build
@@ -65,6 +66,9 @@ build_ci_image:
       - $apk_file
       - $metadata_file
       - $output_metadata
+  cache:
+    # inherit all global cache settings
+    <<: *global_cache
 
 test:
   extends: .gradle-default
@@ -79,6 +83,11 @@ test:
       junit: app/build/test-results/test**/TEST-*.xml
     paths:
       - $JACOCO_XML_LOCATION
+  cache:
+    # inherit all global cache settings
+    <<: *global_cache
+    # override the policy
+    policy: pull-push
 
 coverage:
   stage: visualize
