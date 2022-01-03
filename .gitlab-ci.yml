@@ -99,7 +99,7 @@ build-develop:
   extends: .build
   script:
     - echo -n $PREVIEW_SIGNING_KEY_STORE | base64 -d > app/android.keystore
-    - ./gradlew --stacktrace --no-daemon assembleDebug -Psigning.store=android.keystore -Psigning.store_passphrase=$PREVIEW_SIGNING_KEY_PASS -Psigning.key_passphrase=$PREVIEW_SIGNING_KEY_PASS
+    - ./gradlew --stacktrace --no-daemon assembleDebug -x check -Psigning.store=android.keystore -Psigning.store_passphrase=$PREVIEW_SIGNING_KEY_PASS -Psigning.key_passphrase=$PREVIEW_SIGNING_KEY_PASS
   only:
     - develop
 
@@ -119,7 +119,7 @@ build-release:
 build-bleeding-edge:
   extends: .build
   script:
-    - ./gradlew --stacktrace --no-daemon assembleDebug
+    - ./gradlew --stacktrace --no-daemon -x check assembleDebug
   except:
     - develop
     - tags
