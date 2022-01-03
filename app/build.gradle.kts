@@ -52,7 +52,7 @@ android {
     disable += listOf("MissingTranslation", "ExtraTranslation")
   }
 
-  compileSdk = 30
+  compileSdk = 31
 
   defaultConfig {
 
