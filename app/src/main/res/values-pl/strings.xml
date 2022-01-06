@@ -72,7 +72,7 @@
     <string name="settings_crash_report_copied">Szczegóły ostatniej awarii zostały skopiowane do schowka</string>
     <string name="settings_crash_report_description">Zbierane będą tylko informacje z ostatnich 5 minut przed awarią</string>
     <string name="settings_crash_report_title">Skopiuj szczegóły awarii</string>
-    <string name="settings_information_repository_description">Funkwhale dla Androida</string>
+    <string name="settings_information_repository_description">Funkwhale™ dla Androida</string>
     <string name="settings_information_repository_title">Repozytorium</string>
     <string name="settings_information">Informacje</string>
     <string name="settings_play_order_in_order">Odtwarzaj utwory w albumach w kolejności</string>
@@ -127,4 +127,6 @@
     <string name="login_username">Nazwa użytkownika</string>
     <string name="login_anonymous">Anonimowy dostęp</string>
     <string name="login_cleartext">Zezwól na nieszyfrowany przesył (HTTP)</string>
+    <string name="login_error">Logowanie nieudane: %s</string>
+    <string name="login_error_funkwhale_not_found">Nie znaleziono instancji Funkwhale</string>
 </resources>
