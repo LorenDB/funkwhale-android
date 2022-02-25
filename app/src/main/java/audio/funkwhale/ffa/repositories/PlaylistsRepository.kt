@@ -108,7 +108,7 @@ class ManagementPlaylistsRepository(override val context: Context?) :
   }
 
   suspend fun remove(albumId: Int, index: Int) {
-    context?.let {
+    if (context != null) {
       val body = mapOf("index" to index)
 
       val request = Fuel.post(mustNormalizeUrl("/api/v1/playlists/$albumId/remove/")).apply {
@@ -122,12 +122,13 @@ class ManagementPlaylistsRepository(override val context: Context?) :
         .header("Content-Type", "application/json")
         .body(Gson().toJson(body))
         .awaitByteArrayResponseResult()
-    }
-    throw IllegalStateException("Illegal state: context is null")
+    } else {
+      throw IllegalStateException("Illegal state: context is null")
+   }
   }
 
   fun move(id: Int, from: Int, to: Int) {
-    context?.let {
+    if (context != null) {
       val body = mapOf("from" to from, "to" to to)
 
       val request = Fuel.post(mustNormalizeUrl("/api/v1/playlists/$id/move/")).apply {
@@ -143,7 +144,8 @@ class ManagementPlaylistsRepository(override val context: Context?) :
           .body(Gson().toJson(body))
           .awaitByteArrayResponseResult()
       }
+    } else {
+      throw IllegalStateException("Illegal state: context is null")
     }
-    throw IllegalStateException("Illegal state: context is null")
   }
 }
