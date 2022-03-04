@@ -75,6 +75,7 @@
     <plurals name="album_count">
         <item quantity="one">%d album</item>
         <item quantity="other">%d albums</item>
+        <item quantity="many">Beaucoup albums</item>
     </plurals>
     <string name="alt_app_logo">Logo de l\'application</string>
     <string name="alt_artist_art">Image de l\'artiste</string>
@@ -109,6 +110,7 @@
     <plurals name="playlist_description">
         <item quantity="one">%1$d piste • %2$s</item>
         <item quantity="other">%1$d pistes • %2$s</item>
+        <item quantity="many">Beaucoup pistes • %1$s</item>
     </plurals>
     <string name="playlist_add_to">Ajouter à une playlist</string>
     <string name="playlist_add_to_new">Nouvelle playlist…</string>
@@ -121,6 +123,7 @@
     <plurals name="downloads_description">
         <item quantity="one">Téléchargement de %1$d piste</item>
         <item quantity="other">Téléchargement de %1$d pistes</item>
+        <item quantity="many">Téléchargement de beaucoup pistes</item>
     </plurals>
     <string name="login_error_funkwhale_not_found">Aucun pod Funkwhale trouvé</string>
     <string name="login_error">Connexion échouée : %s</string>
