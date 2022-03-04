@@ -9,7 +9,7 @@ object Versions {
   const val fuel = "2.3.1"
   const val gson = "2.8.7"
   const val powerPreference = "2.0.0"
-  const val openIdAppAuth = "0.10.0"
+  const val openIdAppAuth = "0.11.1"
 
   const val mockk = "1.12.0"
   const val strikt = "0.31.0"
