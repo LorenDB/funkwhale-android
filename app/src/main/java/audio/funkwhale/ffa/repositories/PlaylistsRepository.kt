@@ -124,7 +124,7 @@ class ManagementPlaylistsRepository(override val context: Context?) :
         .awaitByteArrayResponseResult()
     } else {
       throw IllegalStateException("Illegal state: context is null")
-   }
+    }
   }
 
   fun move(id: Int, from: Int, to: Int) {
