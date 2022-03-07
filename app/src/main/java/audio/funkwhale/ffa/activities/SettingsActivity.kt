@@ -41,7 +41,6 @@ class SettingsActivity : AppCompatActivity() {
       .commit()
   }
 
-  fun getThemeResId(): Int = R.style.AppTheme
 }
 
 class SettingsFragment :
@@ -51,7 +50,7 @@ class SettingsFragment :
   override fun onResume() {
     super.onResume()
 
-    preferenceScreen.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+    preferenceScreen.sharedPreferences?.registerOnSharedPreferenceChangeListener(this)
   }
 
   override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -60,7 +59,7 @@ class SettingsFragment :
     updateValues()
   }
 
-  override fun onPreferenceTreeClick(preference: Preference?): Boolean {
+  override fun onPreferenceTreeClick(preference: Preference): Boolean {
     when (preference?.key) {
       "oss_licences" -> startActivity(Intent(activity, LicencesActivity::class.java))
 
