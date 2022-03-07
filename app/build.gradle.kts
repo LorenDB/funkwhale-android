@@ -161,7 +161,7 @@ dependencies {
   implementation("androidx.core:core-ktx:1.7.0")
   implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.1")
   implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
-  implementation("androidx.preference:preference-ktx:1.1.1")
+  implementation("androidx.preference:preference-ktx:1.2.0")
   implementation("androidx.recyclerview:recyclerview:1.2.1")
   implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
   implementation("com.google.android.material:material:1.5.0")
