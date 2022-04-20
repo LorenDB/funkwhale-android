@@ -1,2 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="login_hostname">Ainm óstach</string>
+    <string name="login_cleartext">Ceadaigh trácht soiléir-théacs (HTTP)</string>
+    <string name="login_anonymous">Fíordheimhniú gan ainm</string>
+    <string name="login_username">Ainm úsáideora</string>
+    <string name="login_password">Pasfhocal</string>
+    <string name="login_submit">Logáil isteach</string>
+    <string name="login_error">theip ar logáil isteach: %s</string>
+    <string name="login_error_funkwhale_not_found">Níor aimsíodh pod Funkwhale</string>
+    <string name="login_error_hostname_https">Ba cheart go mbeadh an t-óstainm Funkwhale slán trí HTTPS</string>
+    <string name="login_error_userinfo">Níorbh fhéidir linn faisnéis a fháil faoi d\'úsáideoir</string>
+    <string name="toolbar_search">cuardaigh</string>
+    <string name="title_downloads">Íoslódálacha</string>
+    <string name="login_welcome">Cuir isteach sonraí do shampla Funkwhale chun rochtain a fháil ar an ábhar atá ann</string>
+    <string name="login_logging_in">Logáil isteach</string>
+    <string name="login_error_hostname">Níorbh fhéidir é seo a thuiscint mar URL bailí</string>
+</resources>
