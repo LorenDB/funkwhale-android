@@ -31,6 +31,7 @@ import audio.funkwhale.ffa.utils.CommandBus
 import audio.funkwhale.ffa.utils.maybeLoad
 import audio.funkwhale.ffa.utils.maybeNormalizeUrl
 import audio.funkwhale.ffa.utils.onViewPager
+import com.preference.PowerPreference
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import kotlinx.coroutines.Dispatchers.IO
@@ -125,6 +126,12 @@ class AlbumsFragment : FFAFragment<Album, AlbumsAdapter>() {
   ): View {
     _binding = FragmentAlbumsBinding.inflate(inflater)
     swiper = binding.swiper
+
+    when (PowerPreference.getDefaultFile().getString("play_order")) {
+      "in_order" -> binding.play.text = getString(R.string.playback_play)
+      else -> binding.play.text = getString(R.string.playback_shuffle)
+    }
+
     return binding.root
   }
 
@@ -147,35 +154,6 @@ class AlbumsFragment : FFAFragment<Album, AlbumsAdapter>() {
     }
 
     binding.artist.text = artistName
-
-    binding.play.setOnClickListener {
-      val loader = CircularProgressDrawable(requireContext()).apply {
-        setColorSchemeColors(ContextCompat.getColor(requireContext(), android.R.color.white))
-        strokeWidth = 4f
-      }
-
-      loader.start()
-
-      binding.play.icon = loader
-      binding.play.isClickable = false
-
-      lifecycleScope.launch(IO) {
-        artistTracksRepository.fetch(Repository.Origin.Network.origin)
-          .map { it.data }
-          .toList()
-          .flatten()
-          .shuffled()
-          .also {
-            CommandBus.send(Command.ReplaceQueue(it))
-
-            withContext(Main) {
-              binding.play.icon =
-                AppCompatResources.getDrawable(binding.root.context, R.drawable.play)
-              binding.play.isClickable = true
-            }
-          }
-      }
-    }
   }
 
   override fun onResume() {
@@ -192,6 +170,41 @@ class AlbumsFragment : FFAFragment<Album, AlbumsAdapter>() {
 
       coverHeight?.let { height ->
         binding.cover.alpha = (height - scrollY.toFloat()) / height
+      }
+    }
+
+    when (PowerPreference.getDefaultFile().getString("play_order")) {
+      "in_order" -> binding.play.text = getString(R.string.playback_play)
+      else -> binding.play.text = getString(R.string.playback_shuffle)
+    }
+
+    binding.play.setOnClickListener {
+      val loader = CircularProgressDrawable(requireContext()).apply {
+        setColorSchemeColors(ContextCompat.getColor(requireContext(), android.R.color.white))
+        strokeWidth = 4f
+      }
+
+      loader.start()
+
+      binding.play.icon = loader
+      binding.play.isClickable = false
+
+      lifecycleScope.launch(IO) {
+        val tracks = artistTracksRepository.fetch(Repository.Origin.Network.origin)
+          .map { it.data }
+          .toList()
+          .flatten()
+
+        when (PowerPreference.getDefaultFile().getString("play_order")) {
+          "in_order" -> CommandBus.send(Command.ReplaceQueue(tracks))
+          else -> CommandBus.send(Command.ReplaceQueue(tracks.shuffled()))
+        }
+
+        withContext(Main) {
+          binding.play.icon =
+            AppCompatResources.getDrawable(binding.root.context, R.drawable.play)
+          binding.play.isClickable = true
+        }
       }
     }
   }

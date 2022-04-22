@@ -129,6 +129,12 @@ class TracksFragment : FFAFragment<Track, TracksAdapter>() {
   ): View {
     _binding = FragmentTracksBinding.inflate(inflater)
     swiper = binding.swiper
+
+    when (PowerPreference.getDefaultFile().getString("play_order")) {
+      "in_order" -> binding.play.text = getString(R.string.playback_play)
+      else -> binding.play.text = getString(R.string.playback_shuffle)
+    }
+
     return binding.root
   }
 
