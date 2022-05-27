@@ -1,4 +1,4 @@
-image: dev.funkwhale.audio:5050/funkwhale/funkwhale-android:latest
+image: $CI_REGISTRY/funkwhale/funkwhale-android:latest
 
 variables:
   COBERTURA_REPORT: '$CI_PROJECT_DIR/app/build/reports/cobertura.xml'
