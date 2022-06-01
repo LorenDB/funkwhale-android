@@ -164,7 +164,7 @@ dependencies {
   implementation("androidx.preference:preference-ktx:1.2.0")
   implementation("androidx.recyclerview:recyclerview:1.2.1")
   implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
-  implementation("com.google.android.material:material:1.6.0")
+  implementation("com.google.android.material:material:1.6.1")
   implementation("com.android.support.constraint:constraint-layout:2.0.4")
 
   implementation("com.google.android.exoplayer:exoplayer-core:${Versions.exoPlayer}")
