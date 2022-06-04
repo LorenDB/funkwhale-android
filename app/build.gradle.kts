@@ -157,7 +157,7 @@ dependencies {
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.2")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.2")
 
-  implementation("androidx.appcompat:appcompat:1.4.1")
+  implementation("androidx.appcompat:appcompat:1.4.2")
   implementation("androidx.core:core-ktx:1.8.0")
   implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.1")
   implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
