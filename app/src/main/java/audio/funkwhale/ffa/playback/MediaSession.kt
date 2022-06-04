@@ -2,6 +2,7 @@ package audio.funkwhale.ffa.playback
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.ResultReceiver
 import android.support.v4.media.session.MediaSessionCompat
@@ -44,13 +45,17 @@ class MediaSession(private val context: Context) {
 
       it.setMediaButtonEventHandler { _, _, intent ->
         if (!active) {
-          context.startService(
-            Intent(context, PlayerService::class.java).apply {
-              action = intent.action
+          Intent(context, PlayerService::class.java).let { player ->
+            player.action = intent.action
 
-              intent.extras?.let { extras -> putExtras(extras) }
+            intent.extras?.let { extras -> player.putExtras(extras) }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+              context.startForegroundService(player)
+            } else {
+              context.startService(player)
             }
-          )
+          }
 
           return@setMediaButtonEventHandler true
         }
