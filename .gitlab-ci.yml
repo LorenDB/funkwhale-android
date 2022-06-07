@@ -102,7 +102,9 @@ coverage:
     - tags
   artifacts:
     reports:
-      cobertura: $COBERTURA_REPORT
+      coverage_report:
+        coverage_format: cobertura
+        path: $COBERTURA_REPORT
 
 build-develop:
   extends: .build
