@@ -76,8 +76,13 @@ fun Request.authorize(context: Context, oAuth: OAuth): Request {
           val old = state.accessToken
           val auth = ClientSecretPost(oAuth.state().clientSecret)
           val done = CompletableDeferred<Boolean>()
+          val tokenService = oAuth.service(context)
 
-          state.performActionWithFreshTokens(oAuth.service(context), auth) { token, _, _ ->
+          state.performActionWithFreshTokens(tokenService, auth) { token, _, e ->
+            if (e != null) {
+              Log.e("Request.authorize()", "performActionWithFreshToken failed: ${e}")
+              Log.e("Request.authorize()", Log.getStackTraceString(e))
+            }
             if (token == old) {
               Log.i("Request.authorize()", "Accesstoken not renewed")
             }
@@ -88,6 +93,7 @@ fun Request.authorize(context: Context, oAuth: OAuth): Request {
             done.complete(true)
           }
           done.await()
+          tokenService.dispose()
           return@runBlocking this
         }
       }
