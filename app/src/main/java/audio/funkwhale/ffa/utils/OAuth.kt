@@ -98,15 +98,22 @@ class OAuth(private val authorizationServiceFactory: AuthorizationServiceFactory
     return if (state.refreshToken != null) {
       val refreshRequest = state.createTokenRefreshRequest()
       val auth = ClientSecretPost(state.clientSecret)
+      val refreshService = service(context)
       runBlocking {
-        service(context).performTokenRequest(refreshRequest, auth) { response, e ->
-          state.apply {
-            Log.i("OAuth", "applying new authState")
-            update(response, e)
-            save()
+        refreshService.performTokenRequest(refreshRequest, auth) { response, e ->
+          if (e != null) {
+            Log.e("OAuth", "performTokenRequest failed: ${e}")
+            Log.e("OAuth", Log.getStackTraceString(e))
+          } else {
+            state.apply {
+              Log.i("OAuth", "applying new authState")
+              update(response, e)
+              save()
+            }
           }
         }
       }
+      refreshService.dispose()
       true
     } else {
       false
@@ -202,17 +209,23 @@ class OAuth(private val authorizationServiceFactory: AuthorizationServiceFactory
 
       AuthorizationResponse.fromIntent(authorization)?.let {
         val auth = ClientSecretPost(state().clientSecret)
+        val requestService = service(context)
 
-        service(context).performTokenRequest(it.createTokenExchangeRequest(), auth) { response, e ->
-          state
-            .apply {
-              update(response, e)
-              save()
-            }
+        requestService.performTokenRequest(it.createTokenExchangeRequest(), auth) { response, e ->
+          if (e != null) {
+            Log.e("FFA", "performTokenRequest failed: ${e}")
+            Log.e("FFA", Log.getStackTraceString(e))
+          } else {
+            state.apply {
+                update(response, e)
+                save()
+              }
+          }
 
           if (response != null) success()
           else Log.e("FFA", "performTokenRequest() not successful")
         }
+        requestService.dispose()
       }
     }
   }
