@@ -1,0 +1,1 @@
+Fix warnings in log output due to leaked BufferedReader resource (thanks @hdash)

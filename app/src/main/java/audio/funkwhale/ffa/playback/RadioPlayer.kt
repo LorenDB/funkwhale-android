@@ -53,10 +53,10 @@ class RadioPlayer(val context: Context, val scope: CoroutineScope) {
   private val favoritedRepository = FavoritedRepository(context)
 
   init {
-    FFACache.get(context, "radio_type")?.readLine()?.let { radio_type ->
-      FFACache.get(context, "radio_id")?.readLine()?.toInt()?.let { radio_id ->
-        FFACache.get(context, "radio_session")?.readLine()?.toInt()?.let { radio_session ->
-          val cachedCookie = FFACache.get(context, "radio_cookie")?.readLine()
+    FFACache.getLine(context, "radio_type")?.let { radio_type ->
+      FFACache.getLine(context, "radio_id")?.toInt()?.let { radio_id ->
+        FFACache.getLine(context, "radio_session")?.toInt()?.let { radio_session ->
+          val cachedCookie = FFACache.getLine(context, "radio_cookie")
 
           currentRadio = Radio(radio_id, radio_type, "", "")
           session = radio_session
@@ -107,10 +107,10 @@ class RadioPlayer(val context: Context, val scope: CoroutineScope) {
         session = result.get().id
         cookie = response.header("set-cookie").joinToString(";")
 
-        FFACache.set(context, "radio_type", radio.radio_type.toByteArray())
-        FFACache.set(context, "radio_id", radio.id.toString().toByteArray())
-        FFACache.set(context, "radio_session", session.toString().toByteArray())
-        FFACache.set(context, "radio_cookie", cookie.toString().toByteArray())
+        FFACache.set(context, "radio_type", radio.radio_type)
+        FFACache.set(context, "radio_id", radio.id.toString())
+        FFACache.set(context, "radio_session", session.toString())
+        FFACache.set(context, "radio_cookie", cookie.toString())
 
         prepareNextTrack(true)
       } catch (e: Exception) {

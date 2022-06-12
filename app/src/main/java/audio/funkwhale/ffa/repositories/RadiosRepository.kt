@@ -26,8 +26,8 @@ class RadiosRepository(override val context: Context?) : Repository<Radio, Radio
   )
 
   override fun cache(data: List<Radio>) = RadiosCache(data)
-  override fun uncache(reader: BufferedReader) =
-    gsonDeserializerOf(RadiosCache::class.java).deserialize(reader)
+  override fun uncache(json: String) =
+    gsonDeserializerOf(RadiosCache::class.java).deserialize(json)
 
   override fun onDataFetched(data: List<Radio>): List<Radio> {
     return data

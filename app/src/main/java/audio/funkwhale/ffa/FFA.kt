@@ -83,7 +83,7 @@ class FFA : Application() {
 
             builder.appendLine(e.toString())
 
-            FFACache.set(this@FFA, "crashdump", builder.toString().toByteArray())
+            FFACache.set(this@FFA, "crashdump", builder.toString())
           }
         }
 

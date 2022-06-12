@@ -153,8 +153,8 @@ class PlayerService : Service() {
     if (queue.current > -1) {
       player.prepare(queue.dataSources)
 
-      FFACache.get(this, "progress")?.let { progress ->
-        player.seekTo(queue.current, progress.readLine().toLong())
+      FFACache.getLine(this, "progress")?.let {
+        player.seekTo(queue.current, it.toLong())
 
         val (current, duration, percent) = getProgress(true)
 
@@ -303,7 +303,7 @@ class PlayerService : Service() {
     if (!state) {
       val (progress, _, _) = getProgress()
 
-      FFACache.set(this@PlayerService, "progress", progress.toString().toByteArray())
+      FFACache.set(this@PlayerService, "progress", progress.toString())
     }
 
     if (state && player.playbackState == Player.STATE_IDLE) {
@@ -332,7 +332,7 @@ class PlayerService : Service() {
   private fun skipToNextTrack() {
     player.next()
 
-    FFACache.set(this@PlayerService, "progress", "0".toByteArray())
+    FFACache.set(this@PlayerService, "progress", "0")
     ProgressBus.send(0, 0, 0)
   }
 
@@ -481,7 +481,7 @@ class PlayerService : Service() {
       }
 
       if (queue.get().isNotEmpty() && queue.current() == queue.get()
-        .last() && radioPlayer.isActive()
+          .last() && radioPlayer.isActive()
       ) {
         scope.launch(IO) {
           if (radioPlayer.lock.tryAcquire()) {
@@ -491,7 +491,7 @@ class PlayerService : Service() {
         }
       }
 
-      FFACache.set(this@PlayerService, "current", queue.current.toString().toByteArray())
+      FFACache.set(this@PlayerService, "current", queue.current.toString())
 
       CommandBus.send(Command.RefreshTrack(queue.current()))
     }

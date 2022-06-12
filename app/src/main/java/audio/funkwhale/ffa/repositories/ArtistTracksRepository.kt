@@ -9,7 +9,6 @@ import audio.funkwhale.ffa.utils.OAuth
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
 import com.google.gson.reflect.TypeToken
 import org.koin.java.KoinJavaComponent.inject
-import java.io.BufferedReader
 
 class ArtistTracksRepository(override val context: Context?, private val artistId: Int) :
   Repository<Track, TracksCache>() {
@@ -27,6 +26,6 @@ class ArtistTracksRepository(override val context: Context?, private val artistI
   )
 
   override fun cache(data: List<Track>) = TracksCache(data)
-  override fun uncache(reader: BufferedReader) =
-    gsonDeserializerOf(TracksCache::class.java).deserialize(reader)
+  override fun uncache(json: String) =
+    gsonDeserializerOf(TracksCache::class.java).deserialize(json)
 }
