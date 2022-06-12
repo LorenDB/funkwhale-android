@@ -34,7 +34,7 @@ abstract class Repository<D : Any, C : CacheItem<D>> {
   abstract val upstream: Upstream<D>
 
   open fun cache(data: List<D>): C? = null
-  protected open fun uncache(reader: BufferedReader): C? = null
+  protected open fun uncache(json: String): C? = null
 
   fun fetch(
     upstreams: Int = Origin.Cache.origin and Origin.Network.origin,
@@ -46,8 +46,8 @@ abstract class Repository<D : Any, C : CacheItem<D>> {
 
   private fun fromCache() = flow {
     cacheId?.let { cacheId ->
-      FFACache.get(context, cacheId)?.let { reader ->
-        uncache(reader)?.let { cache ->
+      FFACache.getLine(context, cacheId)?.let { line ->
+        uncache(line)?.let { cache ->
           return@flow emit(
             Response(
               Origin.Cache,

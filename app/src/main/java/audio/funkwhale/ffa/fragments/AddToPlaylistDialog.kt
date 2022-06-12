@@ -124,7 +124,7 @@ object AddToPlaylistDialog {
             FFACache.set(
               context,
               cacheId,
-              Gson().toJson(cache(adapter.data)).toByteArray()
+              Gson().toJson(cache(adapter.data)).toString()
             )
           } catch (e: ConcurrentModificationException) {
           }

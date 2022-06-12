@@ -42,8 +42,8 @@ class TracksSearchRepository(override val context: Context?, var query: String) 
     )
 
   override fun cache(data: List<Track>) = TracksCache(data)
-  override fun uncache(reader: BufferedReader) =
-    gsonDeserializerOf(TracksCache::class.java).deserialize(reader)
+  override fun uncache(json: String) =
+    gsonDeserializerOf(TracksCache::class.java).deserialize(json)
 
   override fun onDataFetched(data: List<Track>): List<Track> = runBlocking {
     val favorites = FavoritedRepository(context).fetch(Origin.Cache.origin)
@@ -84,8 +84,8 @@ class ArtistsSearchRepository(override val context: Context?, var query: String)
     )
 
   override fun cache(data: List<Artist>) = ArtistsCache(data)
-  override fun uncache(reader: BufferedReader) =
-    gsonDeserializerOf(ArtistsCache::class.java).deserialize(reader)
+  override fun uncache(json: String) =
+    gsonDeserializerOf(ArtistsCache::class.java).deserialize(json)
 }
 
 class AlbumsSearchRepository(override val context: Context?, var query: String) :
@@ -104,6 +104,6 @@ class AlbumsSearchRepository(override val context: Context?, var query: String) 
     )
 
   override fun cache(data: List<Album>) = AlbumsCache(data)
-  override fun uncache(reader: BufferedReader) =
-    gsonDeserializerOf(AlbumsCache::class.java).deserialize(reader)
+  override fun uncache(json: String) =
+    gsonDeserializerOf(AlbumsCache::class.java).deserialize(json)
 }

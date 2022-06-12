@@ -160,17 +160,17 @@ class MainActivity : AppCompatActivity() {
       }
 
       binding.nowPlayingContainer?.nowPlayingDetailsProgress?.setOnSeekBarChangeListener(object :
-          SeekBar.OnSeekBarChangeListener {
-          override fun onStopTrackingTouch(view: SeekBar?) {}
+        SeekBar.OnSeekBarChangeListener {
+        override fun onStopTrackingTouch(view: SeekBar?) {}
 
-          override fun onStartTrackingTouch(view: SeekBar?) {}
+        override fun onStartTrackingTouch(view: SeekBar?) {}
 
-          override fun onProgressChanged(view: SeekBar?, progress: Int, fromUser: Boolean) {
-            if (fromUser) {
-              CommandBus.send(Command.Seek(progress))
-            }
+        override fun onProgressChanged(view: SeekBar?, progress: Int, fromUser: Boolean) {
+          if (fromUser) {
+            CommandBus.send(Command.Seek(progress))
           }
-        })
+        }
+      })
 
       landscapeQueue?.let {
         supportFragmentManager.beginTransaction()
@@ -379,7 +379,8 @@ class MainActivity : AppCompatActivity() {
             when (message.playing) {
               true -> {
                 binding.nowPlayingContainer?.nowPlayingToggle?.icon = getDrawable(R.drawable.pause)
-                binding.nowPlayingContainer?.nowPlayingDetailsToggle?.icon = getDrawable(R.drawable.pause)
+                binding.nowPlayingContainer?.nowPlayingDetailsToggle?.icon =
+                  getDrawable(R.drawable.pause)
               }
 
               false -> {
@@ -529,10 +530,10 @@ class MainActivity : AppCompatActivity() {
       }
 
       binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.let { now_playing_details_repeat ->
-        changeRepeatMode(FFACache.get(this@MainActivity, "repeat")?.readLine()?.toInt() ?: 0)
+        changeRepeatMode(FFACache.getLine(this@MainActivity, "repeat")?.toInt() ?: 0)
 
         now_playing_details_repeat.setOnClickListener {
-          val current = FFACache.get(this@MainActivity, "repeat")?.readLine()?.toInt() ?: 0
+          val current = FFACache.getLine(this@MainActivity, "repeat")?.toInt() ?: 0
 
           changeRepeatMode((current + 1) % 3)
         }
@@ -612,7 +613,7 @@ class MainActivity : AppCompatActivity() {
     when (index) {
       // From no repeat to repeat all
       0 -> {
-        FFACache.set(this@MainActivity, "repeat", "0".toByteArray())
+        FFACache.set(this@MainActivity, "repeat", "0")
 
         binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.setImageResource(R.drawable.repeat)
         binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.setColorFilter(
@@ -628,7 +629,7 @@ class MainActivity : AppCompatActivity() {
 
       // From repeat all to repeat one
       1 -> {
-        FFACache.set(this@MainActivity, "repeat", "1".toByteArray())
+        FFACache.set(this@MainActivity, "repeat", "1")
 
         binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.setImageResource(R.drawable.repeat)
         binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.setColorFilter(
@@ -644,7 +645,7 @@ class MainActivity : AppCompatActivity() {
 
       // From repeat one to no repeat
       2 -> {
-        FFACache.set(this@MainActivity, "repeat", "2".toByteArray())
+        FFACache.set(this@MainActivity, "repeat", "2")
         binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.setImageResource(R.drawable.repeat_one)
         binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.setColorFilter(
           ContextCompat.getColor(

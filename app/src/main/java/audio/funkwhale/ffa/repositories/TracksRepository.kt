@@ -38,8 +38,8 @@ class TracksRepository(override val context: Context?, albumId: Int) :
   )
 
   override fun cache(data: List<Track>) = TracksCache(data)
-  override fun uncache(reader: BufferedReader) =
-    gsonDeserializerOf(TracksCache::class.java).deserialize(reader)
+  override fun uncache(json: String) =
+    gsonDeserializerOf(TracksCache::class.java).deserialize(json)
 
   companion object {
     fun getDownloadedIds(exoDownloadManager: DownloadManager): List<Int>? {

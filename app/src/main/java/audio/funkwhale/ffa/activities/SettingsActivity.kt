@@ -66,7 +66,7 @@ class SettingsFragment :
       "crash" -> {
         activity?.let { activity ->
           (activity.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager)?.also { clip ->
-            FFACache.get(activity, "crashdump")?.readLines()?.joinToString("\n").also {
+            FFACache.getLines(activity, "crashdump")?.joinToString("\n").also {
               clip.setPrimaryClip(ClipData.newPlainText("Funkwhale logs", it))
 
               Toast.makeText(

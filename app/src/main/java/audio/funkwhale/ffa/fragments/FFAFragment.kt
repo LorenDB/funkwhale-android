@@ -150,7 +150,7 @@ abstract class FFAFragment<D : Any, A : FFAAdapter<D, *>>() : Fragment() {
                 FFACache.set(
                   context,
                   cacheId,
-                  Gson().toJson(repository.cache(adapter.data)).toByteArray()
+                  Gson().toJson(repository.cache(adapter.data)).toString()
                 )
               }
             } catch (e: ConcurrentModificationException) {

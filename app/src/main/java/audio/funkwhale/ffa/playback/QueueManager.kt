@@ -28,7 +28,7 @@ class QueueManager(val context: Context) {
   var current = -1
 
   init {
-    FFACache.get(context, "queue")?.let { json ->
+    FFACache.getLine(context, "queue")?.let { json ->
       gsonDeserializerOf(QueueCache::class.java).deserialize(json)?.let { cache ->
         metadata = cache.data.toMutableList()
 
@@ -45,8 +45,8 @@ class QueueManager(val context: Context) {
       }
     }
 
-    FFACache.get(context, "current")?.let { string ->
-      current = string.readLine().toInt()
+    FFACache.getLine(context, "current")?.let {
+      current = it.toInt()
     }
   }
 
@@ -54,7 +54,7 @@ class QueueManager(val context: Context) {
     FFACache.set(
       context,
       "queue",
-      Gson().toJson(QueueCache(metadata)).toByteArray()
+      Gson().toJson(QueueCache(metadata)).toString()
     )
   }
 

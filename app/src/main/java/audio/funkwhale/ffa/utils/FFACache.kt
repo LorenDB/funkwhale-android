@@ -12,28 +12,47 @@ object FFACache {
     val md = MessageDigest.getInstance("SHA-1")
     val digest = md.digest(key.toByteArray(Charset.defaultCharset()))
 
-    return digest.fold("", { acc, it -> acc + "%02x".format(it) })
+    return digest.fold("") { acc, it -> acc + "%02x".format(it) }
   }
 
-  fun set(context: Context?, key: String, value: ByteArray) = context?.let {
-    with(File(it.cacheDir, key(key))) {
-      writeBytes(value)
+  fun set(context: Context?, key:String, value: String){
+    set(context, key, value.toByteArray())
+  }
+
+  fun set(context: Context?, key: String, value: ByteArray) {
+    context?.let {
+      with(File(it.cacheDir, key(key))) {
+        writeBytes(value)
+      }
     }
   }
 
-  fun get(context: Context?, key: String): BufferedReader? = context?.let {
+  fun getLine(context: Context?, key: String): String? = get(context, key)?.let {
+    val line = it.readLine()
+    it.close()
+    line
+  }
+
+  fun getLines(context: Context?, key: String): List<String>? = get(context, key)
+    ?.let { reader ->
+      val lines = reader.readLines()
+      reader.close()
+      lines
+    }
+
+  fun delete(context: Context?, key: String) = context?.let {
+    with(File(it.cacheDir, key(key))) {
+      delete()
+    }
+  }
+
+  private fun get(context: Context?, key: String): BufferedReader? = context?.let {
     try {
       with(File(it.cacheDir, key(key))) {
         bufferedReader()
       }
     } catch (e: Exception) {
       return null
-    }
-  }
-
-  fun delete(context: Context?, key: String) = context?.let {
-    with(File(it.cacheDir, key(key))) {
-      delete()
     }
   }
 }
