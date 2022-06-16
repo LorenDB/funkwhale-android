@@ -1,25 +1,16 @@
 package audio.funkwhale.ffa.repositories
 
 import android.content.Context
-import audio.funkwhale.ffa.model.FFAResponse
-import audio.funkwhale.ffa.model.Playlist
-import audio.funkwhale.ffa.model.PlaylistsCache
-import audio.funkwhale.ffa.model.PlaylistsResponse
-import audio.funkwhale.ffa.model.Track
-import audio.funkwhale.ffa.utils.OAuth
-import audio.funkwhale.ffa.utils.Settings
-import audio.funkwhale.ffa.utils.authorize
-import audio.funkwhale.ffa.utils.mustNormalizeUrl
+import audio.funkwhale.ffa.model.*
+import audio.funkwhale.ffa.utils.*
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.coroutines.awaitByteArrayResponseResult
 import com.github.kittinunf.fuel.coroutines.awaitObjectResponseResult
-import com.github.kittinunf.fuel.gson.gsonDeserializerOf
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent.inject
-import java.io.BufferedReader
 
 data class PlaylistAdd(val tracks: List<Int>, val allow_duplicates: Boolean)
 

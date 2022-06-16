@@ -6,10 +6,9 @@ import audio.funkwhale.ffa.model.ArtistsCache
 import audio.funkwhale.ffa.model.ArtistsResponse
 import audio.funkwhale.ffa.model.FFAResponse
 import audio.funkwhale.ffa.utils.OAuth
-import com.github.kittinunf.fuel.gson.gsonDeserializerOf
+import audio.funkwhale.ffa.utils.gsonDeserializerOf
 import com.google.gson.reflect.TypeToken
 import org.koin.java.KoinJavaComponent.inject
-import java.io.BufferedReader
 
 class ArtistsRepository(override val context: Context?) : Repository<Artist, ArtistsCache>() {
 
