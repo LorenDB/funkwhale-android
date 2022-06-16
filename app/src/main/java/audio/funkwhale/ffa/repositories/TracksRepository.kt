@@ -7,8 +7,8 @@ import audio.funkwhale.ffa.model.TracksCache
 import audio.funkwhale.ffa.model.TracksResponse
 import audio.funkwhale.ffa.utils.OAuth
 import audio.funkwhale.ffa.utils.getMetadata
+import audio.funkwhale.ffa.utils.gsonDeserializerOf
 import audio.funkwhale.ffa.utils.mustNormalizeUrl
-import com.github.kittinunf.fuel.gson.gsonDeserializerOf
 import com.google.android.exoplayer2.offline.Download
 import com.google.android.exoplayer2.offline.DownloadManager
 import com.google.android.exoplayer2.upstream.cache.Cache
@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.koin.core.qualifier.named
 import org.koin.java.KoinJavaComponent.inject
-import java.io.BufferedReader
 
 class TracksRepository(override val context: Context?, albumId: Int) :
   Repository<Track, TracksCache>() {

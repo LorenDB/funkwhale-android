@@ -5,7 +5,7 @@ import audio.funkwhale.ffa.model.Album
 import audio.funkwhale.ffa.model.AlbumsCache
 import audio.funkwhale.ffa.model.AlbumsResponse
 import audio.funkwhale.ffa.utils.OAuth
-import com.github.kittinunf.fuel.gson.gsonDeserializerOf
+import audio.funkwhale.ffa.utils.gsonDeserializerOf
 import com.google.gson.reflect.TypeToken
 import org.koin.java.KoinJavaComponent.inject
 

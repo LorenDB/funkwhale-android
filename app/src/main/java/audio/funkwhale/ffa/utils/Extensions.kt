@@ -10,20 +10,22 @@ import audio.funkwhale.ffa.model.DownloadInfo
 import audio.funkwhale.ffa.repositories.Repository
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.google.android.exoplayer2.offline.Download
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.RequestCreator
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import net.openid.appauth.ClientSecretPost
+import java.io.Reader
 import java.text.SimpleDateFormat
-import java.util.Date
+import java.util.*
 import kotlin.coroutines.CoroutineContext
 
 inline fun <D> Flow<Repository.Response<D>>.untilNetwork(
@@ -112,4 +114,16 @@ val ISO_8601_DATE_TIME_FORMAT = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
 
 fun Date.format(): String {
   return ISO_8601_DATE_TIME_FORMAT.format(this)
+}
+
+inline fun <reified T : Any> gsonDeserializerOf(clazz: Class<T>) = gsonDeserializer<T>()
+
+inline fun <reified T : Any> gsonDeserializer(gson: Gson = Gson()) = object :
+  ResponseDeserializable<T> {
+
+  override fun deserialize(content: String): T? =
+    gson.fromJson<T>(content, object : TypeToken<T>() {}.type)
+
+  override fun deserialize(reader: Reader): T? =
+    gson.fromJson<T>(reader, object : TypeToken<T>() {}.type)
 }

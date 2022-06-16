@@ -6,10 +6,9 @@ import audio.funkwhale.ffa.model.Radio
 import audio.funkwhale.ffa.model.RadiosCache
 import audio.funkwhale.ffa.model.RadiosResponse
 import audio.funkwhale.ffa.utils.OAuth
-import com.github.kittinunf.fuel.gson.gsonDeserializerOf
+import audio.funkwhale.ffa.utils.gsonDeserializerOf
 import com.google.gson.reflect.TypeToken
 import org.koin.java.KoinJavaComponent.inject
-import java.io.BufferedReader
 
 class RadiosRepository(override val context: Context?) : Repository<Radio, RadiosCache>() {
 

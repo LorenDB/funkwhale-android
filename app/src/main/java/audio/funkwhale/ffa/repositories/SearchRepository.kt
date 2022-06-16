@@ -1,18 +1,10 @@
 package audio.funkwhale.ffa.repositories
 
 import android.content.Context
-import audio.funkwhale.ffa.model.Album
-import audio.funkwhale.ffa.model.AlbumsCache
-import audio.funkwhale.ffa.model.AlbumsResponse
-import audio.funkwhale.ffa.model.Artist
-import audio.funkwhale.ffa.model.ArtistsCache
-import audio.funkwhale.ffa.model.ArtistsResponse
-import audio.funkwhale.ffa.model.Track
-import audio.funkwhale.ffa.model.TracksCache
-import audio.funkwhale.ffa.model.TracksResponse
+import audio.funkwhale.ffa.model.*
 import audio.funkwhale.ffa.utils.OAuth
+import audio.funkwhale.ffa.utils.gsonDeserializerOf
 import audio.funkwhale.ffa.utils.mustNormalizeUrl
-import com.github.kittinunf.fuel.gson.gsonDeserializerOf
 import com.google.android.exoplayer2.offline.DownloadManager
 import com.google.android.exoplayer2.upstream.cache.Cache
 import com.google.gson.reflect.TypeToken
@@ -21,7 +13,6 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.koin.core.qualifier.named
 import org.koin.java.KoinJavaComponent.inject
-import java.io.BufferedReader
 
 class TracksSearchRepository(override val context: Context?, var query: String) :
   Repository<Track, TracksCache>() {
