@@ -7,13 +7,7 @@ import androidx.core.net.toUri
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.model.DownloadInfo
 import audio.funkwhale.ffa.model.Track
-import audio.funkwhale.ffa.utils.AppContext
-import audio.funkwhale.ffa.utils.Event
-import audio.funkwhale.ffa.utils.EventBus
-import audio.funkwhale.ffa.utils.Request
-import audio.funkwhale.ffa.utils.RequestBus
-import audio.funkwhale.ffa.utils.Response
-import audio.funkwhale.ffa.utils.mustNormalizeUrl
+import audio.funkwhale.ffa.utils.*
 import com.google.android.exoplayer2.offline.Download
 import com.google.android.exoplayer2.offline.DownloadManager
 import com.google.android.exoplayer2.offline.DownloadRequest
@@ -24,10 +18,9 @@ import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent
-import java.util.Collections
+import java.util.*
 
 class PinService : DownloadService(AppContext.NOTIFICATION_DOWNLOADS) {
 
@@ -35,6 +28,7 @@ class PinService : DownloadService(AppContext.NOTIFICATION_DOWNLOADS) {
   private val exoDownloadManager: DownloadManager by KoinJavaComponent.inject(DownloadManager::class.java)
 
   companion object {
+
     fun download(context: Context, track: Track) {
       track.bestUpload()?.let { upload ->
         val url = mustNormalizeUrl(upload.listen_url)
@@ -48,7 +42,7 @@ class PinService : DownloadService(AppContext.NOTIFICATION_DOWNLOADS) {
           )
         ).toByteArray()
 
-        val request = DownloadRequest.Builder(track.id.toString(), url.toUri())
+        val request = DownloadRequest.Builder(url.toUri().toString(), url.toUri())
           .setData(data)
           .setStreamKeys(Collections.emptyList())
           .build()
@@ -72,8 +66,10 @@ class PinService : DownloadService(AppContext.NOTIFICATION_DOWNLOADS) {
     return super.onStartCommand(intent, flags, startId)
   }
 
-  override fun getDownloadManager() = exoDownloadManager.apply {
-    addListener(DownloadListener())
+  override fun getDownloadManager(): DownloadManager {
+    return exoDownloadManager.apply {
+      addListener(DownloadListener())
+    }
   }
 
   override fun getScheduler(): Scheduler? = null
