@@ -14,7 +14,6 @@ import com.google.android.exoplayer2.offline.DownloadManager
 import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.java.KoinJavaComponent.inject
@@ -65,20 +64,19 @@ class DownloadsActivity : AppCompatActivity() {
 
   private fun refresh() {
     lifecycleScope.launch(Main) {
-      val cursor = exoDownloadManager.downloadIndex.getDownloads()
-
       adapter.downloads.clear()
+      exoDownloadManager.downloadIndex.getDownloads()
+        .use { cursor ->
+          while (cursor.moveToNext()) {
+            val download = cursor.download
 
-      while (cursor.moveToNext()) {
-        val download = cursor.download
-
-        download.getMetadata()?.let { info ->
-          adapter.downloads.add(
-            info.apply { this.download = download }
-          )
+            download.getMetadata()?.let { info ->
+              adapter.downloads.add(
+                info.apply { this.download = download }
+              )
+            }
+          }
         }
-      }
-
       adapter.notifyDataSetChanged()
     }
   }
@@ -101,26 +99,29 @@ class DownloadsActivity : AppCompatActivity() {
   }
 
   private suspend fun refreshProgress() {
-    val cursor = exoDownloadManager.downloadIndex.getDownloads()
+    exoDownloadManager.downloadIndex.getDownloads()
+      .use { cursor ->
+        while (cursor.moveToNext()) {
+          val download = cursor.download
 
-    while (cursor.moveToNext()) {
-      val download = cursor.download
+          download.getMetadata()?.let { info ->
+            adapter.downloads.withIndex().associate { it.value to it.index }
+              .filter { it.key.id == info.id }.toList().getOrNull(0)?.let { match ->
+                if (download.state == Download.STATE_DOWNLOADING
+                  && download.percentDownloaded != (info.download?.percentDownloaded ?: 0)
+                ) {
+                  withContext(Main) {
+                    adapter.downloads[match.second] = info.apply {
+                      this.download = download
+                    }
 
-      download.getMetadata()?.let { info ->
-        adapter.downloads.withIndex().associate { it.value to it.index }
-          .filter { it.key.id == info.id }.toList().getOrNull(0)?.let { match ->
-            if (download.state == Download.STATE_DOWNLOADING && download.percentDownloaded != info.download?.percentDownloaded ?: 0) {
-              withContext(Main) {
-                adapter.downloads[match.second] = info.apply {
-                  this.download = download
+                    adapter.notifyItemChanged(match.second)
+                  }
                 }
-
-                adapter.notifyItemChanged(match.second)
               }
-            }
           }
+        }
       }
-    }
   }
 
   inner class DownloadChangedListener : DownloadsAdapter.OnDownloadChangedListener {

@@ -42,19 +42,18 @@ class TracksRepository(override val context: Context?, albumId: Int) :
 
   companion object {
     fun getDownloadedIds(exoDownloadManager: DownloadManager): List<Int>? {
-      val cursor = exoDownloadManager.downloadIndex.getDownloads()
       val ids: MutableList<Int> = mutableListOf()
-
-      while (cursor.moveToNext()) {
-        val download = cursor.download
-
-        download.getMetadata()?.let {
-          if (download.state == Download.STATE_COMPLETED) {
-            ids.add(it.id)
+      exoDownloadManager.downloadIndex.getDownloads()
+        .use { cursor ->
+          while (cursor.moveToNext()) {
+            val download = cursor.download
+            download.getMetadata()?.let {
+              if (download.state == Download.STATE_COMPLETED) {
+                ids.add(it.id)
+              }
+            }
           }
         }
-      }
-
       return ids
     }
   }
