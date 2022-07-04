@@ -1,3 +1,15 @@
+0.1.5 (2022-07-04)
+Bugfixes:
+
+- Fix App crashes when interacting with playlist (@Mouath)
+- Fix leaked database cursor resource
+- Fix playback order to respect preference setting on albums fragment
+- Fix the removal of existing downloads
+- Fix unresponsive bluetooth buttons with Oreo and later (thanks @hdasch)
+- Fix warnings in log output due to leaked BufferedReader resource (thanks @hdasch)
+- Fixes problem where users are logged out sporadically (thanks to @hdasch)
+
+
 0.1.4 (2021-09-18)
 Bugfixes:
 
