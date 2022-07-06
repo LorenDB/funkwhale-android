@@ -69,11 +69,7 @@ if [ "$(git tag -l | grep -e "^$TAG$")" != '' ]; then
 fi
 
 echo "Compiling the changelog..."
-towncrier build --version="$TAG"
-
-# Manually fixing the release date in the changelog,
-# as towncrier's --date param doesn't seem to work
-sed -i '' "s/$TAG (unreleased)/$TAG ($(date +"%Y-%m-%d"))/g" CHANGELOG
+towncrier build --version="$TAG" --date $(date +"%Y-%m-%d") --yes
 
 git add CHANGELOG
 git commit --message "Update changelog for version $TAG"
@@ -84,9 +80,10 @@ versionName = $TAG" > fdroidversion.txt
 git add fdroidversion.txt
 git commit --message "Update version information for F-Droid"
 
-git push
-
 # Create and push tag
+# Push tag first to make sure the Tag Pipeline runs
 echo "Tagging the application..."
 git tag -a -s -m "$MESSAGE" "$TAG"
 git push --tags
+
+git push

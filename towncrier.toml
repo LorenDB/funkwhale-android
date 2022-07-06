@@ -6,7 +6,7 @@
     start_string = ".. towncrier\n"
     template = "changes/template.rst"
     issue_format = ""
-    title_format = "{version} (unreleased)"
+    title_format = false
     underlines = "-"
 
     [[tool.towncrier.section]]

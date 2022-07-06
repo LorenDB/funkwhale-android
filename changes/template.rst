@@ -1,4 +1,4 @@
-
+{{ versiondata.version }} ({{ versiondata.date }})
 {% for section, _ in sections.items() %}
 {% if sections[section] %}
 {% for category, val in definitions.items() if category in sections[section]%}
