@@ -34,7 +34,7 @@ class FavoritesRepository(override val context: Context?) : Repository<Track, Tr
 
   override fun cache(data: List<Track>) = TracksCache(data)
   override fun uncache(json: String) =
-    gsonDeserializerOf(TracksCache::class.java).deserialize(json)
+    gsonDeserializerOf(TracksCache::class.java).deserialize(json.reader())
 
   private val favoritedRepository = FavoritedRepository(context!!)
 
@@ -115,7 +115,7 @@ class FavoritedRepository(override val context: Context?) : Repository<Int, Favo
 
   override fun cache(data: List<Int>) = FavoritedCache(data)
   override fun uncache(json: String) =
-    gsonDeserializerOf(FavoritedCache::class.java).deserialize(json)
+    gsonDeserializerOf(FavoritedCache::class.java).deserialize(json.reader())
 
   fun update(context: Context?, scope: CoroutineScope) {
     fetch(Origin.Network.origin).untilNetwork(scope, IO) { favorites, _, _, _ ->
