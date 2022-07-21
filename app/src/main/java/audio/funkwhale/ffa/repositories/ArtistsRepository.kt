@@ -26,5 +26,5 @@ class ArtistsRepository(override val context: Context?) : Repository<Artist, Art
 
   override fun cache(data: List<Artist>) = ArtistsCache(data)
   override fun uncache(json: String) =
-    gsonDeserializerOf(ArtistsCache::class.java).deserialize(json)
+    gsonDeserializerOf(ArtistsCache::class.java).deserialize(json.reader())
 }

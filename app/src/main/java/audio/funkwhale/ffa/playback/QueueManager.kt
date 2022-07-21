@@ -29,7 +29,7 @@ class QueueManager(val context: Context) {
 
   init {
     FFACache.getLine(context, "queue")?.let { json ->
-      gsonDeserializerOf(QueueCache::class.java).deserialize(json)?.let { cache ->
+      gsonDeserializerOf(QueueCache::class.java).deserialize(json.reader())?.let { cache ->
         metadata = cache.data.toMutableList()
 
         val factory = cacheDataSourceFactoryProvider.create(context)

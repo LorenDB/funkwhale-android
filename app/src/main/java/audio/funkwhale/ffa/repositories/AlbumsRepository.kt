@@ -35,5 +35,5 @@ class AlbumsRepository(override val context: Context?, artistId: Int? = null) :
 
   override fun cache(data: List<Album>) = AlbumsCache(data)
   override fun uncache(json: String) =
-    gsonDeserializerOf(AlbumsCache::class.java).deserialize(json)
+    gsonDeserializerOf(AlbumsCache::class.java).deserialize(json.reader())
 }

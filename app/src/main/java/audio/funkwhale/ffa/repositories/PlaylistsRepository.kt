@@ -30,7 +30,7 @@ class PlaylistsRepository(override val context: Context?) : Repository<Playlist,
 
   override fun cache(data: List<Playlist>) = PlaylistsCache(data)
   override fun uncache(json: String) =
-    gsonDeserializerOf(PlaylistsCache::class.java).deserialize(json)
+    gsonDeserializerOf(PlaylistsCache::class.java).deserialize(json.reader())
 }
 
 class ManagementPlaylistsRepository(override val context: Context?) :
@@ -50,7 +50,7 @@ class ManagementPlaylistsRepository(override val context: Context?) :
 
   override fun cache(data: List<Playlist>) = PlaylistsCache(data)
   override fun uncache(json: String) =
-    gsonDeserializerOf(PlaylistsCache::class.java).deserialize(json)
+    gsonDeserializerOf(PlaylistsCache::class.java).deserialize(json.reader())
 
   suspend fun new(name: String): Int? {
     context?.let {

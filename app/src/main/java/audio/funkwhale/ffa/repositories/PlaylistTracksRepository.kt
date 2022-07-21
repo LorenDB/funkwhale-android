@@ -30,7 +30,7 @@ class PlaylistTracksRepository(override val context: Context?, playlistId: Int) 
 
   override fun cache(data: List<PlaylistTrack>) = PlaylistTracksCache(data)
   override fun uncache(json: String) =
-    gsonDeserializerOf(PlaylistTracksCache::class.java).deserialize(json)
+    gsonDeserializerOf(PlaylistTracksCache::class.java).deserialize(json.reader())
 
   override fun onDataFetched(data: List<PlaylistTrack>): List<PlaylistTrack> = runBlocking {
     val favorites = FavoritedRepository(context).fetch(Origin.Network.origin)
