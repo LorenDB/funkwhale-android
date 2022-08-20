@@ -8,7 +8,9 @@ import com.google.android.exoplayer2.offline.DownloadCursor
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.launch
@@ -72,13 +74,15 @@ sealed class Response {
 }
 
 object EventBus {
+  private var _events = MutableSharedFlow<Event>()
+  val events = _events.asSharedFlow()
   fun send(event: Event) {
     GlobalScope.launch(IO) {
-      FFA.get().eventBus.trySend(event).isSuccess
+      _events.emit(event)
     }
   }
 
-  fun get() = FFA.get().eventBus.asFlow()
+  fun get() = events
 }
 
 object CommandBus {
