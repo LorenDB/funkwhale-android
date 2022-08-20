@@ -8,8 +8,9 @@ import com.google.android.exoplayer2.offline.DownloadCursor
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.launch
 
 sealed class Command {
@@ -105,13 +106,13 @@ object RequestBus {
 }
 
 object ProgressBus {
+  private var _progress = MutableStateFlow(Triple(0, 0, 0))
+  val progress = _progress.asStateFlow()
   fun send(current: Int, duration: Int, percent: Int) {
-    GlobalScope.launch(IO) {
-      FFA.get().progressBus.send(Triple(current, duration, percent))
-    }
+    _progress.value = Triple(current, duration, percent)
   }
 
-  fun get() = FFA.get().progressBus.asFlow().conflate()
+  fun get() = progress
 }
 
 suspend inline fun <reified T> Channel<Response>.wait(): T? {

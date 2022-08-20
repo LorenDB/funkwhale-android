@@ -12,7 +12,6 @@ import audio.funkwhale.ffa.utils.FFACache
 import audio.funkwhale.ffa.utils.Request
 import com.preference.PowerPreference
 import kotlinx.coroutines.channels.BroadcastChannel
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import org.koin.core.context.startKoin
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -31,7 +30,6 @@ class FFA : Application() {
   val eventBus: BroadcastChannel<Event> = BroadcastChannel(10)
   val commandBus: BroadcastChannel<Command> = BroadcastChannel(10)
   val requestBus: BroadcastChannel<Request> = BroadcastChannel(10)
-  val progressBus: BroadcastChannel<Triple<Int, Int, Int>> = ConflatedBroadcastChannel()
 
   override fun onCreate() {
     super.onCreate()
