@@ -7,9 +7,7 @@ import audio.funkwhale.ffa.koin.authModule
 import audio.funkwhale.ffa.koin.exoplayerModule
 import audio.funkwhale.ffa.utils.AppContext
 import audio.funkwhale.ffa.utils.FFACache
-import audio.funkwhale.ffa.utils.Request
 import com.preference.PowerPreference
-import kotlinx.coroutines.channels.BroadcastChannel
 import org.koin.core.context.startKoin
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -24,8 +22,6 @@ class FFA : Application() {
   }
 
   var defaultExceptionHandler: Thread.UncaughtExceptionHandler? = null
-
-  val requestBus: BroadcastChannel<Request> = BroadcastChannel(10)
 
   override fun onCreate() {
     super.onCreate()

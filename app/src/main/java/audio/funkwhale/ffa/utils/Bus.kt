@@ -1,6 +1,5 @@
 package audio.funkwhale.ffa.utils
 
-import audio.funkwhale.ffa.FFA
 import audio.funkwhale.ffa.model.Radio
 import audio.funkwhale.ffa.model.Track
 import com.google.android.exoplayer2.offline.Download
@@ -12,7 +11,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.launch
 
 sealed class Command {
@@ -98,17 +96,19 @@ object CommandBus {
 }
 
 object RequestBus {
+  private var _requests = MutableSharedFlow<Request>()
+  var requests = _requests.asSharedFlow()
   fun send(request: Request): Channel<Response> {
     return Channel<Response>().also {
       GlobalScope.launch(IO) {
         request.channel = it
 
-        FFA.get().requestBus.trySend(request).isSuccess
+        _requests.emit(request)
       }
     }
   }
 
-  fun get() = FFA.get().requestBus.asFlow()
+  fun get() = requests
 }
 
 object ProgressBus {
