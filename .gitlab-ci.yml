@@ -136,7 +136,7 @@ build-bleeding-edge:
     - tags
 
 .deploy:
-  image: debian
+  image: curlimages/curl:latest
   before_script: 
     - apt update && apt -y install openssh-server
 
@@ -145,13 +145,11 @@ deploy-develop:
   stage: deploy
   only:
     - develop
+  variables:
+    FILE: app/build/outputs/apk/debug/app-debug.apk
+    PACKAGE: audio.funkwhale.ffa.dev
   script:
-    - eval `ssh-agent -s`
-    - ssh-add <(echo "$SSH_PRIVATE_KEY")
-    - scp -P22103 -o StrictHostKeyChecking=no app/build/outputs/apk/debug/app-debug.apk fdroid@apps.funkwhale.audio:/srv/fdroid/fdroid/develop/repo/audio.funkwhale.ffa.dev-$CI_COMMIT_SHORT_SHA.apk
-    - scp -P22103 -o StrictHostKeyChecking=no app/build/outputs/apk/debug/output-metadata.json fdroid@apps.funkwhale.audio:/srv/fdroid/fdroid/develop/output-metadata.json
-    - scp -P22103 -o StrictHostKeyChecking=no metadata/audio.funkwhale.android.dev.yml fdroid@apps.funkwhale.audio:/srv/fdroid/fdroid/develop/metadata/audio.funkwhale.ffa.dev.yml      
-    - ssh -p22103 -o StrictHostKeyChecking=no fdroid@apps.funkwhale.audio 'docker run --rm -u $(id -u):$(id -g) -v /srv/fdroid/fdroid/develop:/repo registry.gitlab.com/fdroid/docker-executable-fdroidserver:master update'
+    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file $FILE "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/$PACKAGE/$CI_COMMIT_SHORT_SHA/$PACKAGE-$CI_COMMIT_SHORT_SHA.apk"'
 
 deploy-release:
   extends: .deploy
