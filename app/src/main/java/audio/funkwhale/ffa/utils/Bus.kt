@@ -86,13 +86,15 @@ object EventBus {
 }
 
 object CommandBus {
+  private var _commands = MutableSharedFlow<Command>()
+  var commands = _commands.asSharedFlow()
   fun send(command: Command) {
     GlobalScope.launch(IO) {
-      FFA.get().commandBus.trySend(command).isSuccess
+    _commands.emit(command)
     }
   }
 
-  fun get() = FFA.get().commandBus.asFlow()
+  fun get() = commands
 }
 
 object RequestBus {
