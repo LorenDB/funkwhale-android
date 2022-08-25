@@ -107,8 +107,8 @@ class DownloadsActivity : AppCompatActivity() {
           download.getMetadata()?.let { info ->
             adapter.downloads.withIndex().associate { it.value to it.index }
               .filter { it.key.id == info.id }.toList().getOrNull(0)?.let { match ->
-                if (download.state == Download.STATE_DOWNLOADING
-                  && download.percentDownloaded != (info.download?.percentDownloaded ?: 0)
+                if (download.state == Download.STATE_DOWNLOADING &&
+                  download.percentDownloaded != (info.download?.percentDownloaded ?: 0)
                 ) {
                   withContext(Main) {
                     adapter.downloads[match.second] = info.apply {

@@ -40,7 +40,6 @@ class SettingsActivity : AppCompatActivity() {
       )
       .commit()
   }
-
 }
 
 class SettingsFragment :

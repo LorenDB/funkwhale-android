@@ -37,7 +37,7 @@ android {
   }
 
   testCoverage {
-    version = Versions.jacoco
+    version = "0.8.7"
   }
 
   kotlinOptions {
@@ -153,7 +153,7 @@ play {
 dependencies {
   implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 
-  implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:${Versions.kotlin}")
+  implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.5.21")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
 
@@ -167,38 +167,38 @@ dependencies {
   implementation("com.google.android.material:material:1.6.1")
   implementation("com.android.support.constraint:constraint-layout:2.0.4")
 
-  implementation("com.google.android.exoplayer:exoplayer-core:${Versions.exoPlayer}")
-  implementation("com.google.android.exoplayer:exoplayer-ui:${Versions.exoPlayer}")
-  implementation("com.google.android.exoplayer:extension-mediasession:${Versions.exoPlayer}")
+  implementation("com.google.android.exoplayer:exoplayer-core:2.14.2")
+  implementation("com.google.android.exoplayer:exoplayer-ui:2.14.2")
+  implementation("com.google.android.exoplayer:extension-mediasession:2.14.2")
 
-  implementation("io.insert-koin:koin-core:${Versions.koin}")
-  implementation("io.insert-koin:koin-android:${Versions.koin}")
-  testImplementation("io.insert-koin:koin-test:${Versions.koin}")
+  implementation("io.insert-koin:koin-core:3.1.2")
+  implementation("io.insert-koin:koin-android:3.1.2")
+  testImplementation("io.insert-koin:koin-test:3.1.2")
 
-  implementation("com.github.PaulWoitaschek.ExoPlayer-Extensions:extension-opus:${Versions.exoPlayerExtensions}") {
+  implementation("com.github.PaulWoitaschek.ExoPlayer-Extensions:extension-opus:2.14.0") {
     isTransitive = false
   }
-  implementation("com.github.PaulWoitaschek.ExoPlayer-Extensions:extension-flac:${Versions.exoPlayerExtensions}") {
+  implementation("com.github.PaulWoitaschek.ExoPlayer-Extensions:extension-flac:2.14.0") {
     isTransitive = false
   }
 
-  implementation("com.aliassadi:power-preference-lib:${Versions.powerPreference}")
-  implementation("com.github.kittinunf.fuel:fuel:${Versions.fuel}")
-  implementation("com.github.kittinunf.fuel:fuel-coroutines:${Versions.fuel}")
-  implementation("com.github.kittinunf.fuel:fuel-android:${Versions.fuel}")
-  implementation("com.github.kittinunf.fuel:fuel-gson:${Versions.fuel}")
-  implementation("com.google.code.gson:gson:${Versions.gson}")
+  implementation("com.aliassadi:power-preference-lib:2.0.0")
+  implementation("com.github.kittinunf.fuel:fuel:2.3.1")
+  implementation("com.github.kittinunf.fuel:fuel-coroutines:2.3.1")
+  implementation("com.github.kittinunf.fuel:fuel-android:2.3.1")
+  implementation("com.github.kittinunf.fuel:fuel-gson:2.3.1")
+  implementation("com.google.code.gson:gson:2.8.7")
   implementation("com.squareup.picasso:picasso:2.71828")
   implementation("jp.wasabeef:picasso-transformations:2.4.0")
-  implementation("net.openid:appauth:${Versions.openIdAppAuth}")
+  implementation("net.openid:appauth:0.11.1")
 
   testImplementation("junit:junit:4.13.2")
   testImplementation("io.mockk:mockk:1.12.4")
   testImplementation("androidx.test:core:1.4.0")
-  testImplementation("io.strikt:strikt-core:${Versions.strikt}")
-  testImplementation("org.robolectric:robolectric:${Versions.robolectric}")
+  testImplementation("io.strikt:strikt-core:0.31.0")
+  testImplementation("org.robolectric:robolectric:4.6.1")
 
-  androidTestImplementation("io.mockk:mockk-android:${Versions.mockk}")
+  androidTestImplementation("io.mockk:mockk-android:1.12.4")
 }
 
 project.afterEvaluate {
