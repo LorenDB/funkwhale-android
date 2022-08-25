@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import audio.funkwhale.ffa.adapters.BrowseTabsAdapter
 import audio.funkwhale.ffa.databinding.FragmentBrowseBinding
+import com.google.android.material.tabs.TabLayoutMediator
 
 class BrowseFragment : Fragment() {
 
@@ -17,7 +18,7 @@ class BrowseFragment : Fragment() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    adapter = BrowseTabsAdapter(this, childFragmentManager)
+    adapter = BrowseTabsAdapter(this)
   }
 
   override fun onCreateView(
@@ -27,11 +28,13 @@ class BrowseFragment : Fragment() {
   ): View {
     _binding = FragmentBrowseBinding.inflate(inflater)
     return binding.root.apply {
-      binding.tabs.setupWithViewPager(binding.pager)
       binding.tabs.getTabAt(0)?.select()
 
       binding.pager.adapter = adapter
       binding.pager.offscreenPageLimit = 3
+      TabLayoutMediator(binding.tabs, binding.pager) { tab, position ->
+        tab.text = adapter?.tabText(position)
+      }.attach()
     }
   }
 
