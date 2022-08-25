@@ -1,0 +1,1 @@
+/Users/reinhard/Projekte/funkwhale/funkwhale-android/buildSrc/build/classes/kotlin/main/Versions.class

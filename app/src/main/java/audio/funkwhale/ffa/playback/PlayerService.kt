@@ -480,8 +480,8 @@ class PlayerService : Service() {
         mediaControlsManager.updateNotification(queue.current(), player.playWhenReady)
       }
 
-      if (queue.get().isNotEmpty() && queue.current() == queue.get()
-          .last() && radioPlayer.isActive()
+      if (queue.get().isNotEmpty() &&
+        queue.current() == queue.get().last() && radioPlayer.isActive()
       ) {
         scope.launch(IO) {
           if (radioPlayer.lock.tryAcquire()) {

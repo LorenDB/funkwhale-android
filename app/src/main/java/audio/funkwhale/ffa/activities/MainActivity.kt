@@ -73,7 +73,6 @@ import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.java.KoinJavaComponent.inject
@@ -159,18 +158,18 @@ class MainActivity : AppCompatActivity() {
         CommandBus.send(Command.ToggleState)
       }
 
-      binding.nowPlayingContainer?.nowPlayingDetailsProgress?.setOnSeekBarChangeListener(object :
-        SeekBar.OnSeekBarChangeListener {
-        override fun onStopTrackingTouch(view: SeekBar?) {}
+      binding.nowPlayingContainer?.nowPlayingDetailsProgress?.setOnSeekBarChangeListener(
+        object : SeekBar.OnSeekBarChangeListener {
+          override fun onStopTrackingTouch(view: SeekBar?) {}
 
-        override fun onStartTrackingTouch(view: SeekBar?) {}
+          override fun onStartTrackingTouch(view: SeekBar?) {}
 
-        override fun onProgressChanged(view: SeekBar?, progress: Int, fromUser: Boolean) {
-          if (fromUser) {
-            CommandBus.send(Command.Seek(progress))
+          override fun onProgressChanged(view: SeekBar?, progress: Int, fromUser: Boolean) {
+            if (fromUser) {
+              CommandBus.send(Command.Seek(progress))
+            }
           }
-        }
-      })
+        })
 
       landscapeQueue?.let {
         supportFragmentManager.beginTransaction()
