@@ -6,7 +6,7 @@ plugins {
   id("com.android.application")
   id("kotlin-android")
 
-  id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
+  id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
   id("com.gladed.androidgitversion") version "0.4.14"
   id("com.github.triplet.play") version "3.7.0"
   id("de.mobilej.unmock")
