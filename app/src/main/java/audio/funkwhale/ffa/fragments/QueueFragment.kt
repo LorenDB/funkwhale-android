@@ -127,16 +127,16 @@ class QueueFragment : BottomSheetDialogFragment() {
   private fun watchEventBus() {
     lifecycleScope.launch(Main) {
       EventBus.get().collect { message ->
-        when (message) {
-          is Event.QueueChanged -> refresh()
+        if (message is Event.QueueChanged) {
+          refresh()
         }
       }
     }
 
     lifecycleScope.launch(Main) {
       CommandBus.get().collect { command ->
-        when (command) {
-          is Command.RefreshTrack -> refresh()
+        if (command is Command.RefreshTrack) {
+          refresh()
         }
       }
     }

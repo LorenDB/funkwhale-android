@@ -15,7 +15,7 @@ object FFACache {
     return digest.fold("") { acc, it -> acc + "%02x".format(it) }
   }
 
-  fun set(context: Context?, key:String, value: String){
+  fun set(context: Context?, key: String, value: String) {
     set(context, key, value.toByteArray())
   }
 

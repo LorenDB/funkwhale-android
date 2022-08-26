@@ -1,8 +1,16 @@
 package audio.funkwhale.ffa.repositories
 
 import android.content.Context
-import audio.funkwhale.ffa.model.*
-import audio.funkwhale.ffa.utils.*
+import audio.funkwhale.ffa.model.FFAResponse
+import audio.funkwhale.ffa.model.Playlist
+import audio.funkwhale.ffa.model.PlaylistsCache
+import audio.funkwhale.ffa.model.PlaylistsResponse
+import audio.funkwhale.ffa.model.Track
+import audio.funkwhale.ffa.utils.OAuth
+import audio.funkwhale.ffa.utils.Settings
+import audio.funkwhale.ffa.utils.authorize
+import audio.funkwhale.ffa.utils.gsonDeserializerOf
+import audio.funkwhale.ffa.utils.mustNormalizeUrl
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.coroutines.awaitByteArrayResponseResult
 import com.github.kittinunf.fuel.coroutines.awaitObjectResponseResult

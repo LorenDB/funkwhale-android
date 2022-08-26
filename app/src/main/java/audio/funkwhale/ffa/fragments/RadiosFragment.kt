@@ -62,12 +62,11 @@ class RadiosFragment : FFAFragment<Radio, RadiosAdapter>() {
 
       lifecycleScope.launch(Main) {
         EventBus.get().collect { message ->
-          when (message) {
-            is Event.RadioStarted ->
-              recycler.forEach {
-                it.isEnabled = true
-                it.isClickable = true
-              }
+          if (message is Event.RadioStarted) {
+            recycler.forEach {
+              it.isEnabled = true
+              it.isClickable = true
+            }
           }
         }
       }

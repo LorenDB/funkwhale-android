@@ -1,7 +1,15 @@
 package audio.funkwhale.ffa.repositories
 
 import android.content.Context
-import audio.funkwhale.ffa.model.*
+import audio.funkwhale.ffa.model.Album
+import audio.funkwhale.ffa.model.AlbumsCache
+import audio.funkwhale.ffa.model.AlbumsResponse
+import audio.funkwhale.ffa.model.Artist
+import audio.funkwhale.ffa.model.ArtistsCache
+import audio.funkwhale.ffa.model.ArtistsResponse
+import audio.funkwhale.ffa.model.Track
+import audio.funkwhale.ffa.model.TracksCache
+import audio.funkwhale.ffa.model.TracksResponse
 import audio.funkwhale.ffa.utils.OAuth
 import audio.funkwhale.ffa.utils.gsonDeserializerOf
 import audio.funkwhale.ffa.utils.mustNormalizeUrl

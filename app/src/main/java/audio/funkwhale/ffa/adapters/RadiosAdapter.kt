@@ -17,7 +17,6 @@ import audio.funkwhale.ffa.views.LoadingImageView
 import com.preference.PowerPreference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class RadiosAdapter(
@@ -190,12 +189,10 @@ class RadiosAdapter(
         art.setColorFilter(context.getColor(R.color.controlForeground))
 
         scope.launch(Main) {
-          EventBus.get().collect { message ->
-            when (message) {
-              is Event.RadioStarted -> {
-                art.colorFilter = originalColorFilter
-                LoadingImageView.stop(context, originalDrawable, art, imageAnimator)
-              }
+          EventBus.get().collect { event ->
+            if (event is Event.RadioStarted) {
+              art.colorFilter = originalColorFilter
+              LoadingImageView.stop(context, originalDrawable, art, imageAnimator)
             }
           }
         }

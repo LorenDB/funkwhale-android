@@ -171,61 +171,59 @@ class PlayerService : Service() {
   private fun watchEventBus() {
     scope.launch(Main) {
       CommandBus.get().collect { command ->
-        when (command) {
-          is Command.RefreshService -> {
-            if (queue.metadata.isNotEmpty()) {
-              CommandBus.send(Command.RefreshTrack(queue.current()))
-              EventBus.send(Event.StateChanged(player.playWhenReady))
-            }
-          }
-
-          is Command.ReplaceQueue -> {
-            if (!command.fromRadio) radioPlayer.stop()
-
-            queue.replace(command.queue)
-            player.prepare(queue.dataSources, true, true)
-
-            setPlaybackState(true)
-
+        if (command is Command.RefreshService) {
+          if (queue.metadata.isNotEmpty()) {
             CommandBus.send(Command.RefreshTrack(queue.current()))
+            EventBus.send(Event.StateChanged(player.playWhenReady))
           }
+        } else if (command is Command.ReplaceQueue) {
+          if (!command.fromRadio) radioPlayer.stop()
 
-          is Command.AddToQueue -> queue.append(command.tracks)
-          is Command.PlayNext -> queue.insertNext(command.track)
-          is Command.RemoveFromQueue -> queue.remove(command.track)
-          is Command.MoveFromQueue -> queue.move(command.oldPosition, command.newPosition)
+          queue.replace(command.queue)
+          player.prepare(queue.dataSources, true, true)
 
-          is Command.PlayTrack -> {
-            queue.current = command.index
-            player.seekTo(command.index, C.TIME_UNSET)
+          setPlaybackState(true)
 
-            setPlaybackState(true)
+          CommandBus.send(Command.RefreshTrack(queue.current()))
+        } else if (command is Command.AddToQueue) {
+          queue.append(command.tracks)
+        } else if (command is Command.PlayNext) {
+          queue.insertNext(command.track)
+        } else if (command is Command.RemoveFromQueue) {
+          queue.remove(command.track)
+        } else if (command is Command.MoveFromQueue) {
+          queue.move(command.oldPosition, command.newPosition)
+        } else if (command is Command.PlayTrack) {
+          queue.current = command.index
+          player.seekTo(command.index, C.TIME_UNSET)
 
-            CommandBus.send(Command.RefreshTrack(queue.current()))
-          }
+          setPlaybackState(true)
 
-          is Command.ToggleState -> togglePlayback()
-          is Command.SetState -> setPlaybackState(command.state)
-
-          is Command.NextTrack -> skipToNextTrack()
-          is Command.PreviousTrack -> skipToPreviousTrack()
-          is Command.Seek -> seek(command.progress)
-
-          is Command.ClearQueue -> {
-            queue.clear()
-            player.stop()
-          }
-          is Command.ShuffleQueue -> queue.shuffle()
-
-          is Command.PlayRadio -> {
-            queue.clear()
-            radioPlayer.play(command.radio)
-          }
-
-          is Command.SetRepeatMode -> player.repeatMode = command.mode
-
-          is Command.PinTrack -> PinService.download(this@PlayerService, command.track)
-          is Command.PinTracks -> command.tracks.forEach {
+          CommandBus.send(Command.RefreshTrack(queue.current()))
+        } else if (command is Command.ToggleState) {
+          togglePlayback()
+        } else if (command is Command.SetState) {
+          setPlaybackState(command.state)
+        } else if (command is Command.NextTrack) {
+          skipToNextTrack()
+        } else if (command is Command.PreviousTrack) {
+          skipToPreviousTrack()
+        } else if (command is Command.Seek) {
+          seek(command.progress)
+        } else if (command is Command.ClearQueue) {
+          queue.clear()
+          player.stop()
+        } else if (command is Command.ShuffleQueue) {
+          queue.shuffle()
+        } else if (command is Command.PlayRadio) {
+          queue.clear()
+          radioPlayer.play(command.radio)
+        } else if (command is Command.SetRepeatMode) {
+          player.repeatMode = command.mode
+        } else if (command is Command.PinTrack) {
+          PinService.download(this@PlayerService, command.track)
+        } else if (command is Command.PinTracks) {
+          command.tracks.forEach {
             PinService.download(
               this@PlayerService,
               it
@@ -237,10 +235,12 @@ class PlayerService : Service() {
 
     scope.launch(Main) {
       RequestBus.get().collect { request ->
-        when (request) {
-          is Request.GetCurrentTrack -> request.channel?.trySend(Response.CurrentTrack(queue.current()))?.isSuccess
-          is Request.GetState -> request.channel?.trySend(Response.State(player.playWhenReady))?.isSuccess
-          is Request.GetQueue -> request.channel?.trySend(Response.Queue(queue.get()))?.isSuccess
+        if (request is Request.GetCurrentTrack) {
+          request.channel?.trySend(Response.CurrentTrack(queue.current()))?.isSuccess
+        } else if (request is Request.GetState) {
+          request.channel?.trySend(Response.State(player.playWhenReady))?.isSuccess
+        } else if (request is Request.GetQueue) {
+          request.channel?.trySend(Response.Queue(queue.get()))?.isSuccess
         }
       }
     }

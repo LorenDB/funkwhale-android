@@ -28,7 +28,6 @@ import audio.funkwhale.ffa.utils.getMetadata
 import audio.funkwhale.ffa.utils.untilNetwork
 import com.google.android.exoplayer2.offline.Download
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.net.URLEncoder
@@ -65,8 +64,9 @@ class SearchActivity : AppCompatActivity() {
 
     lifecycleScope.launch(Dispatchers.Main) {
       CommandBus.get().collect { command ->
-        when (command) {
-          is Command.AddToPlaylist -> if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+        if (command is Command.AddToPlaylist) {
+
+          if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
             AddToPlaylistDialog.show(
               layoutInflater,
               this@SearchActivity,
@@ -79,10 +79,8 @@ class SearchActivity : AppCompatActivity() {
     }
 
     lifecycleScope.launch(Dispatchers.IO) {
-      EventBus.get().collect { message ->
-        when (message) {
-          is Event.DownloadChanged -> refreshDownloadedTrack(message.download)
-        }
+      EventBus.get().collect { event ->
+        if (event is Event.DownloadChanged) refreshDownloadedTrack(event.download)
       }
     }
 

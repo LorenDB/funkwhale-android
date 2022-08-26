@@ -25,7 +25,6 @@ import com.google.android.exoplayer2.offline.Download
 import com.google.android.exoplayer2.offline.DownloadManager
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.java.KoinJavaComponent.inject
@@ -84,18 +83,14 @@ class FavoritesFragment : FFAFragment<Track, FavoritesAdapter>() {
 
   private fun watchEventBus() {
     lifecycleScope.launch(Main) {
-      EventBus.get().collect { message ->
-        when (message) {
-          is Event.DownloadChanged -> refreshDownloadedTrack(message.download)
-        }
+      EventBus.get().collect { event ->
+        if (event is Event.DownloadChanged) refreshDownloadedTrack(event.download)
       }
     }
 
     lifecycleScope.launch(Main) {
       CommandBus.get().collect { command ->
-        when (command) {
-          is Command.RefreshTrack -> refreshCurrentTrack(command.track)
-        }
+        if (command is Command.RefreshTrack) refreshCurrentTrack(command.track)
       }
     }
   }
