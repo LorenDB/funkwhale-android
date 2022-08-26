@@ -75,7 +75,12 @@ class PlaylistTracksFragment : FFAFragment<PlaylistTrack, PlaylistTracksAdapter>
     favoritesRepository = FavoritesRepository(context)
     playlistsRepository = ManagementPlaylistsRepository(context)
 
-    adapter = PlaylistTracksAdapter(layoutInflater, context, FavoriteListener(favoritesRepository), PlaylistListener())
+    adapter = PlaylistTracksAdapter(
+      layoutInflater,
+      context,
+      FavoriteListener(favoritesRepository),
+      PlaylistListener()
+    )
     repository = PlaylistTracksRepository(context, albumId)
 
     watchEventBus()
@@ -199,8 +204,8 @@ class PlaylistTracksFragment : FFAFragment<PlaylistTrack, PlaylistTracksAdapter>
   private fun watchEventBus() {
     lifecycleScope.launch(Main) {
       CommandBus.get().collect { command ->
-        when (command) {
-          is Command.RefreshTrack -> refreshCurrentTrack(command.track)
+        if (command is Command.RefreshTrack) {
+          refreshCurrentTrack(command.track)
         }
       }
     }

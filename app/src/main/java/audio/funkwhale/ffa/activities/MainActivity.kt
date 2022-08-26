@@ -326,77 +326,67 @@ class MainActivity : AppCompatActivity() {
   @SuppressLint("NewApi")
   private fun watchEventBus() {
     lifecycleScope.launch(Main) {
-      EventBus.get().collect { message ->
-        when (message) {
-          is Event.LogOut -> {
-            FFA.get().deleteAllData(this@MainActivity)
-            startActivity(
-              Intent(this@MainActivity, LoginActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NO_HISTORY
-              }
-            )
-
-            finish()
-          }
-
-          is Event.PlaybackError -> toast(message.message)
-
-          is Event.Buffering -> {
-            when (message.value) {
-              true -> binding.nowPlayingContainer?.nowPlayingBuffering?.visibility = View.VISIBLE
-              false -> binding.nowPlayingContainer?.nowPlayingBuffering?.visibility = View.GONE
+      EventBus.get().collect { event ->
+        if (event is Event.LogOut) {
+          FFA.get().deleteAllData(this@MainActivity)
+          startActivity(
+            Intent(this@MainActivity, LoginActivity::class.java).apply {
+              flags = Intent.FLAG_ACTIVITY_NO_HISTORY
             }
-          }
+          )
 
-          is Event.PlaybackStopped -> {
-            if (binding.nowPlaying.visibility == View.VISIBLE) {
-              (binding.container.layoutParams as? ViewGroup.MarginLayoutParams)?.let {
+          finish()
+        } else if (event is Event.PlaybackError) {
+          toast(event.message)
+        } else if (event is Event.Buffering) {
+          when (event.value) {
+            true -> binding.nowPlayingContainer?.nowPlayingBuffering?.visibility = View.VISIBLE
+            false -> binding.nowPlayingContainer?.nowPlayingBuffering?.visibility = View.GONE
+          }
+        } else if (event is Event.PlaybackStopped) {
+          if (binding.nowPlaying.visibility == View.VISIBLE) {
+            (binding.container.layoutParams as? ViewGroup.MarginLayoutParams)?.let {
+              it.bottomMargin = it.bottomMargin / 2
+            }
+
+            binding.landscapeQueue?.let { landscape_queue ->
+              (landscape_queue.layoutParams as? ViewGroup.MarginLayoutParams)?.let {
                 it.bottomMargin = it.bottomMargin / 2
               }
+            }
 
-              binding.landscapeQueue?.let { landscape_queue ->
-                (landscape_queue.layoutParams as? ViewGroup.MarginLayoutParams)?.let {
-                  it.bottomMargin = it.bottomMargin / 2
+            binding.nowPlaying.animate()
+              .alpha(0.0f)
+              .setDuration(400)
+              .setListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animator: Animator?) {
+                  binding.nowPlaying.visibility = View.GONE
                 }
-              }
+              })
+              .start()
+          }
+        } else if (event is Event.TrackFinished) {
+          incrementListenCount(event.track)
+        } else if (event is Event.StateChanged) {
+          when (event.playing) {
+            true -> {
+              binding.nowPlayingContainer?.nowPlayingToggle?.icon = getDrawable(R.drawable.pause)
+              binding.nowPlayingContainer?.nowPlayingDetailsToggle?.icon =
+                getDrawable(R.drawable.pause)
+            }
 
-              binding.nowPlaying.animate()
-                .alpha(0.0f)
-                .setDuration(400)
-                .setListener(object : AnimatorListenerAdapter() {
-                  override fun onAnimationEnd(animator: Animator?) {
-                    binding.nowPlaying.visibility = View.GONE
-                  }
-                })
-                .start()
+            false -> {
+              binding.nowPlayingContainer?.nowPlayingToggle?.icon = getDrawable(R.drawable.play)
+              binding.nowPlayingContainer?.nowPlayingDetailsToggle?.icon =
+                getDrawable(R.drawable.play)
             }
           }
-
-          is Event.TrackFinished -> incrementListenCount(message.track)
-
-          is Event.StateChanged -> {
-            when (message.playing) {
-              true -> {
-                binding.nowPlayingContainer?.nowPlayingToggle?.icon = getDrawable(R.drawable.pause)
-                binding.nowPlayingContainer?.nowPlayingDetailsToggle?.icon =
-                  getDrawable(R.drawable.pause)
-              }
-
-              false -> {
-                binding.nowPlayingContainer?.nowPlayingToggle?.icon = getDrawable(R.drawable.play)
-                binding.nowPlayingContainer?.nowPlayingDetailsToggle?.icon =
-                  getDrawable(R.drawable.play)
-              }
-            }
-          }
-
-          is Event.QueueChanged -> {
-            findViewById<View>(R.id.nav_queue)?.let { view ->
-              ObjectAnimator.ofFloat(view, View.ROTATION, 0f, 360f).let {
-                it.duration = 500
-                it.interpolator = AccelerateDecelerateInterpolator()
-                it.start()
-              }
+        } else if (event is Event.QueueChanged) {
+          findViewById<View>(R.id.nav_queue)?.let { view ->
+            ObjectAnimator.ofFloat(view, View.ROTATION, 0f, 360f).let {
+              it.duration = 500
+              it.interpolator = AccelerateDecelerateInterpolator()
+              it.start()
             }
           }
         }
@@ -405,32 +395,30 @@ class MainActivity : AppCompatActivity() {
 
     lifecycleScope.launch(Main) {
       CommandBus.get().collect { command ->
-        when (command) {
-          is Command.StartService -> {
-            Build.VERSION_CODES.O.onApi(
-              {
-                startForegroundService(
-                  Intent(
-                    this@MainActivity,
-                    PlayerService::class.java
-                  ).apply {
-                    putExtra(PlayerService.INITIAL_COMMAND_KEY, command.command.toString())
-                  }
-                )
-              },
-              {
-                startService(
-                  Intent(this@MainActivity, PlayerService::class.java).apply {
-                    putExtra(PlayerService.INITIAL_COMMAND_KEY, command.command.toString())
-                  }
-                )
-              }
-            )
-          }
-
-          is Command.RefreshTrack -> refreshCurrentTrack(command.track)
-
-          is Command.AddToPlaylist -> if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+        if (command is Command.StartService) {
+          Build.VERSION_CODES.O.onApi(
+            {
+              startForegroundService(
+                Intent(
+                  this@MainActivity,
+                  PlayerService::class.java
+                ).apply {
+                  putExtra(PlayerService.INITIAL_COMMAND_KEY, command.command.toString())
+                }
+              )
+            },
+            {
+              startService(
+                Intent(this@MainActivity, PlayerService::class.java).apply {
+                  putExtra(PlayerService.INITIAL_COMMAND_KEY, command.command.toString())
+                }
+              )
+            }
+          )
+        } else if (command is Command.RefreshTrack) {
+          refreshCurrentTrack(command.track)
+        } else if (command is Command.AddToPlaylist) {
+          if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
             AddToPlaylistDialog.show(
               layoutInflater,
               this@MainActivity,

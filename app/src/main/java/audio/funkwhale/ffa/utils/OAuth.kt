@@ -71,9 +71,8 @@ class OAuth(private val authorizationServiceFactory: AuthorizationServiceFactory
       } else {
         false
       }
-      ).also {
-      it.logInfo("isAuthorized()")
-    }
+      )
+      .also { it.logInfo("isAuthorized()") }
   }
 
   private fun AuthState.validAuthorization() = this.isAuthorized && !this.needsTokenRefresh
@@ -102,7 +101,7 @@ class OAuth(private val authorizationServiceFactory: AuthorizationServiceFactory
       runBlocking {
         refreshService.performTokenRequest(refreshRequest, auth) { response, e ->
           if (e != null) {
-            Log.e("OAuth", "performTokenRequest failed: ${e}")
+            Log.e("OAuth", "performTokenRequest failed: $e")
             Log.e("OAuth", Log.getStackTraceString(e))
           } else {
             state.apply {
@@ -213,13 +212,13 @@ class OAuth(private val authorizationServiceFactory: AuthorizationServiceFactory
 
         requestService.performTokenRequest(it.createTokenExchangeRequest(), auth) { response, e ->
           if (e != null) {
-            Log.e("FFA", "performTokenRequest failed: ${e}")
+            Log.e("FFA", "performTokenRequest failed: $e")
             Log.e("FFA", Log.getStackTraceString(e))
           } else {
             state.apply {
-                update(response, e)
-                save()
-              }
+              update(response, e)
+              save()
+            }
           }
 
           if (response != null) success()

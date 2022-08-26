@@ -25,7 +25,7 @@ import kotlinx.coroutines.runBlocking
 import net.openid.appauth.ClientSecretPost
 import java.io.Reader
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
 import kotlin.coroutines.CoroutineContext
 
 inline fun <D> Flow<Repository.Response<D>>.untilNetwork(
@@ -82,7 +82,7 @@ fun Request.authorize(context: Context, oAuth: OAuth): Request {
 
           state.performActionWithFreshTokens(tokenService, auth) { token, _, e ->
             if (e != null) {
-              Log.e("Request.authorize()", "performActionWithFreshToken failed: ${e}")
+              Log.e("Request.authorize()", "performActionWithFreshToken failed: $e")
               Log.e("Request.authorize()", Log.getStackTraceString(e))
             }
             if (token == old) {

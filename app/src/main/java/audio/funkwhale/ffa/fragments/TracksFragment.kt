@@ -250,16 +250,16 @@ class TracksFragment : FFAFragment<Track, TracksAdapter>() {
   private fun watchEventBus() {
     lifecycleScope.launch(IO) {
       EventBus.get().collect { message ->
-        when (message) {
-          is Event.DownloadChanged -> refreshDownloadedTrack(message.download)
+        if (message is Event.DownloadChanged) {
+          refreshDownloadedTrack(message.download)
         }
       }
     }
 
     lifecycleScope.launch(Main) {
       CommandBus.get().collect { command ->
-        when (command) {
-          is Command.RefreshTrack -> refreshCurrentTrack(command.track)
+        if (command is Command.RefreshTrack) {
+          refreshCurrentTrack(command.track)
         }
       }
     }
