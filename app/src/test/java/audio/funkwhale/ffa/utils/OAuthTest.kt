@@ -27,6 +27,7 @@ import org.junit.Before
 import org.junit.Test
 import strikt.api.expectThat
 import strikt.api.expectThrows
+import strikt.assertions.isA
 import strikt.assertions.isEqualTo
 import strikt.assertions.isFalse
 import strikt.assertions.isNotNull
@@ -282,7 +283,7 @@ class OAuthTest {
   }
 
   @Test
-  fun `authorize() should start activity for result`() {
+  fun `authorizeIntent() should return an Intent`() {
 
     mockkStatic(PowerPreference::class)
     every { PowerPreference.getFileByName(any()) } returns mockPreference
@@ -302,9 +303,7 @@ class OAuthTest {
 
     val activity = mockk<Activity>(relaxed = true)
 
-    oAuth.authorize(activity)
-
-    verify { activity.startActivityForResult(mockkIntent, 0) }
+    expectThat(oAuth.authorizeIntent(activity)).isNotNull().isA<Intent>()
   }
 
   private fun <T> deserializeJson(

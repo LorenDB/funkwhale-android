@@ -184,11 +184,10 @@ class OAuth(private val authorizationServiceFactory: AuthorizationServiceFactory
     )
   }
 
-  fun authorize(activity: Activity) {
+  fun authorizeIntent(activity: Activity): Intent? {
     val authService = service(activity)
-    authorizationRequest()?.let { it ->
-      val intent = authService.getAuthorizationRequestIntent(it)
-      activity.startActivityForResult(intent, 0)
+    return authorizationRequest()?.let { it ->
+      authService.getAuthorizationRequestIntent(it)
     }
   }
 
