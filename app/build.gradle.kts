@@ -187,7 +187,7 @@ dependencies {
   implementation("com.github.kittinunf.fuel:fuel-coroutines:2.3.1")
   implementation("com.github.kittinunf.fuel:fuel-android:2.3.1")
   implementation("com.github.kittinunf.fuel:fuel-gson:2.3.1")
-  implementation("com.google.code.gson:gson:2.8.7")
+  implementation("com.google.code.gson:gson:2.9.1")
   implementation("com.squareup.picasso:picasso:2.71828")
   implementation("jp.wasabeef:picasso-transformations:2.4.0")
   implementation("net.openid:appauth:0.11.1")
