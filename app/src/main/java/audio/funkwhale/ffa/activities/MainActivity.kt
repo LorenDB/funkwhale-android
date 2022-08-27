@@ -473,11 +473,9 @@ class MainActivity : AppCompatActivity() {
 
       binding.nowPlayingContainer?.nowPlayingTitle?.text = track.title
       binding.nowPlayingContainer?.nowPlayingAlbum?.text = track.artist.name
-      binding.nowPlayingContainer?.nowPlayingToggle?.icon = getDrawable(R.drawable.pause)
 
       binding.nowPlayingContainer?.nowPlayingDetailsTitle?.text = track.title
       binding.nowPlayingContainer?.nowPlayingDetailsArtist?.text = track.artist.name
-      binding.nowPlayingContainer?.nowPlayingDetailsToggle?.icon = getDrawable(R.drawable.pause)
 
       Picasso.get()
         .maybeLoad(maybeNormalizeUrl(track.album?.cover?.urls?.original))

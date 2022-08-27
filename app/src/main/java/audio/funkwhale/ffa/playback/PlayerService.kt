@@ -31,11 +31,10 @@ import audio.funkwhale.ffa.utils.log
 import audio.funkwhale.ffa.utils.maybeNormalizeUrl
 import audio.funkwhale.ffa.utils.onApi
 import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.ExoPlaybackException
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.SimpleExoPlayer
-import com.google.android.exoplayer2.source.TrackGroupArray
-import com.google.android.exoplayer2.trackselection.TrackSelectionArray
+import com.google.android.exoplayer2.Tracks
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -65,7 +64,7 @@ class PlayerService : Service() {
 
   private lateinit var queue: QueueManager
   private lateinit var mediaControlsManager: MediaControlsManager
-  private lateinit var player: SimpleExoPlayer
+  private lateinit var player: ExoPlayer
 
   private val mediaMetadataBuilder = MediaMetadataCompat.Builder()
 
@@ -132,12 +131,13 @@ class PlayerService : Service() {
 
     mediaControlsManager = MediaControlsManager(this, scope, mediaSession.session)
 
-    player = SimpleExoPlayer.Builder(this).build().apply {
+    player = ExoPlayer.Builder(this).build().apply {
       playWhenReady = false
 
       playerEventListener = PlayerEventListener().also {
         addListener(it)
       }
+      EventBus.send(Event.StateChanged(this.isPlaying()))
     }
 
     mediaSession.active = true
@@ -151,7 +151,8 @@ class PlayerService : Service() {
     }
 
     if (queue.current > -1) {
-      player.prepare(queue.dataSources)
+      player.setMediaSource(queue.dataSources)
+      player.prepare()
 
       FFACache.getLine(this, "progress")?.let {
         player.seekTo(queue.current, it.toLong())
@@ -180,7 +181,8 @@ class PlayerService : Service() {
           if (!command.fromRadio) radioPlayer.stop()
 
           queue.replace(command.queue)
-          player.prepare(queue.dataSources, true, true)
+          player.setMediaSource(queue.dataSources)
+          player.prepare()
 
           setPlaybackState(true)
 
@@ -307,7 +309,8 @@ class PlayerService : Service() {
     }
 
     if (state && player.playbackState == Player.STATE_IDLE) {
-      player.prepare(queue.dataSources)
+      player.setMediaSource(queue.dataSources)
+      player.prepare()
     }
 
     if (hasAudioFocus(state)) {
@@ -318,7 +321,7 @@ class PlayerService : Service() {
   }
 
   private fun togglePlayback() {
-    setPlaybackState(!player.playWhenReady)
+    setPlaybackState(!player.isPlaying)
   }
 
   private fun skipToPreviousTrack() {
@@ -326,11 +329,11 @@ class PlayerService : Service() {
       return player.seekTo(0)
     }
 
-    player.previous()
+    player.seekToPrevious()
   }
 
   private fun skipToNextTrack() {
-    player.next()
+    player.seekToNext()
 
     FFACache.set(this@PlayerService, "progress", "0")
     ProgressBus.send(0, 0, 0)
@@ -419,9 +422,14 @@ class PlayerService : Service() {
   }
 
   @SuppressLint("NewApi")
-  inner class PlayerEventListener : Player.EventListener {
-    override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-      super.onPlayerStateChanged(playWhenReady, playbackState)
+  inner class PlayerEventListener : Player.Listener {
+    override fun onIsPlayingChanged(isPlaying: Boolean) {
+      super.onIsPlayingChanged(isPlaying)
+      mediaControlsManager.updateNotification(queue.current(), isPlaying)
+    }
+
+    override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
+      super.onPlayWhenReadyChanged(playWhenReady, reason)
 
       EventBus.send(Event.StateChanged(playWhenReady))
 
@@ -429,55 +437,45 @@ class PlayerService : Service() {
         CommandBus.send(Command.RefreshTrack(queue.current()))
       }
 
-      when (playWhenReady) {
-        true -> {
-          when (playbackState) {
-            Player.STATE_READY -> mediaControlsManager.updateNotification(queue.current(), true)
-            Player.STATE_BUFFERING -> EventBus.send(Event.Buffering(true))
-            Player.STATE_ENDED -> {
-              setPlaybackState(false)
+      if (!playWhenReady) {
+         Build.VERSION_CODES.N.onApi(
+           { stopForeground(STOP_FOREGROUND_DETACH) },
+           { stopForeground(false) }
+         )
+      }
+    }
 
-              queue.current = 0
-              player.seekTo(0, C.TIME_UNSET)
+    override fun onPlaybackStateChanged(playbackState: Int) {
+      super.onPlaybackStateChanged(playbackState)
+      EventBus.send(Event.Buffering(playbackState == Player.STATE_BUFFERING))
+      when (playbackState) {
+        Player.STATE_ENDED -> {
+          setPlaybackState(false)
 
-              ProgressBus.send(0, 0, 0)
-            }
+          queue.current = 0
+          player.seekTo(0, C.TIME_UNSET)
 
-            Player.STATE_IDLE -> {
-              setPlaybackState(false)
-
-              return EventBus.send(Event.PlaybackStopped)
-            }
-          }
-
-          if (playbackState != Player.STATE_BUFFERING) EventBus.send(Event.Buffering(false))
+          ProgressBus.send(0, 0, 0)
         }
 
-        false -> {
-          EventBus.send(Event.Buffering(false))
+        Player.STATE_IDLE -> {
+          setPlaybackState(false)
 
-          Build.VERSION_CODES.N.onApi(
-            { stopForeground(STOP_FOREGROUND_DETACH) },
-            { stopForeground(false) }
-          )
+          EventBus.send(Event.PlaybackStopped)
 
-          when (playbackState) {
-            Player.STATE_READY -> mediaControlsManager.updateNotification(queue.current(), false)
-            Player.STATE_IDLE -> mediaControlsManager.remove()
+          if (!player.playWhenReady) {
+            mediaControlsManager.remove()
           }
         }
       }
     }
 
-    override fun onTracksChanged(
-      trackGroups: TrackGroupArray,
-      trackSelections: TrackSelectionArray
-    ) {
-      super.onTracksChanged(trackGroups, trackSelections)
+    override fun onTracksChanged(tracks: Tracks) {
+      super.onTracksChanged(tracks)
 
-      if (queue.current != player.currentWindowIndex) {
-        queue.current = player.currentWindowIndex
-        mediaControlsManager.updateNotification(queue.current(), player.playWhenReady)
+      if (queue.current != player.currentMediaItemIndex) {
+        queue.current = player.currentMediaItemIndex
+        mediaControlsManager.updateNotification(queue.current(), player.isPlaying)
       }
 
       if (queue.get().isNotEmpty() &&
@@ -510,13 +508,14 @@ class PlayerService : Service() {
       }
     }
 
-    override fun onPlayerError(error: ExoPlaybackException) {
+    override fun onPlayerError(error: PlaybackException) {
       EventBus.send(Event.PlaybackError(getString(R.string.error_playback)))
 
       if (player.playWhenReady) {
         queue.current++
-        player.prepare(queue.dataSources, true, true)
+        player.setMediaSource(queue.dataSources, true)
         player.seekTo(queue.current, 0)
+        player.prepare()
 
         CommandBus.send(Command.RefreshTrack(queue.current()))
       }

@@ -80,14 +80,16 @@ class PinService : DownloadService(AppContext.NOTIFICATION_DOWNLOADS) {
 
   override fun getScheduler(): Scheduler? = null
 
-  override fun getForegroundNotification(downloads: MutableList<Download>): Notification {
+  override fun getForegroundNotification(downloads: MutableList<Download>,
+                                         notMetRequirements: Int): Notification {
     val description =
       resources.getQuantityString(R.plurals.downloads_description, downloads.size, downloads.size)
 
     return DownloadNotificationHelper(
       this,
       AppContext.NOTIFICATION_CHANNEL_DOWNLOADS
-    ).buildProgressNotification(this, R.drawable.downloads, null, description, downloads)
+    ).buildProgressNotification(this, R.drawable.downloads, null, description,
+                                 downloads, notMetRequirements)
   }
 
   private fun getDownloads() = downloadManager.downloadIndex.getDownloads()
