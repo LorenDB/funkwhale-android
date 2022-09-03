@@ -6,7 +6,7 @@ import audio.funkwhale.ffa.model.PlaylistTrack
 import audio.funkwhale.ffa.model.PlaylistTracksCache
 import audio.funkwhale.ffa.model.PlaylistTracksResponse
 import audio.funkwhale.ffa.utils.OAuth
-import audio.funkwhale.ffa.utils.gsonDeserializerOf
+import com.github.kittinunf.fuel.gson.gsonDeserializerOf
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList

@@ -6,7 +6,7 @@ import audio.funkwhale.ffa.model.Radio
 import audio.funkwhale.ffa.model.RadiosCache
 import audio.funkwhale.ffa.model.RadiosResponse
 import audio.funkwhale.ffa.utils.OAuth
-import audio.funkwhale.ffa.utils.gsonDeserializerOf
+import com.github.kittinunf.fuel.gson.gsonDeserializerOf
 import com.google.gson.reflect.TypeToken
 import org.koin.java.KoinJavaComponent.inject
 

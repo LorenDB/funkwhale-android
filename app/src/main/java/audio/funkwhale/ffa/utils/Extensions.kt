@@ -115,15 +115,3 @@ val ISO_8601_DATE_TIME_FORMAT = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
 fun Date.format(): String {
   return ISO_8601_DATE_TIME_FORMAT.format(this)
 }
-
-inline fun <reified T : Any> gsonDeserializerOf(clazz: Class<T>) = gsonDeserializer<T>()
-
-inline fun <reified T : Any> gsonDeserializer(gson: Gson = Gson()) = object :
-  ResponseDeserializable<T> {
-
-  override fun deserialize(content: String): T? =
-    gson.fromJson<T>(content, object : TypeToken<T>() {}.type)
-
-  override fun deserialize(reader: Reader): T? =
-    gson.fromJson<T>(reader, object : TypeToken<T>() {}.type)
-}
