@@ -91,7 +91,7 @@ test:
 
 coverage:
   stage: visualize
-  image: haynes/jacoco2cobertura:1.0.8
+  image: haynes/jacoco2cobertura:1.0.9
   script:
     # convert report from jacoco to cobertura, use relative project path
     - 'python /opt/cover2cover.py $JACOCO_XML_LOCATION $CI_PROJECT_DIR/app/src/main/java > app/build/reports/cobertura.xml'
