@@ -36,6 +36,8 @@ android {
     targetCompatibility = JavaVersion.VERSION_1_8
   }
 
+  namespace = "audio.funkwhale.ffa"
+
   testCoverage {
     version = "0.8.7"
   }
@@ -52,7 +54,7 @@ android {
     disable += listOf("MissingTranslation", "ExtraTranslation")
   }
 
-  compileSdk = 31
+  compileSdk = 33
 
   defaultConfig {
 
@@ -62,7 +64,7 @@ android {
     versionName = androidGitVersion.name()
 
     minSdk = 24
-    targetSdk = 30
+    targetSdk = 33
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 

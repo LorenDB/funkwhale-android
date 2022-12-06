@@ -11,8 +11,8 @@ import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.model.TracksCache
 import audio.funkwhale.ffa.model.TracksResponse
 import audio.funkwhale.ffa.utils.OAuth
-import com.github.kittinunf.fuel.gson.gsonDeserializerOf
 import audio.funkwhale.ffa.utils.mustNormalizeUrl
+import com.github.kittinunf.fuel.gson.gsonDeserializerOf
 import com.google.android.exoplayer2.offline.DownloadManager
 import com.google.android.exoplayer2.upstream.cache.Cache
 import com.google.gson.reflect.TypeToken

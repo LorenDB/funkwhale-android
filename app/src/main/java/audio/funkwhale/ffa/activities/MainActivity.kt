@@ -244,8 +244,8 @@ class MainActivity : AppCompatActivity() {
           item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW)
           item.actionView = View(this)
           item.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
-            override fun onMenuItemActionExpand(item: MenuItem?) = false
-            override fun onMenuItemActionCollapse(item: MenuItem?) = false
+            override fun onMenuItemActionExpand(item: MenuItem) = false
+            override fun onMenuItemActionCollapse(item: MenuItem) = false
           })
 
           item.isChecked = !item.isChecked
@@ -358,7 +358,7 @@ class MainActivity : AppCompatActivity() {
               .alpha(0.0f)
               .setDuration(400)
               .setListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animator: Animator?) {
+                override fun onAnimationEnd(animator: Animator) {
                   binding.nowPlaying.visibility = View.GONE
                 }
               })

@@ -438,10 +438,10 @@ class PlayerService : Service() {
       }
 
       if (!playWhenReady) {
-         Build.VERSION_CODES.N.onApi(
-           { stopForeground(STOP_FOREGROUND_DETACH) },
-           { stopForeground(false) }
-         )
+        Build.VERSION_CODES.N.onApi(
+          { stopForeground(STOP_FOREGROUND_DETACH) },
+          { stopForeground(false) }
+        )
       }
     }
 

@@ -43,23 +43,23 @@ class LoginActivity : AppCompatActivity() {
 
   private var resultLauncher =
     registerForActivityResult(StartActivityForResult()) { result ->
-    result.data?.let {
-      oAuth.exchange(this, it) {
-        PowerPreference
-          .getFileByName(AppContext.PREFS_CREDENTIALS)
-          .setBoolean("anonymous", false)
+      result.data?.let {
+        oAuth.exchange(this, it) {
+          PowerPreference
+            .getFileByName(AppContext.PREFS_CREDENTIALS)
+            .setBoolean("anonymous", false)
 
-        lifecycleScope.launch(Main) {
-          Userinfo.get(this@LoginActivity, oAuth)?.let {
-            startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+          lifecycleScope.launch(Main) {
+            Userinfo.get(this@LoginActivity, oAuth)?.let {
+              startActivity(Intent(this@LoginActivity, MainActivity::class.java))
 
-            return@launch finish()
+              return@launch finish()
+            }
+            throw Exception(getString(R.string.login_error_userinfo))
           }
-          throw Exception(getString(R.string.login_error_userinfo))
         }
       }
     }
-  }
 
   override fun onResume() {
     super.onResume()

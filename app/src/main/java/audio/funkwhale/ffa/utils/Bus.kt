@@ -88,7 +88,7 @@ object CommandBus {
   var commands = _commands.asSharedFlow()
   fun send(command: Command) {
     GlobalScope.launch(IO) {
-    _commands.emit(command)
+      _commands.emit(command)
     }
   }
 
