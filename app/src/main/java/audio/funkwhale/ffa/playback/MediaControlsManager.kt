@@ -2,6 +2,7 @@ package audio.funkwhale.ffa.playback
 
 import android.app.Notification
 import android.app.PendingIntent
+import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.app.Service
 import android.content.Intent
 import android.support.v4.media.session.MediaSessionCompat
@@ -21,7 +22,11 @@ import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent.inject
 
-class MediaControlsManager(val context: Service, private val scope: CoroutineScope, private val mediaSession: MediaSessionCompat) {
+class MediaControlsManager(
+  val context: Service,
+  private val scope: CoroutineScope,
+  private val mediaSession: MediaSessionCompat
+) {
 
   companion object {
     const val NOTIFICATION_ACTION_OPEN_QUEUE = 0
@@ -41,8 +46,10 @@ class MediaControlsManager(val context: Service, private val scope: CoroutineSco
       }
 
       scope.launch(Default) {
-        val openIntent = Intent(context, MainActivity::class.java).apply { action = NOTIFICATION_ACTION_OPEN_QUEUE.toString() }
-        val openPendingIntent = PendingIntent.getActivity(context, 0, openIntent, 0)
+        val openIntent = Intent(context, MainActivity::class.java).apply {
+          action = NOTIFICATION_ACTION_OPEN_QUEUE.toString()
+        }
+        val openPendingIntent = PendingIntent.getActivity(context, 0, openIntent, FLAG_IMMUTABLE)
 
         val coverUrl = maybeNormalizeUrl(track.album?.cover())
 
@@ -98,7 +105,8 @@ class MediaControlsManager(val context: Service, private val scope: CoroutineSco
           if (playing) {
             context.startForeground(AppContext.NOTIFICATION_MEDIA_CONTROL, it)
           } else {
-            NotificationManagerCompat.from(context).notify(AppContext.NOTIFICATION_MEDIA_CONTROL, it)
+            NotificationManagerCompat.from(context)
+              .notify(AppContext.NOTIFICATION_MEDIA_CONTROL, it)
           }
         }
 
