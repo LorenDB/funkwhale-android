@@ -6,7 +6,7 @@ import audio.funkwhale.ffa.playback.MediaSession
 import audio.funkwhale.ffa.utils.AuthorizationServiceFactory
 import audio.funkwhale.ffa.utils.OAuth
 import com.google.android.exoplayer2.database.DatabaseProvider
-import com.google.android.exoplayer2.database.ExoDatabaseProvider
+import com.google.android.exoplayer2.database.StandaloneDatabaseProvider
 import com.google.android.exoplayer2.offline.DownloadManager
 import com.google.android.exoplayer2.upstream.cache.Cache
 import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
@@ -19,7 +19,7 @@ import org.koin.dsl.module
 fun exoplayerModule(context: Context) = module {
 
   single<DatabaseProvider>(named("exoDatabase")) {
-    ExoDatabaseProvider(context)
+    StandaloneDatabaseProvider(context)
   }
 
   single {

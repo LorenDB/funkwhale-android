@@ -1,6 +1,5 @@
 package audio.funkwhale.ffa.utils
 
-import audio.funkwhale.ffa.FFA
 import audio.funkwhale.ffa.model.Radio
 import audio.funkwhale.ffa.model.Track
 import com.google.android.exoplayer2.offline.Download
@@ -8,8 +7,10 @@ import com.google.android.exoplayer2.offline.DownloadCursor
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 sealed class Command {
@@ -71,47 +72,53 @@ sealed class Response {
 }
 
 object EventBus {
+  private var _events = MutableSharedFlow<Event>()
+  val events = _events.asSharedFlow()
   fun send(event: Event) {
     GlobalScope.launch(IO) {
-      FFA.get().eventBus.trySend(event).isSuccess
+      _events.emit(event)
     }
   }
 
-  fun get() = FFA.get().eventBus.asFlow()
+  fun get() = events
 }
 
 object CommandBus {
+  private var _commands = MutableSharedFlow<Command>()
+  var commands = _commands.asSharedFlow()
   fun send(command: Command) {
     GlobalScope.launch(IO) {
-      FFA.get().commandBus.trySend(command).isSuccess
+      _commands.emit(command)
     }
   }
 
-  fun get() = FFA.get().commandBus.asFlow()
+  fun get() = commands
 }
 
 object RequestBus {
+  private var _requests = MutableSharedFlow<Request>()
+  var requests = _requests.asSharedFlow()
   fun send(request: Request): Channel<Response> {
     return Channel<Response>().also {
       GlobalScope.launch(IO) {
         request.channel = it
 
-        FFA.get().requestBus.trySend(request).isSuccess
+        _requests.emit(request)
       }
     }
   }
 
-  fun get() = FFA.get().requestBus.asFlow()
+  fun get() = requests
 }
 
 object ProgressBus {
+  private var _progress = MutableStateFlow(Triple(0, 0, 0))
+  val progress = _progress.asStateFlow()
   fun send(current: Int, duration: Int, percent: Int) {
-    GlobalScope.launch(IO) {
-      FFA.get().progressBus.send(Triple(current, duration, percent))
-    }
+    _progress.value = Triple(current, duration, percent)
   }
 
-  fun get() = FFA.get().progressBus.asFlow().conflate()
+  fun get() = progress
 }
 
 suspend inline fun <reified T> Channel<Response>.wait(): T? {

@@ -16,6 +16,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.SeekBar
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
@@ -207,6 +208,21 @@ class MainActivity : AppCompatActivity() {
     return true
   }
 
+  var resultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
+    if (result.resultCode == ResultCode.LOGOUT.code) {
+      Intent(this, LoginActivity::class.java).apply {
+        FFA.get().deleteAllData(this@MainActivity)
+
+        flags =
+          Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+
+        stopService(Intent(this@MainActivity, PlayerService::class.java))
+        startActivity(this)
+        finish()
+      }
+    }
+  }
+
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     when (item.itemId) {
       android.R.id.home -> {
@@ -228,8 +244,8 @@ class MainActivity : AppCompatActivity() {
           item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW)
           item.actionView = View(this)
           item.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
-            override fun onMenuItemActionExpand(item: MenuItem?) = false
-            override fun onMenuItemActionCollapse(item: MenuItem?) = false
+            override fun onMenuItemActionExpand(item: MenuItem) = false
+            override fun onMenuItemActionCollapse(item: MenuItem) = false
           })
 
           item.isChecked = !item.isChecked
@@ -279,27 +295,10 @@ class MainActivity : AppCompatActivity() {
         }
       }
       R.id.nav_downloads -> startActivity(Intent(this, DownloadsActivity::class.java))
-      R.id.settings -> startActivityForResult(Intent(this, SettingsActivity::class.java), 0)
+      R.id.settings -> resultLauncher.launch(Intent(this, SettingsActivity::class.java))
     }
 
     return true
-  }
-
-  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-    super.onActivityResult(requestCode, resultCode, data)
-
-    if (resultCode == ResultCode.LOGOUT.code) {
-      Intent(this, LoginActivity::class.java).apply {
-        FFA.get().deleteAllData(this@MainActivity)
-
-        flags =
-          Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-
-        stopService(Intent(this@MainActivity, PlayerService::class.java))
-        startActivity(this)
-        finish()
-      }
-    }
   }
 
   private fun launchFragment(fragment: Fragment) {
@@ -359,7 +358,7 @@ class MainActivity : AppCompatActivity() {
               .alpha(0.0f)
               .setDuration(400)
               .setListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animator: Animator?) {
+                override fun onAnimationEnd(animator: Animator) {
                   binding.nowPlaying.visibility = View.GONE
                 }
               })
@@ -474,11 +473,9 @@ class MainActivity : AppCompatActivity() {
 
       binding.nowPlayingContainer?.nowPlayingTitle?.text = track.title
       binding.nowPlayingContainer?.nowPlayingAlbum?.text = track.artist.name
-      binding.nowPlayingContainer?.nowPlayingToggle?.icon = getDrawable(R.drawable.pause)
 
       binding.nowPlayingContainer?.nowPlayingDetailsTitle?.text = track.title
       binding.nowPlayingContainer?.nowPlayingDetailsArtist?.text = track.artist.name
-      binding.nowPlayingContainer?.nowPlayingDetailsToggle?.icon = getDrawable(R.drawable.pause)
 
       Picasso.get()
         .maybeLoad(maybeNormalizeUrl(track.album?.cover?.urls?.original))

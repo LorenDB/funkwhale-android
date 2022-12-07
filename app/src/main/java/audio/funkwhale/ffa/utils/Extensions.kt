@@ -10,10 +10,8 @@ import audio.funkwhale.ffa.model.DownloadInfo
 import audio.funkwhale.ffa.repositories.Repository
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Request
-import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.google.android.exoplayer2.offline.Download
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.RequestCreator
 import kotlinx.coroutines.CompletableDeferred
@@ -23,7 +21,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import net.openid.appauth.ClientSecretPost
-import java.io.Reader
 import java.text.SimpleDateFormat
 import java.util.Date
 import kotlin.coroutines.CoroutineContext

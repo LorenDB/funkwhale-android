@@ -9,7 +9,6 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import audio.funkwhale.ffa.utils.Command
 import audio.funkwhale.ffa.utils.CommandBus
-import com.google.android.exoplayer2.ControlDispatcher
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 
@@ -31,7 +30,6 @@ class MediaSession(private val context: Context) {
 
   val session: MediaSessionCompat by lazy {
     MediaSessionCompat(context, context.packageName).apply {
-      setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS or MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS)
       setPlaybackState(playbackStateBuilder.build())
 
       isActive = true
@@ -43,7 +41,7 @@ class MediaSession(private val context: Context) {
     MediaSessionConnector(session).also {
       it.setQueueNavigator(FFAQueueNavigator())
 
-      it.setMediaButtonEventHandler { _, _, intent ->
+      it.setMediaButtonEventHandler { _, intent ->
         if (!active) {
           Intent(context, PlayerService::class.java).let { player ->
             player.action = intent.action
@@ -67,13 +65,11 @@ class MediaSession(private val context: Context) {
 }
 
 class FFAQueueNavigator : MediaSessionConnector.QueueNavigator {
-  override fun onSkipToQueueItem(player: Player, controlDispatcher: ControlDispatcher, id: Long) {
+  override fun onSkipToQueueItem(player: Player, id: Long) {
     CommandBus.send(Command.PlayTrack(id.toInt()))
   }
 
-  override fun onCurrentWindowIndexChanged(player: Player) {}
-
-  override fun onCommand(player: Player, controlDispatcher: ControlDispatcher, command: String, extras: Bundle?, cb: ResultReceiver?) = true
+  override fun onCommand(player: Player, command: String, extras: Bundle?, cb: ResultReceiver?) = true
 
   override fun getSupportedQueueNavigatorActions(player: Player): Long {
     return PlaybackStateCompat.ACTION_PLAY_PAUSE or
@@ -82,13 +78,13 @@ class FFAQueueNavigator : MediaSessionConnector.QueueNavigator {
       PlaybackStateCompat.ACTION_SKIP_TO_QUEUE_ITEM
   }
 
-  override fun onSkipToNext(player: Player, controlDispatcher: ControlDispatcher) {
+  override fun onSkipToNext(player: Player) {
     CommandBus.send(Command.NextTrack)
   }
 
-  override fun getActiveQueueItemId(player: Player?) = player?.currentWindowIndex?.toLong() ?: 0
+  override fun getActiveQueueItemId(player: Player?) = player?.currentMediaItemIndex?.toLong() ?: 0
 
-  override fun onSkipToPrevious(player: Player, controlDispatcher: ControlDispatcher) {
+  override fun onSkipToPrevious(player: Player) {
     CommandBus.send(Command.PreviousTrack)
   }
 

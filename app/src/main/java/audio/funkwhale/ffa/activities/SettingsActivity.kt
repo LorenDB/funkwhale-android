@@ -59,7 +59,7 @@ class SettingsFragment :
   }
 
   override fun onPreferenceTreeClick(preference: Preference): Boolean {
-    when (preference?.key) {
+    when (preference.key) {
       "oss_licences" -> startActivity(Intent(activity, LicencesActivity::class.java))
 
       "crash" -> {

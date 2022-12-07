@@ -36,6 +36,8 @@ android {
     targetCompatibility = JavaVersion.VERSION_1_8
   }
 
+  namespace = "audio.funkwhale.ffa"
+
   testCoverage {
     version = "0.8.7"
   }
@@ -52,7 +54,7 @@ android {
     disable += listOf("MissingTranslation", "ExtraTranslation")
   }
 
-  compileSdk = 31
+  compileSdk = 33
 
   defaultConfig {
 
@@ -62,7 +64,7 @@ android {
     versionName = androidGitVersion.name()
 
     minSdk = 24
-    targetSdk = 30
+    targetSdk = 33
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -167,18 +169,18 @@ dependencies {
   implementation("com.google.android.material:material:1.6.1")
   implementation("com.android.support.constraint:constraint-layout:2.0.4")
 
-  implementation("com.google.android.exoplayer:exoplayer-core:2.14.2")
-  implementation("com.google.android.exoplayer:exoplayer-ui:2.14.2")
-  implementation("com.google.android.exoplayer:extension-mediasession:2.14.2")
+  implementation("com.google.android.exoplayer:exoplayer-core:2.18.1")
+  implementation("com.google.android.exoplayer:exoplayer-ui:2.18.1")
+  implementation("com.google.android.exoplayer:extension-mediasession:2.18.1")
 
   implementation("io.insert-koin:koin-core:3.1.2")
   implementation("io.insert-koin:koin-android:3.1.2")
   testImplementation("io.insert-koin:koin-test:3.1.2")
 
-  implementation("com.github.PaulWoitaschek.ExoPlayer-Extensions:extension-opus:2.14.0") {
+  implementation("com.github.PaulWoitaschek.ExoPlayer-Extensions:extension-opus:789a4f83169cff5c7a91655bb828fde2cfde671a") {
     isTransitive = false
   }
-  implementation("com.github.PaulWoitaschek.ExoPlayer-Extensions:extension-flac:2.14.0") {
+  implementation("com.github.PaulWoitaschek.ExoPlayer-Extensions:extension-flac:789a4f83169cff5c7a91655bb828fde2cfde671a") {
     isTransitive = false
   }
 

@@ -52,7 +52,7 @@ class NowPlayingView : MaterialCardView {
       viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
         override fun onGlobalLayout() {
           gestureDetectorCallback = OnGestureDetection()
-          gestureDetector = GestureDetector(context, gestureDetectorCallback)
+          gestureDetector = GestureDetector(context, gestureDetectorCallback!!)
 
           setOnTouchListener { _, motionEvent ->
             val ret = gestureDetector?.onTouchEvent(motionEvent) ?: false
@@ -128,8 +128,8 @@ class NowPlayingView : MaterialCardView {
     }
 
     override fun onFling(
-      firstMotionEvent: MotionEvent?,
-      secondMotionEvent: MotionEvent?,
+      firstMotionEvent: MotionEvent,
+      secondMotionEvent: MotionEvent,
       velocityX: Float,
       velocityY: Float
     ): Boolean {
@@ -195,7 +195,7 @@ class NowPlayingView : MaterialCardView {
       return true
     }
 
-    override fun onSingleTapUp(e: MotionEvent?): Boolean {
+    override fun onSingleTapUp(e: MotionEvent): Boolean {
       layoutParams.let {
         if (height != minHeight) return true
 

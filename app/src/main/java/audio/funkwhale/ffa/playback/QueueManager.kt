@@ -12,6 +12,7 @@ import audio.funkwhale.ffa.utils.FFACache
 import audio.funkwhale.ffa.utils.log
 import audio.funkwhale.ffa.utils.mustNormalizeUrl
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
+import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.gson.Gson
@@ -38,8 +39,8 @@ class QueueManager(val context: Context) {
           metadata.map { track ->
             val url = mustNormalizeUrl(track.bestUpload()?.listen_url ?: "")
 
-            ProgressiveMediaSource.Factory(factory).setTag(track.title)
-              .createMediaSource(Uri.parse(url))
+            val mediaItem = MediaItem.fromUri(Uri.parse(url)).buildUpon().setTag(track.title).build()
+            ProgressiveMediaSource.Factory(factory).createMediaSource(mediaItem)
           }
         )
       }
@@ -63,8 +64,8 @@ class QueueManager(val context: Context) {
     val factory = cacheDataSourceFactoryProvider.create(context)
     val sources = tracks.map { track ->
       val url = mustNormalizeUrl(track.bestUpload()?.listen_url ?: "")
-
-      ProgressiveMediaSource.Factory(factory).setTag(track.title).createMediaSource(Uri.parse(url))
+      val mediaItem = MediaItem.fromUri(Uri.parse(url)).buildUpon().setTag(track.title).build()
+      ProgressiveMediaSource.Factory(factory).createMediaSource(mediaItem)
     }
 
     metadata = tracks.toMutableList()
@@ -84,7 +85,8 @@ class QueueManager(val context: Context) {
     val sources = missingTracks.map { track ->
       val url = mustNormalizeUrl(track.bestUpload()?.listen_url ?: "")
 
-      ProgressiveMediaSource.Factory(factory).createMediaSource(Uri.parse(url))
+      val mediaItem = MediaItem.fromUri(Uri.parse(url)).buildUpon().setTag(track.title).build()
+      ProgressiveMediaSource.Factory(factory).createMediaSource(mediaItem)
     }
 
     metadata.addAll(tracks)
@@ -101,7 +103,8 @@ class QueueManager(val context: Context) {
     val url = mustNormalizeUrl(track.bestUpload()?.listen_url ?: "")
 
     if (metadata.indexOf(track) == -1) {
-      ProgressiveMediaSource.Factory(factory).createMediaSource(Uri.parse(url)).let {
+      val mediaItem = MediaItem.fromUri(Uri.parse(url)).buildUpon().setTag(track.title).build()
+      ProgressiveMediaSource.Factory(factory).createMediaSource(mediaItem).let {
         dataSources.addMediaSource(current + 1, it)
         metadata.add(current + 1, track)
       }

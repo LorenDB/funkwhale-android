@@ -1,8 +1,7 @@
 package audio.funkwhale.ffa.adapters
 
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentPagerAdapter
+import androidx.viewpager2.adapter.FragmentStateAdapter
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.fragments.AlbumsGridFragment
 import audio.funkwhale.ffa.fragments.ArtistsFragment
@@ -10,13 +9,13 @@ import audio.funkwhale.ffa.fragments.FavoritesFragment
 import audio.funkwhale.ffa.fragments.PlaylistsFragment
 import audio.funkwhale.ffa.fragments.RadiosFragment
 
-class BrowseTabsAdapter(val context: Fragment, manager: FragmentManager) :
-  FragmentPagerAdapter(manager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+class BrowseTabsAdapter(val context: Fragment) :
+  FragmentStateAdapter(context) {
   var tabs = mutableListOf<Fragment>()
 
-  override fun getCount() = 5
+  override fun getItemCount() = 5
 
-  override fun getItem(position: Int): Fragment {
+  override fun createFragment(position: Int): Fragment {
     tabs.getOrNull(position)?.let {
       return it
     }
@@ -35,7 +34,7 @@ class BrowseTabsAdapter(val context: Fragment, manager: FragmentManager) :
     return fragment
   }
 
-  override fun getPageTitle(position: Int): String {
+  fun tabText(position: Int): String {
     return when (position) {
       0 -> context.getString(R.string.artists)
       1 -> context.getString(R.string.albums)
