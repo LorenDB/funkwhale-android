@@ -194,16 +194,16 @@ class MainActivity : AppCompatActivity() {
     return super.onPrepareOptionsMenu(menu)
   }
 
-  override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+  override fun onCreateOptionsMenu(menu: Menu): Boolean {
     menuInflater.inflate(R.menu.toolbar, menu)
 
-    menu?.findItem(R.id.nav_all_music)?.let {
+    menu.findItem(R.id.nav_all_music)?.let {
       it.isChecked = Settings.getScopes().contains("all")
       it.isEnabled = !it.isChecked
     }
 
-    menu?.findItem(R.id.nav_my_music)?.isChecked = Settings.getScopes().contains("me")
-    menu?.findItem(R.id.nav_followed)?.isChecked = Settings.getScopes().contains("subscribed")
+    menu.findItem(R.id.nav_my_music)?.isChecked = Settings.getScopes().contains("me")
+    menu.findItem(R.id.nav_followed)?.isChecked = Settings.getScopes().contains("subscribed")
 
     return true
   }
