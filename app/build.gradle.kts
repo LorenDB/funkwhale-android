@@ -50,6 +50,11 @@ android {
     viewBinding = true
   }
 
+  packagingOptions {
+    resources.excludes.add("META-INF/LICENSE.md")
+    resources.excludes.add("META-INF/LICENSE-notice.md")
+  }
+
   lint {
     disable += listOf("MissingTranslation", "ExtraTranslation")
   }
@@ -200,7 +205,7 @@ dependencies {
   testImplementation("io.strikt:strikt-core:0.34.1")
   testImplementation("org.robolectric:robolectric:4.9")
 
-  androidTestImplementation("io.mockk:mockk-android:1.12.4")
+  androidTestImplementation("io.mockk:mockk-android:1.13.3")
 }
 
 project.afterEvaluate {
