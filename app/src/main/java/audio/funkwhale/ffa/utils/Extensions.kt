@@ -62,6 +62,8 @@ fun <T, U> Int.onApi(block: () -> T, elseBlock: (() -> U)) {
 fun Picasso.maybeLoad(url: String?): RequestCreator {
   return if (url == null) load(R.drawable.cover)
   else load(url)
+    // Remote storage may have (pre-signed) ephemeral credentials in the query string
+    .stableKey(url.replace(Regex("\\?.*$"), ""))
 }
 
 fun Request.authorize(context: Context, oAuth: OAuth): Request {
