@@ -188,7 +188,7 @@ class MainActivity : AppCompatActivity() {
     super.onBackPressed()
   }
 
-  override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+  override fun onPrepareOptionsMenu(menu: Menu): Boolean {
     this.menu = menu
 
     return super.onPrepareOptionsMenu(menu)
