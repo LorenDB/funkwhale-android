@@ -28,6 +28,7 @@ import audio.funkwhale.ffa.utils.Request
 import audio.funkwhale.ffa.utils.RequestBus
 import audio.funkwhale.ffa.utils.Response
 import audio.funkwhale.ffa.utils.log
+import audio.funkwhale.ffa.utils.maybeLoad
 import audio.funkwhale.ffa.utils.maybeNormalizeUrl
 import audio.funkwhale.ffa.utils.onApi
 import com.google.android.exoplayer2.C
@@ -376,7 +377,7 @@ class PlayerService : Service() {
           runBlocking(IO) {
             this@apply.putBitmap(
               MediaMetadataCompat.METADATA_KEY_ALBUM_ART,
-              Picasso.get().load(coverUrl).get()
+              Picasso.get().maybeLoad(coverUrl).get()
             )
           }
         } catch (e: Exception) {
