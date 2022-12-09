@@ -106,7 +106,7 @@ object AddToPlaylistDialog {
 
       fetch().untilNetwork(lifecycleScope) { data, isCache, _, hasMore ->
         if (isCache) {
-          adapter.data = data.toMutableList()
+          adapter.setUnfilteredData(data.toMutableList())
           adapter.notifyDataSetChanged()
 
           return@untilNetwork

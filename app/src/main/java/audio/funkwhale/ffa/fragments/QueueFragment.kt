@@ -108,7 +108,7 @@ class QueueFragment : BottomSheetDialogFragment() {
       RequestBus.send(Request.GetQueue).wait<Response.Queue>()?.let { response ->
         binding.included.let { included ->
           adapter?.let {
-            it.data = response.queue.toMutableList()
+            it.setUnfilteredData(response.queue.toMutableList())
             it.notifyDataSetChanged()
 
             if (it.data.isEmpty()) {

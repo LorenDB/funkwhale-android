@@ -269,10 +269,12 @@ class TracksFragment : FFAFragment<Track, TracksAdapter>() {
     val downloaded = TracksRepository.getDownloadedIds(exoDownloadManager) ?: listOf()
 
     withContext(Main) {
-      adapter.data = adapter.data.map {
-        it.downloaded = downloaded.contains(it.id)
-        it
-      }.toMutableList()
+      adapter.setUnfilteredData(
+        adapter.data.map {
+          it.downloaded = downloaded.contains(it.id)
+          it
+        }.toMutableList()
+      )
 
       adapter.notifyDataSetChanged()
     }

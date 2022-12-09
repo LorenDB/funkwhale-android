@@ -37,11 +37,21 @@ class FavoritesAdapter(
   private lateinit var binding: RowTrackBinding
 
   var currentTrack: Track? = null
+  var filter = ""
 
   override fun getItemCount() = data.size
 
   override fun getItemId(position: Int): Long {
     return data[position].id.toLong()
+  }
+
+  override fun applyFilter() {
+    data.clear()
+    getUnfilteredData().map {
+      if (it.matchesFilter(filter)) {
+        data.add(it)
+      }
+    }
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

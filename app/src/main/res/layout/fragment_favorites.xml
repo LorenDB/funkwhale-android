@@ -39,14 +39,27 @@
         android:clipChildren="false"
         app:layout_collapseMode="parallax">
 
+        <EditText
+            android:id="@+id/filter_tracks"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/favorites_title"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:ems="10"
+            android:inputType="text"
+            android:hint="@string/filters" />
+
         <TextView
           style="@style/AppTheme.Title"
+            android:id="@+id/favorites_title"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginStart="16dp"
           android:layout_marginTop="64dp"
           android:layout_marginEnd="16dp"
-          android:layout_marginBottom="16dp"
+          android:layout_marginBottom="6dp"
           android:text="@string/favorites" />
 
         <com.google.android.material.button.MaterialButton

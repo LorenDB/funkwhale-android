@@ -114,3 +114,6 @@ val ISO_8601_DATE_TIME_FORMAT = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
 fun Date.format(): String {
   return ISO_8601_DATE_TIME_FORMAT.format(this)
 }
+
+fun String?.containsIgnoringCase(candidate: String): Boolean =
+  this != null && this.lowercase().contains(candidate.lowercase())

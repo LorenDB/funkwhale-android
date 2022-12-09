@@ -18,12 +18,26 @@ import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 abstract class FFAAdapter<D, VH : RecyclerView.ViewHolder> : RecyclerView.Adapter<VH>() {
   var data: MutableList<D> = mutableListOf()
+  private var unfilteredData: MutableList<D> = mutableListOf()
+
+  fun getUnfilteredData(): MutableList<D> {
+    return unfilteredData
+  }
+
+  fun setUnfilteredData(data: MutableList<D>) {
+    unfilteredData = data
+    applyFilter()
+  }
+
+  open fun applyFilter() {
+    data.clear()
+    data.addAll(unfilteredData)
+  }
 
   init {
     super.setHasStableIds(true)
@@ -130,19 +144,20 @@ abstract class FFAFragment<D : Any, A : FFAAdapter<D, *>>() : Fragment() {
           if (isCache) {
             moreLoading = false
 
-            adapter.data = data.toMutableList()
+            adapter.setUnfilteredData(data.toMutableList())
             adapter.notifyDataSetChanged()
 
             return@launch
           }
 
           if (first) {
-            adapter.data.clear()
+            adapter.getUnfilteredData().clear()
           }
 
           onDataFetched(data)
 
-          adapter.data.addAll(data)
+          adapter.getUnfilteredData().addAll(data)
+          adapter.applyFilter()
 
           withContext(IO) {
             try {
@@ -150,7 +165,7 @@ abstract class FFAFragment<D : Any, A : FFAAdapter<D, *>>() : Fragment() {
                 FFACache.set(
                   context,
                   cacheId,
-                  Gson().toJson(repository.cache(adapter.data)).toString()
+                  Gson().toJson(repository.cache(adapter.getUnfilteredData())).toString()
                 )
               }
             } catch (e: ConcurrentModificationException) {
@@ -161,7 +176,7 @@ abstract class FFAFragment<D : Any, A : FFAAdapter<D, *>>() : Fragment() {
             (repository.upstream as? HttpUpstream<*, *>)?.let { upstream ->
               if (!isCache && upstream.behavior == HttpUpstream.Behavior.Progressive) {
                 if (first || needsMoreOffscreenPages()) {
-                  fetch(Repository.Origin.Network.origin, adapter.data.size)
+                  fetch(Repository.Origin.Network.origin, adapter.getUnfilteredData().size)
                 } else {
                   moreLoading = false
                 }
