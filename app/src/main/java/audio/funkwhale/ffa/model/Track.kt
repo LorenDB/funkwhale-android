@@ -1,5 +1,6 @@
 package audio.funkwhale.ffa.model
 
+import audio.funkwhale.ffa.utils.containsIgnoringCase
 import com.preference.PowerPreference
 
 data class Track(
@@ -29,11 +30,13 @@ data class Track(
     )
   }
 
-  data class Upload(
-    val listen_url: String,
-    val duration: Int,
-    val bitrate: Int
-  )
+  data class Upload(val listen_url: String, val duration: Int, val bitrate: Int)
+
+  fun matchesFilter(filter: String): Boolean {
+    return title.containsIgnoringCase(filter) ||
+      artist.name.containsIgnoringCase(filter) ||
+      album?.title.containsIgnoringCase(filter)
+  }
 
   override fun equals(other: Any?): Boolean {
     return when (other) {

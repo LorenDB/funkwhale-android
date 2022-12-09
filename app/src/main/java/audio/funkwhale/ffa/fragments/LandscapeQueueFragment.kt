@@ -92,7 +92,7 @@ class LandscapeQueueFragment : Fragment() {
     activity?.lifecycleScope?.launch(Main) {
       RequestBus.send(Request.GetQueue).wait<Response.Queue>()?.let { response ->
         adapter?.let {
-          it.data = response.queue.toMutableList()
+          it.setUnfilteredData(response.queue.toMutableList())
           it.notifyDataSetChanged()
 
           if (it.data.isEmpty()) {
