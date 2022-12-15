@@ -178,9 +178,9 @@ dependencies {
   implementation("com.google.android.exoplayer:exoplayer-ui:2.18.1")
   implementation("com.google.android.exoplayer:extension-mediasession:2.18.1")
 
-  implementation("io.insert-koin:koin-core:3.2.2")
-  implementation("io.insert-koin:koin-android:3.2.2")
-  testImplementation("io.insert-koin:koin-test:3.2.2")
+  implementation("io.insert-koin:koin-core:3.3.0")
+  implementation("io.insert-koin:koin-android:3.3.1")
+  testImplementation("io.insert-koin:koin-test:3.3.0")
 
   implementation("com.github.PaulWoitaschek.ExoPlayer-Extensions:extension-opus:789a4f83169cff5c7a91655bb828fde2cfde671a") {
     isTransitive = false
