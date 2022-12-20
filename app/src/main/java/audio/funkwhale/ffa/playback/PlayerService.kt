@@ -36,6 +36,7 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.Tracks
+import com.preference.PowerPreference
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -43,7 +44,6 @@ import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.koin.java.KoinJavaComponent.inject
@@ -422,11 +422,24 @@ class PlayerService : Service() {
     return allowed
   }
 
+  private fun skipBackwardsAfterPause(): Int {
+    val deltaPref = PowerPreference.getDefaultFile().getString("auto_skip_backwards_on_pause")
+    val delta = deltaPref.toFloatOrNull()
+    return if (delta == null) 0 else (delta * 1000).toInt()
+  }
+
   @SuppressLint("NewApi")
   inner class PlayerEventListener : Player.Listener {
     override fun onIsPlayingChanged(isPlaying: Boolean) {
       super.onIsPlayingChanged(isPlaying)
       mediaControlsManager.updateNotification(queue.current(), isPlaying)
+      if (!isPlaying) {
+        val delta = skipBackwardsAfterPause()
+        val (current, duration, _) = getProgress(true)
+        val position = if (current > delta) current - delta  else 0
+        player.seekTo(position.toLong())
+        ProgressBus.send(position, duration, ((position.toFloat()) / duration / 10).toInt())
+      }
     }
 
     override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
