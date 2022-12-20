@@ -29,6 +29,18 @@
       android:icon="@drawable/play"
       android:key="play_order"
       android:title="@string/settings_play_order" />
+    <EditTextPreference
+        android:defaultValue="0"
+        android:dialogTitle="@string/settings_auto_skip_backwards_on_pause_summary"
+        android:icon="@drawable/pause"
+        android:inputType="number"
+        android:key="auto_skip_backwards_on_pause"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:summary="@string/settings_auto_skip_backwards_on_pause_summary"
+        android:title="@string/settings_auto_skip_backwards_on_pause"
+        android:visibility="visible"
+        app:useSimpleSummaryProvider="true"/>
 
   </PreferenceCategory>
 

@@ -34,6 +34,8 @@
   <string name="settings_play_order_shuffle_summary">You prefer shuffling album tracks</string>
   <string name="settings_play_order_in_order">Play albums in order</string>
   <string name="settings_play_order_in_order_summary">You prefer playing albums in order</string>
+  <string name="settings_auto_skip_backwards_on_pause">Skip backwards when pausing</string>
+  <string name="settings_auto_skip_backwards_on_pause_summary">Number of seconds to skip backwards when playing is paused</string>
   <string name="settings_other">Other</string>
   <string name="settings_night_mode">Dark mode</string>
   <string name="settings_night_mode_on">Always on (dark mode)</string>
