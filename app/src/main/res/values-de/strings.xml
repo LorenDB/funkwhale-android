@@ -35,7 +35,7 @@
     <string name="settings_night_mode_system_summary">Der Nachtmodus wird den Systemeinstellungen folgen</string>
     <string name="settings_information">Informationen</string>
     <string name="settings_version_title">Version</string>
-    <string name="settings_information_repository_description">Funkwhale für Android</string>
+    <string name="settings_information_repository_description">Funkwhale für Android™</string>
     <string name="settings_information_repository_title">Source Code</string>
     <string name="settings_information_license_title">Lizenz</string>
     <string name="settings_information_license_description">MIT Lizenz</string>
