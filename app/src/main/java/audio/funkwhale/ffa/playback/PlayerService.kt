@@ -240,6 +240,8 @@ class PlayerService : Service() {
       RequestBus.get().collect { request ->
         if (request is Request.GetCurrentTrack) {
           request.channel?.trySend(Response.CurrentTrack(queue.current()))?.isSuccess
+        } else if (request is Request.GetCurrentTrackIndex) {
+          request.channel?.trySend(Response.CurrentTrackIndex(queue.currentIndex()))?.isSuccess
         } else if (request is Request.GetState) {
           request.channel?.trySend(Response.State(player.playWhenReady))?.isSuccess
         } else if (request is Request.GetQueue) {

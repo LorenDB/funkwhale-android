@@ -50,7 +50,9 @@ class QueueFragment : BottomSheetDialogFragment() {
     return super.onCreateDialog(savedInstanceState).apply {
       setOnShowListener {
         findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)?.let {
-          BottomSheetBehavior.from(it).skipCollapsed = true
+          val behavior = BottomSheetBehavior.from(it)
+          behavior.skipCollapsed = true
+          behavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
       }
     }
@@ -100,10 +102,10 @@ class QueueFragment : BottomSheetDialogFragment() {
       CommandBus.send(Command.ClearQueue)
     }
 
-    refresh()
+    refresh(true)
   }
 
-  private fun refresh() {
+  private fun refresh(scroll: Boolean) {
     lifecycleScope.launch(Main) {
       RequestBus.send(Request.GetQueue).wait<Response.Queue>()?.let { response ->
         binding.included.let { included ->
@@ -120,6 +122,11 @@ class QueueFragment : BottomSheetDialogFragment() {
             }
           }
         }
+        if (scroll) {
+          RequestBus.send(Request.GetCurrentTrackIndex).wait<Response.CurrentTrackIndex>()?.let { sresp ->
+            binding.included.queue.scrollToPosition(sresp.index)
+          }
+        }
       }
     }
   }
@@ -128,7 +135,7 @@ class QueueFragment : BottomSheetDialogFragment() {
     lifecycleScope.launch(Main) {
       EventBus.get().collect { message ->
         if (message is Event.QueueChanged) {
-          refresh()
+          refresh(false)
         }
       }
     }
@@ -136,7 +143,7 @@ class QueueFragment : BottomSheetDialogFragment() {
     lifecycleScope.launch(Main) {
       CommandBus.get().collect { command ->
         if (command is Command.RefreshTrack) {
-          refresh()
+          refresh(false)
         }
       }
     }
