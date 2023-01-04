@@ -167,6 +167,8 @@ class QueueManager(val context: Context) {
     return metadata.getOrNull(current)
   }
 
+  fun currentIndex(): Int = (if (current == -1) 0 else current)
+
   fun clear() {
     metadata = mutableListOf()
     dataSources.clear()

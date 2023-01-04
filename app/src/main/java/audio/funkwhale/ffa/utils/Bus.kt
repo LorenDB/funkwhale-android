@@ -61,6 +61,7 @@ sealed class Request(var channel: Channel<Response>? = null) {
   object GetState : Request()
   object GetQueue : Request()
   object GetCurrentTrack : Request()
+  object GetCurrentTrackIndex : Request()
   object GetDownloads : Request()
 }
 
@@ -68,6 +69,7 @@ sealed class Response {
   class State(val playing: Boolean) : Response()
   class Queue(val queue: List<Track>) : Response()
   class CurrentTrack(val track: Track?) : Response()
+  class CurrentTrackIndex(val index: Int) : Response()
   class Downloads(val cursor: DownloadCursor) : Response()
 }
 
