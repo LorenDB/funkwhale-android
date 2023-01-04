@@ -436,7 +436,7 @@ class PlayerService : Service() {
       if (!isPlaying) {
         val delta = skipBackwardsAfterPause()
         val (current, duration, _) = getProgress(true)
-        val position = if (current > delta) current - delta  else 0
+        val position = if (current > delta) current - delta else 0
         player.seekTo(position.toLong())
         ProgressBus.send(position, duration, ((position.toFloat()) / duration / 10).toInt())
       }
