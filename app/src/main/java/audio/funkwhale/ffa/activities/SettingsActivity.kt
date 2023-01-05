@@ -148,7 +148,7 @@ class SettingsFragment :
       }
 
       preferenceManager.findPreference<SeekBarPreference>("media_cache_size")?.let {
-        it.summary = getString(R.string.settings_media_cache_size_summary, it.value)
+        it.summary = getString(R.string.settings_media_cache_size_summary, it.value as Int) // manual cast to address a bug in AGP
       }
 
       preferenceManager.findPreference<Preference>("version")?.let {
