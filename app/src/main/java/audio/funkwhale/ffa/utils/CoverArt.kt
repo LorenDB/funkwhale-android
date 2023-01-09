@@ -2,7 +2,9 @@ package audio.funkwhale.ffa.utils
 
 import android.content.Context
 import android.net.Uri
+import android.transition.CircularPropagation
 import android.util.Log
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import audio.funkwhale.ffa.BuildConfig
 import audio.funkwhale.ffa.R
 import com.squareup.picasso.Downloader
@@ -252,9 +254,10 @@ open class CoverArt private constructor() {
      * The primary entrypoint for the codebase.
      */
     fun withContext(context: Context, url: String?): RequestCreator {
-      return buildPicasso(context)
-        .load(url)
-        .placeholder(R.drawable.cover)
+      val request = buildPicasso(context).load(url)
+      if(url == null) request.placeholder(R.drawable.cover)
+      else request.placeholder(CircularProgressDrawable(context))
+      return request.error(R.drawable.cover)
     }
   }
 }

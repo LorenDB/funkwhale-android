@@ -9,29 +9,16 @@ import audio.funkwhale.ffa.fragments.FavoritesFragment
 import audio.funkwhale.ffa.fragments.PlaylistsFragment
 import audio.funkwhale.ffa.fragments.RadiosFragment
 
-class BrowseTabsAdapter(val context: Fragment) :
-  FragmentStateAdapter(context) {
-  var tabs = mutableListOf<Fragment>()
-
+class BrowseTabsAdapter(val context: Fragment) : FragmentStateAdapter(context) {
   override fun getItemCount() = 5
 
-  override fun createFragment(position: Int): Fragment {
-    tabs.getOrNull(position)?.let {
-      return it
-    }
-
-    val fragment = when (position) {
-      0 -> ArtistsFragment()
-      1 -> AlbumsGridFragment()
-      2 -> PlaylistsFragment()
-      3 -> RadiosFragment()
-      4 -> FavoritesFragment()
-      else -> ArtistsFragment()
-    }
-
-    tabs.add(position, fragment)
-
-    return fragment
+  override fun createFragment(position: Int): Fragment = when (position) {
+    0 -> ArtistsFragment()
+    1 -> AlbumsGridFragment()
+    2 -> PlaylistsFragment()
+    3 -> RadiosFragment()
+    4 -> FavoritesFragment()
+    else -> ArtistsFragment()
   }
 
   fun tabText(position: Int): String {

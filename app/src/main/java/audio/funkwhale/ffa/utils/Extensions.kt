@@ -149,3 +149,5 @@ inline fun <T, U, V, W, R> LiveData<T>.mergeWith(
     }
   }
 }
+
+public fun String?.toIntOrElse(default: Int): Int = this?.toIntOrNull(radix = 10) ?: default

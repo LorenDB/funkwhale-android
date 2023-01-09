@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  xmlns:app="http://schemas.android.com/apk/res-auto">
+  <data>
+    <import type="androidx.lifecycle.LiveData" />
+    <import type="android.view.View" />
+    <import type="android.graphics.drawable.Drawable" />
+    <variable name="isBuffering" type="LiveData&lt;Boolean>" />
+    <variable name="isPlaying" type="LiveData&lt;Boolean>" />
+    <variable name="progress" type="LiveData&lt;Integer>" />
+    <variable name="currentTrackTitle" type="LiveData&lt;String>" />
+    <variable name="currentTrackArtist" type="LiveData&lt;String>" />
+  </data>
+
+  <androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize">
+
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+      android:id="@+id/now_playing_progress"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      android:progress="@{progress, default=40}"
+      android:progressTint="@color/colorPrimaryDark" />
+
+    <audio.funkwhale.ffa.views.SquareImageView
+      android:id="@+id/now_playing_cover"
+      android:layout_width="0dp"
+      android:layout_height="0dp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/now_playing_progress"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:srcCompat="@drawable/cover"
+      tools:src="@tools:sample/avatars" />
+
+    <ProgressBar
+      android:id="@+id/now_playing_buffering"
+      android:layout_width="0dp"
+      android:layout_height="0dp"
+      app:layout_constraintStart_toStartOf="@id/now_playing_cover"
+      app:layout_constraintTop_toTopOf="@id/now_playing_cover"
+      app:layout_constraintBottom_toBottomOf="@id/now_playing_cover"
+      app:layout_constraintEnd_toEndOf="@id/now_playing_cover"
+      android:indeterminate="true"
+      android:indeterminateTint="@color/controlForeground"
+      android:visibility="@{isBuffering ? View.VISIBLE : View.GONE, default=gone}" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+      android:id="@+id/header_controls"
+      android:layout_width="0dp"
+      android:layout_height="0dp"
+      app:layout_constraintHorizontal_weight="10"
+      app:layout_constraintStart_toEndOf="@id/now_playing_cover"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/now_playing_progress"
+      app:layout_constraintBottom_toBottomOf="parent"
+      android:padding="4dp">
+
+      <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/now_playing_toggle"
+        style="@style/AppTheme.ItemTitle"
+        android:text="@{currentTrackTitle}"
+        android:ellipsize="end"
+        android:lines="1"
+        tools:text="Supermassive Black Hole" />
+
+      <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/now_playing_toggle"
+        android:ellipsize="end"
+        android:lines="1"
+        android:text="@{currentTrackArtist}"
+        tools:text="Muse" />
+
+      <com.google.android.material.button.MaterialButton
+        android:id="@+id/now_playing_toggle"
+        style="@style/AppTheme.OutlinedButton"
+        android:layout_width="?attr/actionBarSize"
+        android:layout_height="match_parent"
+        app:layout_constraintEnd_toStartOf="@id/now_playing_next"
+        android:layout_marginEnd="16dp"
+        app:icon="@{isPlaying ? @drawable/pause : @drawable/play, default=@drawable/play}" />
+
+      <ImageButton
+        android:id="@+id/now_playing_next"
+        android:layout_width="32dp"
+        android:layout_height="match_parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        style="@style/IconButton"
+        android:contentDescription="@string/control_next"
+        android:src="@drawable/next" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+  </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

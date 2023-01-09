@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools">
+  <data>
+    <import type="androidx.lifecycle.LiveData" />
+    <import type="android.graphics.drawable.Drawable" />
+    <variable name="currentTrackTitle" type="LiveData&lt;String>" />
+    <variable name="currentTrackArtist" type="LiveData&lt;String>" />
+    <variable name="isCurrentTrackFavorite" type="LiveData&lt;Boolean>" />
+    <variable name="repeatModeResource" type="LiveData&lt;Drawable>" />
+    <variable name="repeatModeAlpha" type="LiveData&lt;Float>" />
+    <variable name="currentProgressText" type="LiveData&lt;String>" />
+    <variable name="currentDurationText" type="LiveData&lt;String>" />
+    <variable name="isPlaying" type="LiveData&lt;Boolean>" />
+    <variable name="progress" type="LiveData&lt;Integer>" />
+  </data>
+  <androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView
+      android:id="@+id/current_playing_details_title"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:paddingTop="2dp"
+      android:paddingBottom="2dp"
+      android:text="@{currentTrackTitle}"
+      android:textColor="@color/itemTitle"
+      android:textSize="18sp"
+      app:layout_constraintEnd_toStartOf="@+id/now_playing_details_add_to_playlist"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent" tools:text="Supermassive Black Hole" />
+
+    <TextView
+      android:id="@+id/current_playing_details_artist"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:paddingTop="2dp"
+      android:paddingBottom="2dp"
+      android:text="@{currentTrackArtist}"
+      app:layout_constraintEnd_toStartOf="@+id/now_playing_details_add_to_playlist"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/current_playing_details_title"
+      tools:text="Muse" />
+
+    <ImageButton
+      android:id="@+id/now_playing_details_add_to_playlist"
+      style="@style/IconButton"
+      android:layout_width="24dp"
+      android:layout_height="24dp"
+      android:layout_margin="8dp"
+      android:contentDescription="@string/playlist_add_to"
+      android:src="@drawable/add_to_playlist"
+      app:layout_constraintBottom_toBottomOf="@+id/current_playing_details_artist"
+
+      app:layout_constraintEnd_toStartOf="@+id/now_playing_details_favorite"
+      app:layout_constraintTop_toTopOf="@+id/current_playing_details_title" />
+
+    <ImageButton
+      android:id="@+id/now_playing_details_favorite"
+      style="@style/IconButton"
+      android:layout_width="24dp"
+      android:layout_height="24dp"
+      android:layout_margin="8dp"
+      android:contentDescription="@string/control_add_to_favorties"
+      android:src="@drawable/favorite"
+      app:layout_constraintBottom_toBottomOf="@+id/current_playing_details_artist"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toTopOf="@+id/current_playing_details_title"
+      app:tint="@{isCurrentTrackFavorite ? @color/colorFavorite : @color/controlForeground, default=@color/controlForeground}" />
+
+
+    <TextView
+      android:id="@+id/now_playing_details_progress_current"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text='@{currentProgressText, default="5:04"}'
+      app:layout_constraintBottom_toBottomOf="@+id/now_playing_details_progress"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="@+id/now_playing_details_progress" />
+
+    <SeekBar
+      android:id="@+id/now_playing_details_progress"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:max="100"
+      android:layout_margin="8dp"
+      android:progress="@{progress, default=40}"
+      android:progressBackgroundTint="#cacaca"
+      android:progressTint="@color/controlForeground"
+      android:thumbOffset="3dp"
+      android:thumbTint="@color/controlForeground"
+      app:layout_constraintEnd_toStartOf="@+id/now_playing_details_progress_duration"
+      app:layout_constraintStart_toEndOf="@+id/now_playing_details_progress_current"
+      app:layout_constraintTop_toBottomOf="@+id/current_playing_details_artist" />
+
+    <TextView
+      android:id="@+id/now_playing_details_progress_duration"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text='@{currentDurationText, default="5:04"}'
+      android:textAlignment="textEnd"
+      app:layout_constraintBottom_toBottomOf="@+id/now_playing_details_progress"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toTopOf="@+id/now_playing_details_progress" />
+
+    <ImageButton
+      android:id="@+id/now_playing_details_previous"
+      style="@style/IconButton"
+      android:layout_width="32dp"
+      android:layout_height="32dp"
+      android:layout_margin="8dp"
+      android:contentDescription="@string/control_previous"
+      android:src="@drawable/previous"
+      app:layout_constraintBottom_toBottomOf="@+id/now_playing_details_toggle"
+      app:layout_constraintEnd_toStartOf="@+id/now_playing_details_toggle"
+      app:layout_constraintTop_toBottomOf="@+id/now_playing_details_progress" />
+
+    <com.google.android.material.button.MaterialButton
+      android:id="@+id/now_playing_details_toggle"
+      style="@style/AppTheme.OutlinedButton"
+      android:layout_width="64dp"
+      android:layout_height="64dp"
+      android:layout_margin="8dp"
+      app:cornerRadius="64dp"
+      app:icon="@{isPlaying ? @drawable/pause : @drawable/play, default=@drawable/play}"
+      app:iconSize="32dp"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/now_playing_details_progress" />
+
+    <ImageButton
+      android:id="@+id/now_playing_details_next"
+      style="@style/IconButton"
+      android:layout_width="32dp"
+      android:layout_height="32dp"
+      android:layout_margin="8dp"
+      android:contentDescription="@string/control_next"
+      android:src="@drawable/next"
+      app:layout_constraintBottom_toBottomOf="@+id/now_playing_details_toggle"
+      app:layout_constraintStart_toEndOf="@+id/now_playing_details_toggle"
+      app:layout_constraintTop_toBottomOf="@+id/now_playing_details_progress" />
+
+    <ImageButton
+      android:id="@+id/now_playing_details_repeat"
+      style="@style/IconButton"
+      android:layout_width="32dp"
+      android:layout_height="32dp"
+      android:layout_margin="8dp"
+      android:alpha="@{repeatModeAlpha, default=1}"
+      android:contentDescription="@string/control_repeat_mode"
+      android:src="@{repeatModeResource, default=@drawable/repeat}"
+      app:layout_constraintBottom_toBottomOf="@+id/now_playing_details_toggle"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/now_playing_details_progress"
+      app:tint="@color/controlForeground" />
+  </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

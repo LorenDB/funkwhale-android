@@ -34,6 +34,7 @@ import audio.funkwhale.ffa.databinding.ActivityMainBinding
 import audio.funkwhale.ffa.fragments.AddToPlaylistDialog
 import audio.funkwhale.ffa.fragments.BrowseFragmentDirections
 import audio.funkwhale.ffa.fragments.LandscapeQueueFragment
+import audio.funkwhale.ffa.fragments.NowPlayingFragment
 import audio.funkwhale.ffa.fragments.QueueFragment
 import audio.funkwhale.ffa.fragments.TrackInfoDetailsFragment
 import audio.funkwhale.ffa.model.Track
@@ -67,6 +68,9 @@ import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.coroutines.awaitStringResponse
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.offline.DownloadService
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
+import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
 import com.google.gson.Gson
 import com.preference.PowerPreference
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
@@ -82,7 +86,6 @@ class MainActivity : AppCompatActivity() {
     LOGOUT(1001)
   }
 
-  private val favoriteRepository = FavoritesRepository(this)
   private val favoritedRepository = FavoritedRepository(this)
   private var menu: Menu? = null
 
@@ -104,8 +107,8 @@ class MainActivity : AppCompatActivity() {
     setSupportActionBar(binding.appbar)
 
     onBackPressedDispatcher.addCallback(this) {
-      if (binding.nowPlaying.isOpened()) {
-        binding.nowPlaying.close()
+      if (binding.nowPlayingBottomSheet.isOpen) {
+        binding.nowPlayingBottomSheet.close()
       } else {
         navigation.navigateUp()
       }
@@ -121,66 +124,16 @@ class MainActivity : AppCompatActivity() {
   override fun onResume() {
     super.onResume()
 
-    findViewById<DisableableFrameLayout?>(R.id.container)?.apply {
-      setShouldRegisterTouch {
-        if (binding.nowPlaying.isOpened()) {
-          binding.nowPlaying.close()
-          false
-        } else {
-          true
-        }
-      }
-    }
+    binding.nowPlaying.getFragment<NowPlayingFragment>().apply {
+      favoritedRepository.update(requireContext(), lifecycleScope)
 
-    favoritedRepository.update(this, lifecycleScope)
+      startService(Intent(requireContext(), PlayerService::class.java))
+      DownloadService.start(requireContext(), PinService::class.java)
 
-    startService(Intent(this, PlayerService::class.java))
-    DownloadService.start(this, PinService::class.java)
+      CommandBus.send(Command.RefreshService)
 
-    CommandBus.send(Command.RefreshService)
-
-    lifecycleScope.launch(IO) {
-      Userinfo.get(this@MainActivity, oAuth)
-    }
-
-    with(binding) {
-
-      nowPlayingContainer?.nowPlayingToggle?.setOnClickListener {
-        CommandBus.send(Command.ToggleState)
-      }
-
-      nowPlayingContainer?.nowPlayingNext?.setOnClickListener {
-        CommandBus.send(Command.NextTrack)
-      }
-
-      nowPlayingContainer?.nowPlayingDetailsPrevious?.setOnClickListener {
-        CommandBus.send(Command.PreviousTrack)
-      }
-
-      nowPlayingContainer?.nowPlayingDetailsNext?.setOnClickListener {
-        CommandBus.send(Command.NextTrack)
-      }
-
-      nowPlayingContainer?.nowPlayingDetailsToggle?.setOnClickListener {
-        CommandBus.send(Command.ToggleState)
-      }
-
-      binding.nowPlayingContainer?.nowPlayingDetailsProgress?.setOnSeekBarChangeListener(
-        object : SeekBar.OnSeekBarChangeListener {
-          override fun onStopTrackingTouch(view: SeekBar?) {}
-
-          override fun onStartTrackingTouch(view: SeekBar?) {}
-
-          override fun onProgressChanged(view: SeekBar?, progress: Int, fromUser: Boolean) {
-            if (fromUser) {
-              CommandBus.send(Command.Seek(progress))
-            }
-          }
-        })
-
-      landscapeQueue?.let {
-        supportFragmentManager.beginTransaction()
-          .replace(R.id.landscape_queue, LandscapeQueueFragment()).commit()
+      lifecycleScope.launch(IO) {
+        Userinfo.get(this@MainActivity, oAuth)
       }
     }
   }
@@ -223,7 +176,7 @@ class MainActivity : AppCompatActivity() {
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     when (item.itemId) {
       android.R.id.home -> {
-        binding.nowPlaying.close()
+        binding.nowPlayingBottomSheet.close()
         navigation.popBackStack(R.id.browseFragment, false)
       }
 
@@ -298,70 +251,22 @@ class MainActivity : AppCompatActivity() {
   private fun watchEventBus() {
     lifecycleScope.launch(Main) {
       EventBus.get().collect { event ->
-        if (event is Event.LogOut) {
-          FFA.get().deleteAllData(this@MainActivity)
-          startActivity(
-            Intent(this@MainActivity, LoginActivity::class.java).apply {
-              flags = Intent.FLAG_ACTIVITY_NO_HISTORY
-            }
-          )
-
-          finish()
-        } else if (event is Event.PlaybackError) {
-          toast(event.message)
-        } else if (event is Event.Buffering) {
-          when (event.value) {
-            true -> binding.nowPlayingContainer?.nowPlayingBuffering?.visibility = View.VISIBLE
-            false -> binding.nowPlayingContainer?.nowPlayingBuffering?.visibility = View.GONE
-          }
-        } else if (event is Event.PlaybackStopped) {
-          if (binding.nowPlaying.visibility == View.VISIBLE) {
-            (binding.navHostFragment.layoutParams as? ViewGroup.MarginLayoutParams)?.let {
-              it.bottomMargin = it.bottomMargin / 2
-            }
-
-            binding.landscapeQueue?.let { landscape_queue ->
-              (landscape_queue.layoutParams as? ViewGroup.MarginLayoutParams)?.let {
-                it.bottomMargin = it.bottomMargin / 2
+        when(event) {
+          is Event.LogOut -> logout()
+          is Event.PlaybackError -> toast(event.message)
+          is Event.PlaybackStopped -> binding.nowPlayingBottomSheet.hide()
+          is Event.TrackFinished -> incrementListenCount(event.track)
+          is Event.QueueChanged -> {
+            if(binding.nowPlayingBottomSheet.isHidden) binding.nowPlayingBottomSheet.show()
+            findViewById<View>(R.id.nav_queue)?.let { view ->
+              ObjectAnimator.ofFloat(view, View.ROTATION, 0f, 360f).let {
+                it.duration = 500
+                it.interpolator = AccelerateDecelerateInterpolator()
+                it.start()
               }
             }
-
-            binding.nowPlaying.animate()
-              .alpha(0.0f)
-              .setDuration(400)
-              .setListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animator: Animator) {
-                  binding.nowPlaying.visibility = View.GONE
-                }
-              })
-              .start()
           }
-        } else if (event is Event.TrackFinished) {
-          incrementListenCount(event.track)
-        } else if (event is Event.StateChanged) {
-          when (event.playing) {
-            true -> {
-              binding.nowPlayingContainer?.nowPlayingToggle?.icon =
-                AppCompatResources.getDrawable(this@MainActivity, R.drawable.pause)
-              binding.nowPlayingContainer?.nowPlayingDetailsToggle?.icon =
-                AppCompatResources.getDrawable(this@MainActivity, R.drawable.pause)
-            }
-
-            false -> {
-              binding.nowPlayingContainer?.nowPlayingToggle?.icon =
-                AppCompatResources.getDrawable(this@MainActivity, R.drawable.play)
-              binding.nowPlayingContainer?.nowPlayingDetailsToggle?.icon =
-                AppCompatResources.getDrawable(this@MainActivity, R.drawable.play)
-            }
-          }
-        } else if (event is Event.QueueChanged) {
-          findViewById<View>(R.id.nav_queue)?.let { view ->
-            ObjectAnimator.ofFloat(view, View.ROTATION, 0f, 360f).let {
-              it.duration = 500
-              it.interpolator = AccelerateDecelerateInterpolator()
-              it.start()
-            }
-          }
+          else -> {}
         }
       }
     }
@@ -402,24 +307,6 @@ class MainActivity : AppCompatActivity() {
         }
       }
     }
-
-    lifecycleScope.launch(Main) {
-      ProgressBus.get().collect { (current, duration, percent) ->
-        binding.nowPlayingContainer?.nowPlayingProgress?.progress = percent
-        binding.nowPlayingContainer?.nowPlayingDetailsProgress?.progress = percent
-
-        val currentMins = (current / 1000) / 60
-        val currentSecs = (current / 1000) % 60
-
-        val durationMins = duration / 60
-        val durationSecs = duration % 60
-
-        binding.nowPlayingContainer?.nowPlayingDetailsProgressCurrent?.text =
-          "%02d:%02d".format(currentMins, currentSecs)
-        binding.nowPlayingContainer?.nowPlayingDetailsProgressDuration?.text =
-          "%02d:%02d".format(durationMins, durationSecs)
-      }
-    }
   }
 
   private fun refreshCurrentTrack(track: Track?) {
@@ -444,175 +331,6 @@ class MainActivity : AppCompatActivity() {
           }
         }
       }
-
-      binding.nowPlayingContainer?.nowPlayingTitle?.text = track.title
-      binding.nowPlayingContainer?.nowPlayingAlbum?.text = track.artist.name
-
-      binding.nowPlayingContainer?.nowPlayingDetailsTitle?.text = track.title
-      binding.nowPlayingContainer?.nowPlayingDetailsArtist?.text = track.artist.name
-
-      val lic = this.layoutInflater.context
-
-      CoverArt.withContext(lic, maybeNormalizeUrl(track.cover()))
-        .fit()
-        .centerCrop()
-        .into(binding.nowPlayingContainer?.nowPlayingCover)
-
-      binding.nowPlayingContainer?.nowPlayingDetailsCover?.let { nowPlayingDetailsCover ->
-        CoverArt.withContext(lic, maybeNormalizeUrl(track.cover()))
-          .fit()
-          .centerCrop()
-          .transform(RoundedCornersTransformation(16, 0))
-          .into(nowPlayingDetailsCover)
-      }
-
-      if (binding.nowPlayingContainer?.nowPlayingCover == null) {
-        lifecycleScope.launch(Default) {
-          val width = DisplayMetrics().apply {
-            windowManager.defaultDisplay.getMetrics(this)
-          }.widthPixels
-
-          val backgroundCover = CoverArt.withContext(lic, maybeNormalizeUrl(track.cover()))
-            .get()
-            .run { Bitmap.createScaledBitmap(this, width, width, false).toDrawable(resources) }
-            .apply {
-              alpha = 20
-              gravity = Gravity.CENTER
-            }
-
-          withContext(Main) {
-            binding.nowPlayingContainer?.nowPlayingDetails?.background = backgroundCover
-          }
-        }
-      }
-
-      binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.let { now_playing_details_repeat ->
-        changeRepeatMode(FFACache.getLine(this@MainActivity, "repeat")?.toInt() ?: 0)
-
-        now_playing_details_repeat.setOnClickListener {
-          val current = FFACache.getLine(this@MainActivity, "repeat")?.toInt() ?: 0
-
-          changeRepeatMode((current + 1) % 3)
-        }
-      }
-
-      binding.nowPlayingContainer?.nowPlayingDetailsInfo?.let { nowPlayingDetailsInfo ->
-        nowPlayingDetailsInfo.setOnClickListener {
-          PopupMenu(
-            this@MainActivity,
-            nowPlayingDetailsInfo,
-            Gravity.START,
-            R.attr.actionOverflowMenuStyle,
-            0
-          ).apply {
-            inflate(R.menu.track_info)
-
-            setOnMenuItemClickListener {
-              when (it.itemId) {
-                R.id.track_info_artist -> BrowseFragmentDirections.browseToAlbums(
-                  track.artist,
-                  track.album?.cover()
-                )
-                R.id.track_info_album -> track.album?.let(BrowseFragmentDirections::browseToTracks)
-                R.id.track_info_details -> TrackInfoDetailsFragment.new(track)
-                  .show(supportFragmentManager, "dialog")
-              }
-
-              binding.nowPlaying.close()
-
-              true
-            }
-
-            show()
-          }
-        }
-      }
-
-      binding.nowPlayingContainer?.nowPlayingDetailsFavorite?.let { now_playing_details_favorite ->
-        favoritedRepository.fetch().untilNetwork(lifecycleScope, IO) { favorites, _, _, _ ->
-          lifecycleScope.launch(Main) {
-            track.favorite = favorites.contains(track.id)
-
-            when (track.favorite) {
-              true -> now_playing_details_favorite.setColorFilter(getColor(R.color.colorFavorite))
-              false -> now_playing_details_favorite.setColorFilter(getColor(R.color.controlForeground))
-            }
-          }
-        }
-
-        now_playing_details_favorite.setOnClickListener {
-          when (track.favorite) {
-            true -> {
-              favoriteRepository.deleteFavorite(track.id)
-              now_playing_details_favorite.setColorFilter(getColor(R.color.controlForeground))
-            }
-
-            false -> {
-              favoriteRepository.addFavorite(track.id)
-              now_playing_details_favorite.setColorFilter(getColor(R.color.colorFavorite))
-            }
-          }
-
-          track.favorite = !track.favorite
-
-          favoriteRepository.fetch(Repository.Origin.Network.origin)
-        }
-
-        binding.nowPlayingContainer?.nowPlayingDetailsAddToPlaylist?.setOnClickListener {
-          CommandBus.send(Command.AddToPlaylist(listOf(track)))
-        }
-      }
-    }
-  }
-
-  private fun changeRepeatMode(index: Int) {
-    when (index) {
-      // From no repeat to repeat all
-      0 -> {
-        FFACache.set(this@MainActivity, "repeat", "0")
-
-        binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.setImageResource(R.drawable.repeat)
-        binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.setColorFilter(
-          ContextCompat.getColor(
-            this,
-            R.color.controlForeground
-          )
-        )
-        binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.alpha = 0.2f
-
-        CommandBus.send(Command.SetRepeatMode(Player.REPEAT_MODE_OFF))
-      }
-
-      // From repeat all to repeat one
-      1 -> {
-        FFACache.set(this@MainActivity, "repeat", "1")
-
-        binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.setImageResource(R.drawable.repeat)
-        binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.setColorFilter(
-          ContextCompat.getColor(
-            this,
-            R.color.controlForeground
-          )
-        )
-        binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.alpha = 1.0f
-
-        CommandBus.send(Command.SetRepeatMode(Player.REPEAT_MODE_ALL))
-      }
-
-      // From repeat one to no repeat
-      2 -> {
-        FFACache.set(this@MainActivity, "repeat", "2")
-        binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.setImageResource(R.drawable.repeat_one)
-        binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.setColorFilter(
-          ContextCompat.getColor(
-            this,
-            R.color.controlForeground
-          )
-        )
-        binding.nowPlayingContainer?.nowPlayingDetailsRepeat?.alpha = 1.0f
-
-        CommandBus.send(Command.SetRepeatMode(Player.REPEAT_MODE_ONE))
-      }
     }
   }
 
@@ -632,5 +350,16 @@ class MainActivity : AppCompatActivity() {
         }
       }
     }
+  }
+
+  private fun logout() {
+    FFA.get().deleteAllData(this@MainActivity)
+    startActivity(
+      Intent(this@MainActivity, LoginActivity::class.java).apply {
+        flags = Intent.FLAG_ACTIVITY_NO_HISTORY
+      }
+    )
+
+    finish()
   }
 }

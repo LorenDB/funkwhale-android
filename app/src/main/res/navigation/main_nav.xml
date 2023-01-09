@@ -1,103 +1,119 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main_nav"
-    app:startDestination="@id/browseFragment">
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/main_nav"
+            app:startDestination="@id/browseFragment">
 
-    <fragment
-        android:id="@+id/browseFragment"
-        android:name="audio.funkwhale.ffa.fragments.BrowseFragment"
-        android:label="BrowseFragment">
-        <action
-            android:id="@+id/browseToSearch"
-            app:destination="@id/searchFragment"
-            app:enterAnim="@anim/slide_up"
-            app:exitAnim="@anim/delayed_fade_out"
-            app:popEnterAnim="@anim/none"
-            app:popExitAnim="@anim/slide_down" />
-        <action
-            android:id="@+id/browseToAlbums"
-            app:destination="@id/albumsFragment"
-            app:enterAnim="@anim/slide_up"
-            app:exitAnim="@anim/delayed_fade_out"
-            app:popEnterAnim="@anim/none"
-            app:popExitAnim="@anim/slide_down" />
-        <action
-            android:id="@+id/browseToTracks"
-            app:destination="@id/tracksFragment"
-            app:enterAnim="@anim/slide_up"
-            app:exitAnim="@anim/delayed_fade_out"
-            app:popEnterAnim="@anim/none"
-            app:popExitAnim="@anim/slide_down" />
-        <action
-            android:id="@+id/browseToArtists"
-            app:destination="@id/artistsFragment"
-            app:enterAnim="@anim/slide_up"
-            app:exitAnim="@anim/delayed_fade_out"
-            app:popEnterAnim="@anim/none"
-            app:popExitAnim="@anim/slide_down" />
-        <action
-            android:id="@+id/browseToPlaylistTracks"
-            app:destination="@id/playlistTracksFragment"
-            app:enterAnim="@anim/slide_up"
-            app:exitAnim="@anim/delayed_fade_out"
-            app:popEnterAnim="@anim/none"
-            app:popExitAnim="@anim/slide_down" />
-    </fragment>
-    <fragment
-        android:id="@+id/playlistTracksFragment"
-        android:name="audio.funkwhale.ffa.fragments.PlaylistTracksFragment"
-        android:label="PlaylistTracksFragment" >
-        <argument
-            android:name="playlist"
-            app:argType="audio.funkwhale.ffa.model.Playlist" />
-    </fragment>
-    <fragment
-        android:id="@+id/tracksFragment"
-        android:name="audio.funkwhale.ffa.fragments.TracksFragment"
-        android:label="TracksFragment" >
-        <argument
-            android:name="album"
-            app:argType="audio.funkwhale.ffa.model.Album" />
-    </fragment>
-    <fragment
-        android:id="@+id/albumsFragment"
-        android:name="audio.funkwhale.ffa.fragments.AlbumsFragment"
-        android:label="AlbumsFragment" >
-        <argument
-            android:name="artist"
-            app:argType="audio.funkwhale.ffa.model.Artist" />
-        <argument
-            android:name="cover"
-            app:argType="string"
-            app:nullable="true"
-            android:defaultValue="@null" />
-        <action
-            android:id="@+id/albumsToTracks"
-            app:destination="@id/tracksFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/searchFragment"
-        android:name="audio.funkwhale.ffa.fragments.SearchFragment"
-        android:label="SearchFragment" >
-        <action
-            android:id="@+id/searchToAlbums"
-            app:destination="@id/albumsFragment"
-            app:enterAnim="@anim/slide_up"
-            app:exitAnim="@anim/delayed_fade_out"
-            app:popEnterAnim="@anim/none"
-            app:popExitAnim="@anim/slide_down" />
-        <action
-            android:id="@+id/searchToTracks"
-            app:destination="@id/tracksFragment"
-            app:enterAnim="@anim/slide_up"
-            app:exitAnim="@anim/delayed_fade_out"
-            app:popEnterAnim="@anim/none"
-            app:popExitAnim="@anim/slide_down" />
-    </fragment>
-    <fragment
-        android:id="@+id/artistsFragment"
-        android:name="audio.funkwhale.ffa.fragments.ArtistsFragment"
-        android:label="ArtistsFragment" />
+  <fragment
+    android:id="@+id/browseFragment"
+    android:name="audio.funkwhale.ffa.fragments.BrowseFragment"
+    android:label="BrowseFragment">
+    <action
+      android:id="@+id/browseToSearch"
+      app:destination="@id/searchFragment"
+      app:enterAnim="@anim/slide_up"
+      app:exitAnim="@anim/delayed_fade_out"
+      app:popEnterAnim="@anim/none"
+      app:popExitAnim="@anim/slide_down" />
+    <action
+      android:id="@+id/browseToAlbums"
+      app:destination="@id/albumsFragment"
+      app:enterAnim="@anim/slide_up"
+      app:exitAnim="@anim/delayed_fade_out"
+      app:popEnterAnim="@anim/none"
+      app:popExitAnim="@anim/slide_down" />
+    <action
+      android:id="@+id/browseToTracks"
+      app:destination="@id/tracksFragment"
+      app:enterAnim="@anim/slide_up"
+      app:exitAnim="@anim/delayed_fade_out"
+      app:popEnterAnim="@anim/none"
+      app:popExitAnim="@anim/slide_down" />
+    <action
+      android:id="@+id/browseToArtists"
+      app:destination="@id/artistsFragment"
+      app:enterAnim="@anim/slide_up"
+      app:exitAnim="@anim/delayed_fade_out"
+      app:popEnterAnim="@anim/none"
+      app:popExitAnim="@anim/slide_down" />
+    <action
+      android:id="@+id/browseToPlaylistTracks"
+      app:destination="@id/playlistTracksFragment"
+      app:enterAnim="@anim/slide_up"
+      app:exitAnim="@anim/delayed_fade_out"
+      app:popEnterAnim="@anim/none"
+      app:popExitAnim="@anim/slide_down" />
+  </fragment>
+  <fragment
+    android:id="@+id/playlistTracksFragment"
+    android:name="audio.funkwhale.ffa.fragments.PlaylistTracksFragment"
+    android:label="PlaylistTracksFragment">
+    <argument
+      android:name="playlist"
+      app:argType="audio.funkwhale.ffa.model.Playlist" />
+  </fragment>
+  <fragment
+    android:id="@+id/tracksFragment"
+    android:name="audio.funkwhale.ffa.fragments.TracksFragment"
+    android:label="TracksFragment">
+    <argument
+      android:name="album"
+      app:argType="audio.funkwhale.ffa.model.Album" />
+  </fragment>
+  <fragment
+    android:id="@+id/albumsFragment"
+    android:name="audio.funkwhale.ffa.fragments.AlbumsFragment"
+    android:label="AlbumsFragment">
+    <argument
+      android:name="artist"
+      app:argType="audio.funkwhale.ffa.model.Artist" />
+    <argument
+      android:name="cover"
+      android:defaultValue="@null"
+      app:argType="string"
+      app:nullable="true" />
+    <action
+      android:id="@+id/albumsToTracks"
+      app:destination="@id/tracksFragment" />
+  </fragment>
+  <fragment
+    android:id="@+id/searchFragment"
+    android:name="audio.funkwhale.ffa.fragments.SearchFragment"
+    android:label="SearchFragment">
+    <action
+      android:id="@+id/searchToAlbums"
+      app:destination="@id/albumsFragment"
+      app:enterAnim="@anim/slide_up"
+      app:exitAnim="@anim/delayed_fade_out"
+      app:popEnterAnim="@anim/none"
+      app:popExitAnim="@anim/slide_down" />
+    <action
+      android:id="@+id/searchToTracks"
+      app:destination="@id/tracksFragment"
+      app:enterAnim="@anim/slide_up"
+      app:exitAnim="@anim/delayed_fade_out"
+      app:popEnterAnim="@anim/none"
+      app:popExitAnim="@anim/slide_down" />
+  </fragment>
+  <fragment
+    android:id="@+id/artistsFragment"
+    android:name="audio.funkwhale.ffa.fragments.ArtistsFragment"
+    android:label="ArtistsFragment" />
+  <action
+    android:id="@+id/globalBrowseToAlbums"
+    app:destination="@id/albumsFragment"
+    app:enterAnim="@anim/slide_up"
+    app:exitAnim="@anim/delayed_fade_out"
+    app:popEnterAnim="@anim/none"
+    app:popExitAnim="@anim/slide_down"
+  />
+  <action
+    android:id="@+id/globalBrowseTracks"
+    app:destination="@id/tracksFragment"
+    app:enterAnim="@anim/slide_up"
+    app:exitAnim="@anim/delayed_fade_out"
+    app:popEnterAnim="@anim/none"
+    app:popExitAnim="@anim/slide_down"
+  />
 </navigation>

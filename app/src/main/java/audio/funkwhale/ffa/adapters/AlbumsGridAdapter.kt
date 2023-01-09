@@ -41,7 +41,6 @@ class AlbumsGridAdapter(
 
     CoverArt.withContext(layoutInflater.context, maybeNormalizeUrl(album.cover()))
       .fit()
-      .placeholder(R.drawable.cover)
       .transform(RoundedCornersTransformation(16, 0))
       .into(holder.cover)
 

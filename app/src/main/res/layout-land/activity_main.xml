@@ -1,64 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent">
 
-  <LinearLayout
+  <androidx.coordinatorlayout.widget.CoordinatorLayout
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:baselineAligned="false"
-    android:orientation="horizontal">
+    android:layout_height="0dp"
+    android:background="@color/surface"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintVertical_weight="10">
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:baselineAligned="false"
+      android:orientation="horizontal">
 
-    <androidx.fragment.app.FragmentContainerView
+      <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:layout_marginBottom="?attr/actionBarSize"
         app:defaultNavHost="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:navGraph="@navigation/main_nav"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        tools:layout="@layout/fragment_artists" />
 
-    <FrameLayout
-      android:id="@+id/landscape_queue"
-      android:layout_width="0dp"
-      android:layout_height="match_parent"
-      android:layout_marginBottom="?attr/actionBarSize"
-      android:layout_weight="1"
-      app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+      <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/landscape_queue"
+        android:name="audio.funkwhale.ffa.fragments.LandscapeQueueFragment"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:layout="@layout/partial_queue" />
+    </LinearLayout>
+  </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-  </LinearLayout>
-
-  <audio.funkwhale.ffa.views.NowPlayingView
-    android:id="@+id/now_playing"
+  <androidx.coordinatorlayout.widget.CoordinatorLayout
     android:layout_width="match_parent"
-    android:layout_height="?attr/actionBarSize"
-    android:layout_gravity="bottom"
-    android:layout_margin="8dp"
-    android:alpha="0"
-    android:visibility="gone"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="12dp"
-    app:layout_dodgeInsetEdges="bottom"
-    tools:alpha="1"
-    tools:visibility="visible">
+    android:layout_height="0dp"
+    app:layout_constraintBottom_toTopOf="@id/appbar_wrapper"
+    app:layout_constraintTop_toTopOf="parent">
+    <audio.funkwhale.ffa.views.NowPlayingBottomSheet
+      android:id="@+id/now_playing_bottom_sheet"
+      style="?attr/bottomSheetStyle"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      app:cardCornerRadius="3dp"
+      app:cardElevation="12dp"
+      app:target_header="@id/header">
+      <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/now_playing"
+        android:name="audio.funkwhale.ffa.fragments.NowPlayingFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout="@layout/fragment_now_playing" />
+    </audio.funkwhale.ffa.views.NowPlayingBottomSheet>
+  </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    <include layout="@layout/partial_now_playing" />
-
-  </audio.funkwhale.ffa.views.NowPlayingView>
-
-  <com.google.android.material.bottomappbar.BottomAppBar
-    android:id="@+id/appbar"
+  <androidx.coordinatorlayout.widget.CoordinatorLayout
+    android:id="@+id/appbar_wrapper"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="bottom"
-    android:theme="@style/AppTheme.AppBar"
-    app:backgroundTint="@color/colorPrimaryDark"
-    app:layout_insetEdge="bottom"
-    app:navigationIcon="@drawable/funkwhaleshape"
-    tools:menu="@menu/toolbar" />
+    app:layout_constraintBottom_toBottomOf="parent">
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    <com.google.android.material.bottomappbar.BottomAppBar
+      android:id="@+id/appbar"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_gravity="bottom"
+      android:theme="@style/AppTheme.AppBar"
+      app:backgroundTint="@color/elevatedSurface"
+      app:layout_insetEdge="bottom"
+      app:navigationIcon="@drawable/funkwhaleshape"
+      tools:menu="@menu/toolbar" />
+  </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
