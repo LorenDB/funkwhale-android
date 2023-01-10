@@ -1,36 +1,27 @@
 package audio.funkwhale.ffa.fragments
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AccelerateDecelerateInterpolator
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
-import androidx.core.os.bundleOf
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
-import androidx.transition.Fade
-import androidx.transition.Slide
 import audio.funkwhale.ffa.R
-import audio.funkwhale.ffa.activities.MainActivity
 import audio.funkwhale.ffa.adapters.AlbumsAdapter
 import audio.funkwhale.ffa.databinding.FragmentAlbumsBinding
 import audio.funkwhale.ffa.model.Album
-import audio.funkwhale.ffa.model.Artist
 import audio.funkwhale.ffa.repositories.AlbumsRepository
 import audio.funkwhale.ffa.repositories.ArtistTracksRepository
 import audio.funkwhale.ffa.repositories.Repository
-import audio.funkwhale.ffa.utils.AppContext
 import audio.funkwhale.ffa.utils.Command
 import audio.funkwhale.ffa.utils.CommandBus
 import audio.funkwhale.ffa.utils.CoverArt
 import audio.funkwhale.ffa.utils.maybeNormalizeUrl
-import audio.funkwhale.ffa.utils.onViewPager
 import com.preference.PowerPreference
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import kotlinx.coroutines.Dispatchers.IO
@@ -45,77 +36,22 @@ class AlbumsFragment : FFAFragment<Album, AlbumsAdapter>() {
   override val recycler: RecyclerView get() = binding.albums
   override val alwaysRefresh = false
 
+  private val args by navArgs<AlbumsFragmentArgs>()
+  private val artistArt: String get() = when {
+    !args.cover.isNullOrBlank() -> args.cover!!
+    else -> args.artist.cover() ?: ""
+  }
+
   private var _binding: FragmentAlbumsBinding? = null
   private val binding get() = _binding!!
 
   private lateinit var artistTracksRepository: ArtistTracksRepository
 
-  private var artistId = 0
-  private var artistName = ""
-  private var artistArt = ""
-
-  companion object {
-    fun new(artist: Artist, _art: String? = null): AlbumsFragment {
-      val art = _art ?: if (artist.albums?.isNotEmpty() == true) artist.cover() else ""
-
-      return AlbumsFragment().apply {
-        arguments = bundleOf(
-          "artistId" to artist.id,
-          "artistName" to artist.name,
-          "artistArt" to art
-        )
-      }
-    }
-
-    fun openTracks(context: Context?, album: Album?, fragment: Fragment? = null) {
-      if (album == null) {
-        return
-      }
-
-      (context as? MainActivity)?.let {
-        fragment?.let { fragment ->
-          fragment.onViewPager {
-            exitTransition = Fade().apply {
-              duration = AppContext.TRANSITION_DURATION
-              interpolator = AccelerateDecelerateInterpolator()
-
-              view?.let {
-                addTarget(it)
-              }
-            }
-          }
-        }
-      }
-
-      (context as? AppCompatActivity)?.let { activity ->
-        val nextFragment = TracksFragment.new(album).apply {
-          enterTransition = Slide().apply {
-            duration = AppContext.TRANSITION_DURATION
-            interpolator = AccelerateDecelerateInterpolator()
-          }
-        }
-
-        activity.supportFragmentManager
-          .beginTransaction()
-          .replace(R.id.container, nextFragment)
-          .addToBackStack(null)
-          .commit()
-      }
-    }
-  }
-
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-
-    arguments?.apply {
-      artistId = getInt("artistId")
-      artistName = getString("artistName") ?: ""
-      artistArt = getString("artistArt") ?: ""
-    }
-
     adapter = AlbumsAdapter(layoutInflater, context, OnAlbumClickListener())
-    repository = AlbumsRepository(context, artistId)
-    artistTracksRepository = ArtistTracksRepository(context, artistId)
+    repository = AlbumsRepository(context, args.artist.id)
+    artistTracksRepository = ArtistTracksRepository(context, args.artist.id)
   }
 
   override fun onCreateView(
@@ -151,7 +87,7 @@ class AlbumsFragment : FFAFragment<Album, AlbumsAdapter>() {
         .into(cover)
     }
 
-    binding.artist.text = artistName
+    binding.artist.text = args.artist.name
   }
 
   override fun onResume() {
@@ -209,7 +145,7 @@ class AlbumsFragment : FFAFragment<Album, AlbumsAdapter>() {
 
   inner class OnAlbumClickListener : AlbumsAdapter.OnAlbumClickListener {
     override fun onClick(view: View?, album: Album) {
-      openTracks(context, album, fragment = this@AlbumsFragment)
+      findNavController().navigate(AlbumsFragmentDirections.albumsToTracks(album))
     }
   }
 }

@@ -7,10 +7,10 @@ import android.graphics.PorterDuffColorFilter
 import android.graphics.Typeface
 import android.os.Build
 import android.view.Gravity
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.databinding.RowSearchHeaderBinding
@@ -24,11 +24,13 @@ import audio.funkwhale.ffa.utils.CoverArt
 import audio.funkwhale.ffa.utils.maybeNormalizeUrl
 import audio.funkwhale.ffa.utils.onApi
 import audio.funkwhale.ffa.utils.toast
+import audio.funkwhale.ffa.viewmodel.SearchViewModel
+import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 
 class SearchAdapter(
-  private val layoutInflater: LayoutInflater,
-  private val context: Context?,
+  viewModel: SearchViewModel,
+  private val fragment: Fragment,
   private val listener: OnSearchResultClickListener,
   private val favoriteListener: FavoriteListener
 ) : RecyclerView.Adapter<SearchAdapter.ViewHolder>() {
@@ -50,11 +52,26 @@ class SearchAdapter(
 
   val sectionCount = 3
 
-  var artists: MutableList<Artist> = mutableListOf()
-  var albums: MutableList<Album> = mutableListOf()
-  var tracks: MutableList<Track> = mutableListOf()
+  var artists = listOf<Artist>()
+  var albums = listOf<Album>()
+  var tracks = listOf<Track>()
 
   var currentTrack: Track? = null
+
+  init {
+    viewModel.artistResults.observe(fragment.viewLifecycleOwner) {
+      artists = it
+      this.notifyDataSetChanged()
+    }
+    viewModel.albumResults.observe(fragment.viewLifecycleOwner) {
+      albums = it
+      this.notifyDataSetChanged()
+    }
+    viewModel.trackResults.observe(fragment.viewLifecycleOwner) {
+      tracks = it
+      this.notifyDataSetChanged()
+    }
+  }
 
   override fun getItemCount() = sectionCount + artists.size + albums.size + tracks.size
 
@@ -67,7 +84,7 @@ class SearchAdapter(
       }
 
       ResultType.Artist.ordinal -> artists[position].id.toLong()
-      ResultType.Artist.ordinal -> albums[position - artists.size - 2].id.toLong()
+      ResultType.Album.ordinal -> albums[position - artists.size - 2].id.toLong()
       ResultType.Track.ordinal ->
         tracks[position - artists.size - albums.size - sectionCount].id.toLong()
       else -> 0
@@ -86,12 +103,12 @@ class SearchAdapter(
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
     return when (viewType) {
       ResultType.Header.ordinal -> {
-        searchHeaderBinding = RowSearchHeaderBinding.inflate(layoutInflater, parent, false)
-        SearchHeaderViewHolder(searchHeaderBinding, context)
+        searchHeaderBinding = RowSearchHeaderBinding.inflate(fragment.layoutInflater, parent, false)
+        SearchHeaderViewHolder(searchHeaderBinding, fragment.requireContext())
       }
       else -> {
-        rowTrackBinding = RowTrackBinding.inflate(layoutInflater, parent, false)
-        RowTrackViewHolder(rowTrackBinding, context).also {
+        rowTrackBinding = RowTrackBinding.inflate(fragment.layoutInflater, parent, false)
+        RowTrackViewHolder(rowTrackBinding, fragment.requireContext()).also {
           rowTrackBinding.root.setOnClickListener(it)
         }
       }
@@ -105,47 +122,45 @@ class SearchAdapter(
     val rowTrackViewHolder = holder as? RowTrackViewHolder
 
     if (resultType == ResultType.Header.ordinal) {
-      context?.let { context ->
-        if (position == 0) {
-          searchHeaderViewHolder?.title?.text = context.getString(R.string.artists)
-          holder.itemView.visibility = View.VISIBLE
-          holder.itemView.layoutParams = RecyclerView.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-          )
+      if (position == 0) {
+        searchHeaderViewHolder?.title?.text = fragment.requireContext().getString(R.string.artists)
+        holder.itemView.visibility = View.VISIBLE
+        holder.itemView.layoutParams = RecyclerView.LayoutParams(
+          ViewGroup.LayoutParams.MATCH_PARENT,
+          ViewGroup.LayoutParams.WRAP_CONTENT
+        )
 
-          if (artists.isEmpty()) {
-            holder.itemView.visibility = View.GONE
-            holder.itemView.layoutParams = RecyclerView.LayoutParams(0, 0)
-          }
+        if (artists.isEmpty()) {
+          holder.itemView.visibility = View.GONE
+          holder.itemView.layoutParams = RecyclerView.LayoutParams(0, 0)
         }
+      }
 
-        if (position == (artists.size + 1)) {
-          searchHeaderViewHolder?.title?.text = context.getString(R.string.albums)
-          holder.itemView.visibility = View.VISIBLE
-          holder.itemView.layoutParams = RecyclerView.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-          )
+      if (position == (artists.size + 1)) {
+        searchHeaderViewHolder?.title?.text = fragment.requireContext().getString(R.string.albums)
+        holder.itemView.visibility = View.VISIBLE
+        holder.itemView.layoutParams = RecyclerView.LayoutParams(
+          ViewGroup.LayoutParams.MATCH_PARENT,
+          ViewGroup.LayoutParams.WRAP_CONTENT
+        )
 
-          if (albums.isEmpty()) {
-            holder.itemView.visibility = View.GONE
-            holder.itemView.layoutParams = RecyclerView.LayoutParams(0, 0)
-          }
+        if (albums.isEmpty()) {
+          holder.itemView.visibility = View.GONE
+          holder.itemView.layoutParams = RecyclerView.LayoutParams(0, 0)
         }
+      }
 
-        if (position == (artists.size + albums.size + 2)) {
-          searchHeaderViewHolder?.title?.text = context.getString(R.string.tracks)
-          holder.itemView.visibility = View.VISIBLE
-          holder.itemView.layoutParams = RecyclerView.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-          )
+      if (position == (artists.size + albums.size + 2)) {
+        searchHeaderViewHolder?.title?.text = fragment.requireContext().getString(R.string.tracks)
+        holder.itemView.visibility = View.VISIBLE
+        holder.itemView.layoutParams = RecyclerView.LayoutParams(
+          ViewGroup.LayoutParams.MATCH_PARENT,
+          ViewGroup.LayoutParams.WRAP_CONTENT
+        )
 
-          if (tracks.isEmpty()) {
-            holder.itemView.visibility = View.GONE
-            holder.itemView.layoutParams = RecyclerView.LayoutParams(0, 0)
-          }
+        if (tracks.isEmpty()) {
+          holder.itemView.visibility = View.GONE
+          holder.itemView.layoutParams = RecyclerView.LayoutParams(0, 0)
         }
       }
 
@@ -174,7 +189,7 @@ class SearchAdapter(
       else -> tracks[position]
     }
 
-    CoverArt.withContext(layoutInflater.context, maybeNormalizeUrl(item.cover()))
+    CoverArt.withContext(fragment.layoutInflater.context, maybeNormalizeUrl(item.cover()))
       .fit()
       .transform(RoundedCornersTransformation(16, 0))
       .into(rowTrackViewHolder?.cover)
@@ -216,90 +231,91 @@ class SearchAdapter(
       }
       ResultType.Track.ordinal -> {
         (item as? Track)?.let { track ->
-          context?.let { context ->
-            if (track == currentTrack || track.current) {
-              searchHeaderViewHolder?.title?.setTypeface(
-                searchHeaderViewHolder.title.typeface,
-                Typeface.BOLD
-              )
-              rowTrackViewHolder?.artist?.setTypeface(
-                rowTrackViewHolder.artist.typeface,
-                Typeface.BOLD
-              )
+          if (track == currentTrack || track.current) {
+            searchHeaderViewHolder?.title?.setTypeface(
+              searchHeaderViewHolder.title.typeface,
+              Typeface.BOLD
+            )
+            rowTrackViewHolder?.artist?.setTypeface(
+              rowTrackViewHolder.artist.typeface,
+              Typeface.BOLD
+            )
+          }
+
+          when (track.favorite) {
+            true -> rowTrackViewHolder?.favorite?.setColorFilter(
+              fragment.requireContext().getColor(R.color.colorFavorite)
+            )
+            false -> rowTrackViewHolder?.favorite?.setColorFilter(
+              fragment.requireContext().getColor(R.color.colorSelected)
+            )
+          }
+
+          rowTrackViewHolder?.favorite?.setOnClickListener {
+            favoriteListener.let {
+              favoriteListener.onToggleFavorite(track.id, !track.favorite)
+
+              tracks[position - artists.size - albums.size - sectionCount].favorite =
+                !track.favorite
+
+              notifyItemChanged(position)
             }
+          }
 
-            when (track.favorite) {
-              true -> rowTrackViewHolder?.favorite?.setColorFilter(
-                context.getColor(R.color.colorFavorite)
-              )
-              false -> rowTrackViewHolder?.favorite?.setColorFilter(
-                context.getColor(R.color.colorSelected)
-              )
+          when (track.cached || track.downloaded) {
+            true -> rowTrackViewHolder?.title?.setCompoundDrawablesWithIntrinsicBounds(
+              R.drawable.downloaded, 0, 0, 0
+            )
+            false -> rowTrackViewHolder?.title?.setCompoundDrawablesWithIntrinsicBounds(
+              0, 0, 0, 0
+            )
+          }
+
+          if (track.cached && !track.downloaded) {
+            rowTrackViewHolder?.title?.compoundDrawables?.forEach {
+              it?.colorFilter =
+                PorterDuffColorFilter(
+                  fragment.requireContext().getColor(R.color.cached),
+                  PorterDuff.Mode.SRC_IN
+                )
             }
+          }
 
-            rowTrackViewHolder?.favorite?.setOnClickListener {
-              favoriteListener.let {
-                favoriteListener.onToggleFavorite(track.id, !track.favorite)
-
-                tracks[position - artists.size - albums.size - sectionCount].favorite =
-                  !track.favorite
-
-                notifyItemChanged(position)
-              }
+          if (track.downloaded) {
+            rowTrackViewHolder?.title?.compoundDrawables?.forEach {
+              it?.colorFilter =
+                PorterDuffColorFilter(
+                  fragment.requireContext().getColor(R.color.downloaded),
+                  PorterDuff.Mode.SRC_IN
+                )
             }
+          }
 
-            when (track.cached || track.downloaded) {
-              true -> rowTrackViewHolder?.title?.setCompoundDrawablesWithIntrinsicBounds(
-                R.drawable.downloaded, 0, 0, 0
-              )
-              false -> rowTrackViewHolder?.title?.setCompoundDrawablesWithIntrinsicBounds(
-                0, 0, 0, 0
-              )
-            }
+          rowTrackViewHolder?.actions?.setOnClickListener {
+            PopupMenu(
+              fragment.requireContext(),
+              rowTrackViewHolder.actions,
+              Gravity.START,
+              R.attr.actionOverflowMenuStyle,
+              0
+            ).apply {
+              inflate(R.menu.row_track)
 
-            if (track.cached && !track.downloaded) {
-              rowTrackViewHolder?.title?.compoundDrawables?.forEach {
-                it?.colorFilter =
-                  PorterDuffColorFilter(context.getColor(R.color.cached), PorterDuff.Mode.SRC_IN)
-              }
-            }
-
-            if (track.downloaded) {
-              rowTrackViewHolder?.title?.compoundDrawables?.forEach {
-                it?.colorFilter =
-                  PorterDuffColorFilter(
-                    context.getColor(R.color.downloaded),
-                    PorterDuff.Mode.SRC_IN
+              setOnMenuItemClickListener {
+                when (it.itemId) {
+                  R.id.track_add_to_queue -> CommandBus.send(Command.AddToQueue(listOf(track)))
+                  R.id.track_play_next -> CommandBus.send(Command.PlayNext(track))
+                  R.id.track_pin -> CommandBus.send(Command.PinTrack(track))
+                  R.id.track_add_to_playlist -> CommandBus.send(
+                    Command.AddToPlaylist(listOf(track))
                   )
-              }
-            }
-
-            rowTrackViewHolder?.actions?.setOnClickListener {
-              PopupMenu(
-                context,
-                rowTrackViewHolder.actions,
-                Gravity.START,
-                R.attr.actionOverflowMenuStyle,
-                0
-              ).apply {
-                inflate(R.menu.row_track)
-
-                setOnMenuItemClickListener {
-                  when (it.itemId) {
-                    R.id.track_add_to_queue -> CommandBus.send(Command.AddToQueue(listOf(track)))
-                    R.id.track_play_next -> CommandBus.send(Command.PlayNext(track))
-                    R.id.track_pin -> CommandBus.send(Command.PinTrack(track))
-                    R.id.track_add_to_playlist -> CommandBus.send(
-                      Command.AddToPlaylist(listOf(track))
-                    )
-                    R.id.queue_remove -> CommandBus.send(Command.RemoveFromQueue(track))
-                  }
-
-                  true
+                  R.id.queue_remove -> CommandBus.send(Command.RemoveFromQueue(track))
                 }
 
-                show()
+                true
               }
+
+              show()
             }
           }
         }
@@ -316,12 +332,12 @@ class SearchAdapter(
     }
   }
 
-  inner class SearchHeaderViewHolder(val binding: RowSearchHeaderBinding, context: Context?) :
+  inner class SearchHeaderViewHolder(val binding: RowSearchHeaderBinding, context: Context) :
     ViewHolder(binding.root, context) {
     val title = binding.title
   }
 
-  inner class RowTrackViewHolder(val binding: RowTrackBinding, context: Context?) :
+  inner class RowTrackViewHolder(val binding: RowTrackBinding, context: Context) :
     ViewHolder(binding.root, context), View.OnClickListener {
     val title = binding.title
     val cover = binding.cover

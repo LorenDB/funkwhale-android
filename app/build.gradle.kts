@@ -5,12 +5,15 @@ import java.util.Properties
 plugins {
   id("com.android.application")
   id("kotlin-android")
+  id("androidx.navigation.safeargs.kotlin")
+  id("kotlin-parcelize")
 
   id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
   id("com.gladed.androidgitversion") version "0.4.14"
   id("com.github.triplet.play") version "3.7.0"
   id("de.mobilej.unmock")
   id("com.github.ben-manes.versions")
+  id("org.jetbrains.kotlin.android")
   jacoco
 }
 
@@ -48,6 +51,7 @@ android {
 
   buildFeatures {
     viewBinding = true
+    dataBinding = true
   }
 
   packagingOptions {
@@ -158,6 +162,9 @@ play {
 }
 
 dependencies {
+  val navVersion: String by rootProject.extra
+  val lifecycleVersion: String by rootProject.extra
+
   implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 
   implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0")
@@ -166,7 +173,8 @@ dependencies {
 
   implementation("androidx.appcompat:appcompat:1.4.2")
   implementation("androidx.core:core-ktx:1.9.0")
-  implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
+  implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
+  implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
   implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
   implementation("androidx.preference:preference-ktx:1.2.0")
   implementation("androidx.recyclerview:recyclerview:1.2.1")
@@ -189,7 +197,7 @@ dependencies {
     isTransitive = false
   }
 
-  implementation("com.aliassadi:power-preference-lib:2.0.0")
+  implementation("com.github.AliAsadi:PowerPreference:2.1.0")
   implementation("com.github.kittinunf.fuel:fuel:2.3.1")
   implementation("com.github.kittinunf.fuel:fuel-coroutines:2.3.1")
   implementation("com.github.kittinunf.fuel:fuel-android:2.3.1")
@@ -199,6 +207,10 @@ dependencies {
   implementation("jp.wasabeef:picasso-transformations:2.4.0")
   implementation("net.openid:appauth:0.11.1")
 
+  implementation("androidx.navigation:navigation-fragment-ktx:$navVersion")
+  implementation("androidx.navigation:navigation-ui-ktx:$navVersion")
+  implementation("androidx.navigation:navigation-dynamic-features-fragment:$navVersion")
+
   testImplementation("junit:junit:4.13.2")
   testImplementation("io.mockk:mockk:1.13.3")
   testImplementation("androidx.test:core:1.5.0")
@@ -206,6 +218,7 @@ dependencies {
   testImplementation("org.robolectric:robolectric:4.9.2")
 
   androidTestImplementation("io.mockk:mockk-android:1.13.3")
+  androidTestImplementation("androidx.navigation:navigation-testing:$navVersion")
 }
 
 project.afterEvaluate {

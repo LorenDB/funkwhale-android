@@ -8,14 +8,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
-import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.adapters.FavoriteListener
 import audio.funkwhale.ffa.adapters.TracksAdapter
 import audio.funkwhale.ffa.databinding.FragmentTracksBinding
-import audio.funkwhale.ffa.model.Album
 import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.repositories.FavoritedRepository
 import audio.funkwhale.ffa.repositories.FavoritesRepository
@@ -43,7 +42,7 @@ import kotlinx.coroutines.withContext
 import org.koin.java.KoinJavaComponent.inject
 
 class TracksFragment : FFAFragment<Track, TracksAdapter>() {
-
+  private val args by navArgs<TracksFragmentArgs>()
   private val exoDownloadManager: DownloadManager by inject(DownloadManager::class.java)
 
   override val recycler: RecyclerView get() = binding.tracks
@@ -54,37 +53,12 @@ class TracksFragment : FFAFragment<Track, TracksAdapter>() {
   private lateinit var favoritesRepository: FavoritesRepository
   private lateinit var favoritedRepository: FavoritedRepository
 
-  private var albumId = 0
-  private var albumArtist = ""
-  private var albumTitle = ""
-  private var albumCover = ""
-
-  companion object {
-    fun new(album: Album): TracksFragment {
-      return TracksFragment().apply {
-        arguments = bundleOf(
-          "albumId" to album.id,
-          "albumArtist" to album.artist.name,
-          "albumTitle" to album.title,
-          "albumCover" to album.cover()
-        )
-      }
-    }
-  }
-
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    arguments?.apply {
-      albumId = getInt("albumId")
-      albumArtist = getString("albumArtist") ?: ""
-      albumTitle = getString("albumTitle") ?: ""
-      albumCover = getString("albumCover") ?: ""
-    }
-
     favoritesRepository = FavoritesRepository(context)
     favoritedRepository = FavoritedRepository(context)
-    repository = TracksRepository(context, albumId)
+    repository = TracksRepository(context, args.album.id)
 
     adapter = TracksAdapter(layoutInflater, context, FavoriteListener(favoritesRepository))
 
@@ -144,15 +118,15 @@ class TracksFragment : FFAFragment<Track, TracksAdapter>() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    CoverArt.withContext(layoutInflater.context, maybeNormalizeUrl(albumCover))
+    CoverArt.withContext(layoutInflater.context, maybeNormalizeUrl(args.album.cover()))
       .noFade()
       .fit()
       .centerCrop()
       .transform(RoundedCornersTransformation(16, 0))
       .into(binding.cover)
 
-    binding.artist.text = albumArtist
-    binding.title.text = albumTitle
+    binding.artist.text = args.album.artist.name
+    binding.title.text = args.album.title
   }
 
   override fun onResume() {

@@ -6,14 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
-import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.adapters.FavoriteListener
 import audio.funkwhale.ffa.adapters.PlaylistTracksAdapter
 import audio.funkwhale.ffa.databinding.FragmentTracksBinding
-import audio.funkwhale.ffa.model.Playlist
 import audio.funkwhale.ffa.model.PlaylistTrack
 import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.repositories.FavoritesRepository
@@ -33,8 +32,9 @@ import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 
 class PlaylistTracksFragment : FFAFragment<PlaylistTrack, PlaylistTracksAdapter>() {
-
   override val recycler: RecyclerView get() = binding.tracks
+
+  private val args by navArgs<PlaylistTracksFragmentArgs>()
 
   private var _binding: FragmentTracksBinding? = null
   private val binding get() = _binding!!
@@ -42,33 +42,8 @@ class PlaylistTracksFragment : FFAFragment<PlaylistTrack, PlaylistTracksAdapter>
   lateinit var favoritesRepository: FavoritesRepository
   lateinit var playlistsRepository: ManagementPlaylistsRepository
 
-  var albumId = 0
-  var albumArtist = ""
-  var albumTitle = ""
-  var albumCover = ""
-
-  companion object {
-    fun new(playlist: Playlist): PlaylistTracksFragment {
-      return PlaylistTracksFragment().apply {
-        arguments = bundleOf(
-          "albumId" to playlist.id,
-          "albumArtist" to "N/A",
-          "albumTitle" to playlist.name,
-          "albumCover" to ""
-        )
-      }
-    }
-  }
-
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-
-    arguments?.apply {
-      albumId = getInt("albumId")
-      albumArtist = getString("albumArtist") ?: ""
-      albumTitle = getString("albumTitle") ?: ""
-      albumCover = getString("albumCover") ?: ""
-    }
 
     favoritesRepository = FavoritesRepository(context)
     playlistsRepository = ManagementPlaylistsRepository(context)
@@ -79,7 +54,7 @@ class PlaylistTracksFragment : FFAFragment<PlaylistTrack, PlaylistTracksAdapter>
       FavoriteListener(favoritesRepository),
       PlaylistListener()
     )
-    repository = PlaylistTracksRepository(context, albumId)
+    repository = PlaylistTracksRepository(context, args.playlist.id)
 
     watchEventBus()
   }
@@ -105,8 +80,8 @@ class PlaylistTracksFragment : FFAFragment<PlaylistTrack, PlaylistTracksAdapter>
     binding.cover.visibility = View.INVISIBLE
     binding.covers.visibility = View.VISIBLE
 
-    binding.artist.text = "Playlist"
-    binding.title.text = albumTitle
+    binding.artist.text = getString(R.string.playlist)
+    binding.title.text = args.playlist.name
   }
 
   override fun onResume() {
@@ -216,12 +191,12 @@ class PlaylistTracksFragment : FFAFragment<PlaylistTrack, PlaylistTracksAdapter>
 
   inner class PlaylistListener : PlaylistTracksAdapter.OnPlaylistListener {
     override fun onMoveTrack(from: Int, to: Int) {
-      playlistsRepository.move(albumId, from, to)
+      playlistsRepository.move(args.playlist.id, from, to)
     }
 
     override fun onRemoveTrackFromPlaylist(track: Track, index: Int) {
       lifecycleScope.launch(Main) {
-        playlistsRepository.remove(albumId, index)
+        playlistsRepository.remove(args.playlist.id, index)
         update()
       }
     }

@@ -3,8 +3,8 @@ package audio.funkwhale.ffa.utils
 import android.content.Context
 import android.os.Build
 import android.util.Log
-import androidx.fragment.app.Fragment
-import audio.funkwhale.ffa.fragments.BrowseFragment
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import audio.funkwhale.ffa.model.DownloadInfo
 import audio.funkwhale.ffa.repositories.Repository
 import com.github.kittinunf.fuel.core.FuelError
@@ -30,14 +30,6 @@ inline fun <D> Flow<Repository.Response<D>>.untilNetwork(
   scope.launch(context) {
     collect { data ->
       callback(data.data, data.origin == Repository.Origin.Cache, data.page, data.hasMore)
-    }
-  }
-}
-
-fun Fragment.onViewPager(block: Fragment.() -> Unit) {
-  for (f in activity?.supportFragmentManager?.fragments ?: listOf()) {
-    if (f is BrowseFragment) {
-      f.block()
     }
   }
 }
@@ -107,3 +99,53 @@ fun Date.format(): String {
 
 fun String?.containsIgnoringCase(candidate: String): Boolean =
   this != null && this.lowercase().contains(candidate.lowercase())
+
+inline fun <T, U, V, R> LiveData<T>.mergeWith(
+  u: LiveData<U>,
+  v: LiveData<V>,
+  crossinline block: (valT: T, valU: U, valV: V) -> R
+): LiveData<R> = MediatorLiveData<R>().apply {
+  addSource(this@mergeWith) {
+    if (u.value != null && v.value != null) {
+      postValue(block(it, u.value!!, v.value!!))
+    }
+  }
+  addSource(u) {
+    if (this@mergeWith.value != null && u.value != null) {
+      postValue(block(this@mergeWith.value!!, it, v.value!!))
+    }
+  }
+  addSource(v) {
+    if (this@mergeWith.value != null && u.value != null) {
+      postValue(block(this@mergeWith.value!!, u.value!!, it))
+    }
+  }
+}
+
+inline fun <T, U, V, W, R> LiveData<T>.mergeWith(
+  u: LiveData<U>,
+  v: LiveData<V>,
+  w: LiveData<W>,
+  crossinline block: (valT: T, valU: U, valV: V, valW: W) -> R
+): LiveData<R> = MediatorLiveData<R>().apply {
+  addSource(this@mergeWith) {
+    if (u.value != null && v.value != null && w.value != null) {
+      postValue(block(it, u.value!!, v.value!!, w.value!!))
+    }
+  }
+  addSource(u) {
+    if (this@mergeWith.value != null && v.value != null && w.value != null) {
+      postValue(block(this@mergeWith.value!!, it, v.value!!, w.value!!))
+    }
+  }
+  addSource(v) {
+    if (this@mergeWith.value != null && u.value != null && w.value != null) {
+      postValue(block(this@mergeWith.value!!, u.value!!, it, w.value!!))
+    }
+  }
+  addSource(w) {
+    if (this@mergeWith.value != null && u.value != null && v.value != null) {
+      postValue(block(this@mergeWith.value!!, u.value!!, v.value!!, it))
+    }
+  }
+}
