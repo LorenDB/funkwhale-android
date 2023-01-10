@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Build
 import android.util.Log
 import androidx.fragment.app.Fragment
-import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.fragments.BrowseFragment
 import audio.funkwhale.ffa.model.DownloadInfo
 import audio.funkwhale.ffa.repositories.Repository
@@ -12,8 +11,6 @@ import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Request
 import com.google.android.exoplayer2.offline.Download
 import com.google.gson.Gson
-import com.squareup.picasso.Picasso
-import com.squareup.picasso.RequestCreator
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
@@ -57,13 +54,6 @@ fun <T, U> Int.onApi(block: () -> T, elseBlock: (() -> U)) {
   } else {
     elseBlock()
   }
-}
-
-fun Picasso.maybeLoad(url: String?): RequestCreator {
-  return if (url == null) load(R.drawable.cover)
-  else load(url)
-    // Remote storage may have (pre-signed) ephemeral credentials in the query string
-    .stableKey(url.replace(Regex("\\?.*$"), ""))
 }
 
 fun Request.authorize(context: Context, oAuth: OAuth): Request {

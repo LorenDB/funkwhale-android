@@ -20,10 +20,9 @@ import audio.funkwhale.ffa.model.PlaylistTrack
 import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.utils.Command
 import audio.funkwhale.ffa.utils.CommandBus
-import audio.funkwhale.ffa.utils.maybeLoad
+import audio.funkwhale.ffa.utils.CoverArt
 import audio.funkwhale.ffa.utils.maybeNormalizeUrl
 import audio.funkwhale.ffa.utils.toast
-import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import java.util.Collections
 
@@ -72,8 +71,7 @@ class PlaylistTracksAdapter(
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
     val track = data[position]
 
-    Picasso.get()
-      .maybeLoad(maybeNormalizeUrl(track.track.album?.cover()))
+    CoverArt.withContext(layoutInflater.context, maybeNormalizeUrl(track.track.album?.cover()))
       .fit()
       .placeholder(R.drawable.cover)
       .transform(RoundedCornersTransformation(16, 0))

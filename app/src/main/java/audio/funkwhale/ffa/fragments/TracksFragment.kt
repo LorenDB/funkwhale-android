@@ -22,24 +22,22 @@ import audio.funkwhale.ffa.repositories.FavoritesRepository
 import audio.funkwhale.ffa.repositories.TracksRepository
 import audio.funkwhale.ffa.utils.Command
 import audio.funkwhale.ffa.utils.CommandBus
+import audio.funkwhale.ffa.utils.CoverArt
 import audio.funkwhale.ffa.utils.Event
 import audio.funkwhale.ffa.utils.EventBus
 import audio.funkwhale.ffa.utils.Request
 import audio.funkwhale.ffa.utils.RequestBus
 import audio.funkwhale.ffa.utils.Response
 import audio.funkwhale.ffa.utils.getMetadata
-import audio.funkwhale.ffa.utils.maybeLoad
 import audio.funkwhale.ffa.utils.maybeNormalizeUrl
 import audio.funkwhale.ffa.utils.toast
 import audio.funkwhale.ffa.utils.wait
 import com.google.android.exoplayer2.offline.Download
 import com.google.android.exoplayer2.offline.DownloadManager
 import com.preference.PowerPreference
-import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.java.KoinJavaComponent.inject
@@ -146,8 +144,7 @@ class TracksFragment : FFAFragment<Track, TracksAdapter>() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    Picasso.get()
-      .maybeLoad(maybeNormalizeUrl(albumCover))
+    CoverArt.withContext(layoutInflater.context, maybeNormalizeUrl(albumCover))
       .noFade()
       .fit()
       .centerCrop()
@@ -194,7 +191,6 @@ class TracksFragment : FFAFragment<Track, TracksAdapter>() {
         "in_order" -> CommandBus.send(Command.ReplaceQueue(adapter.data))
         else -> CommandBus.send(Command.ReplaceQueue(adapter.data.shuffled()))
       }
-
       context.toast("All tracks were added to your queue")
     }
 

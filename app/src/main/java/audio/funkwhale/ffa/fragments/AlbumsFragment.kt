@@ -28,11 +28,10 @@ import audio.funkwhale.ffa.repositories.Repository
 import audio.funkwhale.ffa.utils.AppContext
 import audio.funkwhale.ffa.utils.Command
 import audio.funkwhale.ffa.utils.CommandBus
-import audio.funkwhale.ffa.utils.maybeLoad
+import audio.funkwhale.ffa.utils.CoverArt
 import audio.funkwhale.ffa.utils.maybeNormalizeUrl
 import audio.funkwhale.ffa.utils.onViewPager
 import com.preference.PowerPreference
-import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -144,8 +143,7 @@ class AlbumsFragment : FFAFragment<Album, AlbumsAdapter>() {
     super.onViewCreated(view, savedInstanceState)
 
     binding.cover.let { cover ->
-      Picasso.get()
-        .maybeLoad(maybeNormalizeUrl(artistArt))
+      CoverArt.withContext(layoutInflater.context, maybeNormalizeUrl(artistArt))
         .noFade()
         .fit()
         .centerCrop()

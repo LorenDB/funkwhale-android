@@ -9,9 +9,8 @@ import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.databinding.RowArtistBinding
 import audio.funkwhale.ffa.fragments.FFAAdapter
 import audio.funkwhale.ffa.model.Artist
-import audio.funkwhale.ffa.utils.maybeLoad
+import audio.funkwhale.ffa.utils.CoverArt
 import audio.funkwhale.ffa.utils.maybeNormalizeUrl
-import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 
 class ArtistsAdapter(
@@ -62,14 +61,11 @@ class ArtistsAdapter(
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
     val artist = active[position]
 
-    artist.albums?.let { albums ->
-      if (albums.isNotEmpty()) {
-        Picasso.get()
-          .maybeLoad(maybeNormalizeUrl(albums[0].cover?.urls?.original))
-          .fit()
-          .transform(RoundedCornersTransformation(8, 0))
-          .into(holder.art)
-      }
+    artist.cover()?.let { coverUrl ->
+      CoverArt.withContext(layoutInflater.context, maybeNormalizeUrl(coverUrl))
+        .fit()
+        .transform(RoundedCornersTransformation(8, 0))
+        .into(holder.art)
     }
 
     holder.name.text = artist.name

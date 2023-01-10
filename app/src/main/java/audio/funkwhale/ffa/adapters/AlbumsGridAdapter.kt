@@ -8,9 +8,8 @@ import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.databinding.RowAlbumGridBinding
 import audio.funkwhale.ffa.fragments.FFAAdapter
 import audio.funkwhale.ffa.model.Album
-import audio.funkwhale.ffa.utils.maybeLoad
+import audio.funkwhale.ffa.utils.CoverArt
 import audio.funkwhale.ffa.utils.maybeNormalizeUrl
-import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 
 class AlbumsGridAdapter(
@@ -40,8 +39,7 @@ class AlbumsGridAdapter(
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
     val album = data[position]
 
-    Picasso.get()
-      .maybeLoad(maybeNormalizeUrl(album.cover()))
+    CoverArt.withContext(layoutInflater.context, maybeNormalizeUrl(album.cover()))
       .fit()
       .placeholder(R.drawable.cover)
       .transform(RoundedCornersTransformation(16, 0))

@@ -21,17 +21,15 @@ import audio.funkwhale.ffa.repositories.ManagementPlaylistsRepository
 import audio.funkwhale.ffa.repositories.PlaylistTracksRepository
 import audio.funkwhale.ffa.utils.Command
 import audio.funkwhale.ffa.utils.CommandBus
+import audio.funkwhale.ffa.utils.CoverArt
 import audio.funkwhale.ffa.utils.Request
 import audio.funkwhale.ffa.utils.RequestBus
 import audio.funkwhale.ffa.utils.Response
-import audio.funkwhale.ffa.utils.maybeLoad
 import audio.funkwhale.ffa.utils.maybeNormalizeUrl
 import audio.funkwhale.ffa.utils.toast
 import audio.funkwhale.ffa.utils.wait
-import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class PlaylistTracksFragment : FFAFragment<PlaylistTrack, PlaylistTracksAdapter>() {
@@ -137,7 +135,6 @@ class PlaylistTracksFragment : FFAFragment<PlaylistTrack, PlaylistTracksAdapter>
 
     binding.play.setOnClickListener {
       CommandBus.send(Command.ReplaceQueue(adapter.data.map { it.track }.shuffled()))
-
       context.toast("All tracks were added to your queue")
     }
 
@@ -191,8 +188,7 @@ class PlaylistTracksFragment : FFAFragment<PlaylistTrack, PlaylistTracksAdapter>
       }
 
       lifecycleScope.launch(Main) {
-        Picasso.get()
-          .maybeLoad(maybeNormalizeUrl(url))
+        CoverArt.withContext(layoutInflater.context, maybeNormalizeUrl(url))
           .fit()
           .centerCrop()
           .transform(RoundedCornersTransformation(16, 0, corner))
