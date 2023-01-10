@@ -157,3 +157,17 @@ deploy-release:
   variables:
     FILE: app/build/outputs/apk/release/app-release.apk
     PACKAGE: audio.funkwhale.ffa
+
+trigger-fdroid-update-develop:
+  stage: .post
+  only:
+    - develop
+  image: curl:7.87.0
+  script: "curl https://fdroid.funkwhale.audio/hooks/webhook?name=audio.funkwhale.ffa.dev&version=$CI_COMMIT_SHORT_SHA"
+
+trigger-fdroid-update-release:
+  stage: .post
+  only:
+    - develop
+  image: curl:7.87.0
+  script: "curl https://fdroid.funkwhale.audio/hooks/webhook?name=audio.funkwhale.ffa&version=$CI_COMMIT_SHORT_SHA"
