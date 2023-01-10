@@ -1,3 +1,7 @@
 package audio.funkwhale.ffa.model
 
-data class CoverUrls(val original: String)
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
+data class CoverUrls(val original: String) : Parcelable

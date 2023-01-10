@@ -1,4 +1,8 @@
 buildscript {
+  extra.apply{
+    set("navVersion", "2.5.2")
+    set("lifecycleVersion", "2.5.1")
+  }
 
   repositories {
     google()
@@ -6,20 +10,22 @@ buildscript {
     gradlePluginPortal()
   }
 
+  val navVersion: String by extra
+
   dependencies {
     classpath("com.android.tools.build:gradle:7.3.1")
     classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.0")
     classpath("com.github.bjoernq:unmockplugin:0.7.9")
     classpath("com.github.ben-manes:gradle-versions-plugin:0.44.0")
     classpath("org.jacoco:org.jacoco.core:0.8.8")
+    classpath("androidx.navigation:navigation-safe-args-gradle-plugin:$navVersion")
   }
 }
 
 allprojects {
-
   repositories {
     google()
-    jcenter()
+    mavenCentral()
     maven(url = "https://jitpack.io")
   }
 }

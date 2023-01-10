@@ -14,13 +14,6 @@ class BrowseFragment : Fragment() {
   private var _binding: FragmentBrowseBinding? = null
   private val binding get() = _binding!!
 
-  private var adapter: BrowseTabsAdapter? = null
-
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    adapter = BrowseTabsAdapter(this)
-  }
-
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
@@ -30,10 +23,11 @@ class BrowseFragment : Fragment() {
     return binding.root.apply {
       binding.tabs.getTabAt(0)?.select()
 
+      val adapter = BrowseTabsAdapter(this@BrowseFragment)
       binding.pager.adapter = adapter
       binding.pager.offscreenPageLimit = 3
       TabLayoutMediator(binding.tabs, binding.pager) { tab, position ->
-        tab.text = adapter?.tabText(position)
+        tab.text = adapter.tabText(position)
       }.attach()
     }
   }
@@ -41,9 +35,5 @@ class BrowseFragment : Fragment() {
   override fun onDestroyView() {
     super.onDestroyView()
     _binding = null
-  }
-
-  fun selectTabAt(position: Int) {
-    binding.tabs.getTabAt(position)?.select()
   }
 }

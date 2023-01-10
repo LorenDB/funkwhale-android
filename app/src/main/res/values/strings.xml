@@ -127,4 +127,7 @@
     <item quantity="one">Downloading %1$d track</item>
     <item quantity="other">Downloading %1$d tracks</item>
   </plurals>
+  <!-- TODO: Remove or change this placeholder text -->
+  <string name="hello_blank_fragment">Hello blank fragment</string>
+  <string name="playlist">Playlist</string>
 </resources>

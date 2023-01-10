@@ -16,23 +16,23 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.SeekBar
+import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
 import audio.funkwhale.ffa.FFA
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.databinding.ActivityMainBinding
 import audio.funkwhale.ffa.fragments.AddToPlaylistDialog
-import audio.funkwhale.ffa.fragments.AlbumsFragment
-import audio.funkwhale.ffa.fragments.ArtistsFragment
-import audio.funkwhale.ffa.fragments.BrowseFragment
+import audio.funkwhale.ffa.fragments.BrowseFragmentDirections
 import audio.funkwhale.ffa.fragments.LandscapeQueueFragment
 import audio.funkwhale.ffa.fragments.QueueFragment
 import audio.funkwhale.ffa.fragments.TrackInfoDetailsFragment
@@ -89,25 +89,31 @@ class MainActivity : AppCompatActivity() {
   private lateinit var binding: ActivityMainBinding
   private val oAuth: OAuth by inject(OAuth::class.java)
 
+  private val navigation: NavController by lazy {
+    val navHost = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+    navHost.navController
+  }
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-
     AppContext.init(this)
-
     binding = ActivityMainBinding.inflate(layoutInflater)
 
     setContentView(binding.root)
 
     setSupportActionBar(binding.appbar)
 
+    onBackPressedDispatcher.addCallback(this) {
+      if (binding.nowPlaying.isOpened()) {
+        binding.nowPlaying.close()
+      } else {
+        navigation.navigateUp()
+      }
+    }
+
     when (intent.action) {
       MediaControlsManager.NOTIFICATION_ACTION_OPEN_QUEUE.toString() -> launchDialog(QueueFragment())
     }
-
-    supportFragmentManager
-      .beginTransaction()
-      .replace(R.id.container, BrowseFragment())
-      .commit()
 
     watchEventBus()
   }
@@ -115,14 +121,15 @@ class MainActivity : AppCompatActivity() {
   override fun onResume() {
     super.onResume()
 
-    (binding.container as? DisableableFrameLayout)?.setShouldRegisterTouch { _ ->
-      if (binding.nowPlaying.isOpened()) {
-        binding.nowPlaying.close()
-
-        return@setShouldRegisterTouch false
+    findViewById<DisableableFrameLayout?>(R.id.container)?.apply {
+      setShouldRegisterTouch {
+        if (binding.nowPlaying.isOpened()) {
+          binding.nowPlaying.close()
+          false
+        } else {
+          true
+        }
       }
-
-      true
     }
 
     favoritedRepository.update(this, lifecycleScope)
@@ -178,15 +185,6 @@ class MainActivity : AppCompatActivity() {
     }
   }
 
-  override fun onBackPressed() {
-    if (binding.nowPlaying.isOpened()) {
-      binding.nowPlaying.close()
-      return
-    }
-
-    super.onBackPressed()
-  }
-
   override fun onPrepareOptionsMenu(menu: Menu): Boolean {
     this.menu = menu
 
@@ -226,18 +224,11 @@ class MainActivity : AppCompatActivity() {
     when (item.itemId) {
       android.R.id.home -> {
         binding.nowPlaying.close()
-
-        (supportFragmentManager.fragments.last() as? BrowseFragment)?.let {
-          it.selectTabAt(0)
-
-          return true
-        }
-
-        launchFragment(BrowseFragment())
+        navigation.popBackStack(R.id.browseFragment, false)
       }
 
       R.id.nav_queue -> launchDialog(QueueFragment())
-      R.id.nav_search -> startActivity(Intent(this, SearchActivity::class.java))
+      R.id.nav_search -> navigation.navigate(BrowseFragmentDirections.browseToSearch())
       R.id.nav_all_music, R.id.nav_my_music, R.id.nav_followed -> {
         menu?.let { menu ->
           item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW)
@@ -300,26 +291,8 @@ class MainActivity : AppCompatActivity() {
     return true
   }
 
-  private fun launchFragment(fragment: Fragment) {
-    supportFragmentManager.fragments.lastOrNull()?.also { oldFragment ->
-      oldFragment.enterTransition = null
-      oldFragment.exitTransition = null
-
-      supportFragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-    }
-
-    supportFragmentManager
-      .beginTransaction()
-      .setCustomAnimations(0, 0, 0, 0)
-      .replace(R.id.container, fragment)
-      .commit()
-  }
-
-  private fun launchDialog(fragment: DialogFragment) {
-    supportFragmentManager.beginTransaction().let {
-      fragment.show(it, "")
-    }
-  }
+  private fun launchDialog(fragment: DialogFragment) =
+    fragment.show(supportFragmentManager.beginTransaction(), "")
 
   @SuppressLint("NewApi")
   private fun watchEventBus() {
@@ -343,7 +316,7 @@ class MainActivity : AppCompatActivity() {
           }
         } else if (event is Event.PlaybackStopped) {
           if (binding.nowPlaying.visibility == View.VISIBLE) {
-            (binding.container.layoutParams as? ViewGroup.MarginLayoutParams)?.let {
+            (binding.navHostFragment.layoutParams as? ViewGroup.MarginLayoutParams)?.let {
               it.bottomMargin = it.bottomMargin / 2
             }
 
@@ -368,15 +341,17 @@ class MainActivity : AppCompatActivity() {
         } else if (event is Event.StateChanged) {
           when (event.playing) {
             true -> {
-              binding.nowPlayingContainer?.nowPlayingToggle?.icon = getDrawable(R.drawable.pause)
+              binding.nowPlayingContainer?.nowPlayingToggle?.icon =
+                AppCompatResources.getDrawable(this@MainActivity, R.drawable.pause)
               binding.nowPlayingContainer?.nowPlayingDetailsToggle?.icon =
-                getDrawable(R.drawable.pause)
+                AppCompatResources.getDrawable(this@MainActivity, R.drawable.pause)
             }
 
             false -> {
-              binding.nowPlayingContainer?.nowPlayingToggle?.icon = getDrawable(R.drawable.play)
+              binding.nowPlayingContainer?.nowPlayingToggle?.icon =
+                AppCompatResources.getDrawable(this@MainActivity, R.drawable.play)
               binding.nowPlayingContainer?.nowPlayingDetailsToggle?.icon =
-                getDrawable(R.drawable.play)
+                AppCompatResources.getDrawable(this@MainActivity, R.drawable.play)
             }
           }
         } else if (event is Event.QueueChanged) {
@@ -459,7 +434,7 @@ class MainActivity : AppCompatActivity() {
           .setListener(null)
           .start()
 
-        (binding.container.layoutParams as? ViewGroup.MarginLayoutParams)?.let {
+        (binding.navHostFragment?.layoutParams as? ViewGroup.MarginLayoutParams)?.let {
           it.bottomMargin = it.bottomMargin * 2
         }
 
@@ -534,12 +509,11 @@ class MainActivity : AppCompatActivity() {
 
             setOnMenuItemClickListener {
               when (it.itemId) {
-                R.id.track_info_artist -> ArtistsFragment.openAlbums(
-                  this@MainActivity,
+                R.id.track_info_artist -> BrowseFragmentDirections.browseToAlbums(
                   track.artist,
-                  art = track.album?.cover()
+                  track.album?.cover()
                 )
-                R.id.track_info_album -> AlbumsFragment.openTracks(this@MainActivity, track.album)
+                R.id.track_info_album -> track.album?.let(BrowseFragmentDirections::browseToTracks)
                 R.id.track_info_details -> TrackInfoDetailsFragment.new(track)
                   .show(supportFragmentManager, "dialog")
               }

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <import type="androidx.lifecycle.LiveData" />
+        <import type="android.view.View" />
+        <variable name="noSearchYet" type="LiveData&lt;Boolean>" />
+        <variable name="isLoadingData" type="LiveData&lt;Boolean>" />
+        <variable name="hasResults" type="LiveData&lt;Boolean>" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/surface">
+
+        <LinearLayout
+            android:id="@+id/search_bar_and_messages"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="0dp"
+                android:elevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <androidx.appcompat.widget.SearchView
+                        android:id="@+id/search"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:iconifiedByDefault="false"
+                        app:queryBackground="@android:color/transparent"
+                        app:queryHint="@string/search_placeholder" />
+
+                    <ProgressBar
+                        android:id="@+id/search_spinner"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="-12dp"
+                        android:layout_marginBottom="-12dp"
+                        android:indeterminate="true"
+                        android:visibility="@{isLoadingData ? View.VISIBLE : View.INVISIBLE, default=invisible}" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:id="@+id/search_empty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="@string/search_welcome"
+                android:textAlignment="center"
+                android:textSize="14sp"
+                android:visibility="@{noSearchYet ? View.VISIBLE : View.GONE, default=visible}"
+                app:drawableTint="#525252"
+                app:drawableTopCompat="@drawable/funkwhaleshape" />
+
+            <TextView
+                android:id="@+id/search_no_results"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="@string/search_no_results"
+                android:textAlignment="center"
+                android:textSize="14sp"
+                android:visibility="@{noSearchYet || hasResults ? View.GONE : View.VISIBLE, default=gone}"
+                app:drawableTint="#525252"
+                app:drawableTopCompat="@drawable/funkwhaleshape" />
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/results"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/surface"
+            app:layout_constraintTop_toBottomOf="@+id/search_bar_and_messages"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:itemCount="10"
+            tools:listitem="@layout/row_track" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

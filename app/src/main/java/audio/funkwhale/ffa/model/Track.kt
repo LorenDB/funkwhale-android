@@ -1,8 +1,12 @@
 package audio.funkwhale.ffa.model
 
+import android.os.Parcelable
 import audio.funkwhale.ffa.utils.containsIgnoringCase
 import com.preference.PowerPreference
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class Track(
   val id: Int = 0,
   val title: String,
@@ -13,10 +17,17 @@ data class Track(
   val uploads: List<Upload> = listOf(),
   val copyright: String? = null,
   val license: String? = null
-) : SearchResult {
+) : SearchResult, Parcelable {
+  @IgnoredOnParcel
   var current: Boolean = false
+
+  @IgnoredOnParcel
   var favorite: Boolean = false
+
+  @IgnoredOnParcel
   var cached: Boolean = false
+
+  @IgnoredOnParcel
   var downloaded: Boolean = false
 
   companion object {
@@ -30,7 +41,8 @@ data class Track(
     )
   }
 
-  data class Upload(val listen_url: String, val duration: Int, val bitrate: Int)
+  @Parcelize
+  data class Upload(val listen_url: String, val duration: Int, val bitrate: Int) : Parcelable
 
   fun matchesFilter(filter: String): Boolean {
     return title.containsIgnoringCase(filter) ||
