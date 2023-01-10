@@ -20,11 +20,10 @@ import audio.funkwhale.ffa.model.Artist
 import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.utils.Command
 import audio.funkwhale.ffa.utils.CommandBus
-import audio.funkwhale.ffa.utils.maybeLoad
+import audio.funkwhale.ffa.utils.CoverArt
 import audio.funkwhale.ffa.utils.maybeNormalizeUrl
 import audio.funkwhale.ffa.utils.onApi
 import audio.funkwhale.ffa.utils.toast
-import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 
 class SearchAdapter(
@@ -175,8 +174,7 @@ class SearchAdapter(
       else -> tracks[position]
     }
 
-    Picasso.get()
-      .maybeLoad(maybeNormalizeUrl(item.cover()))
+    CoverArt.withContext(layoutInflater.context, maybeNormalizeUrl(item.cover()))
       .fit()
       .transform(RoundedCornersTransformation(16, 0))
       .into(rowTrackViewHolder?.cover)

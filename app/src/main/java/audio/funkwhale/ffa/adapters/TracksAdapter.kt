@@ -21,10 +21,9 @@ import audio.funkwhale.ffa.fragments.FFAAdapter
 import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.utils.Command
 import audio.funkwhale.ffa.utils.CommandBus
-import audio.funkwhale.ffa.utils.maybeLoad
+import audio.funkwhale.ffa.utils.CoverArt
 import audio.funkwhale.ffa.utils.maybeNormalizeUrl
 import audio.funkwhale.ffa.utils.toast
-import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import java.util.Collections
 
@@ -71,8 +70,7 @@ class TracksAdapter(
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
     val track = data[position]
 
-    Picasso.get()
-      .maybeLoad(maybeNormalizeUrl(track.album?.cover()))
+    CoverArt.withContext(layoutInflater.context, maybeNormalizeUrl(track.album?.cover()))
       .fit()
       .transform(RoundedCornersTransformation(8, 0))
       .into(holder.cover)
@@ -193,7 +191,6 @@ class TracksAdapter(
         false -> {
           data.subList(layoutPosition, data.size).plus(data.subList(0, layoutPosition)).apply {
             CommandBus.send(Command.ReplaceQueue(this))
-
             context.toast("All tracks were added to your queue")
           }
         }

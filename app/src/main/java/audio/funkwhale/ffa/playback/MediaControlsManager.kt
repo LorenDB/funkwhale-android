@@ -15,9 +15,8 @@ import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.activities.MainActivity
 import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.utils.AppContext
-import audio.funkwhale.ffa.utils.maybeLoad
+import audio.funkwhale.ffa.utils.CoverArt
 import audio.funkwhale.ffa.utils.maybeNormalizeUrl
-import com.squareup.picasso.Picasso
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.launch
@@ -69,7 +68,7 @@ class MediaControlsManager(
           .run {
             coverUrl?.let {
               try {
-                setLargeIcon(Picasso.get().maybeLoad(coverUrl).get())
+                setLargeIcon(CoverArt.withContext(context, coverUrl).get())
               } catch (_: Exception) {
               }
 

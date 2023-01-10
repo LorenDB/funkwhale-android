@@ -46,6 +46,7 @@ import audio.funkwhale.ffa.repositories.Repository
 import audio.funkwhale.ffa.utils.AppContext
 import audio.funkwhale.ffa.utils.Command
 import audio.funkwhale.ffa.utils.CommandBus
+import audio.funkwhale.ffa.utils.CoverArt
 import audio.funkwhale.ffa.utils.Event
 import audio.funkwhale.ffa.utils.EventBus
 import audio.funkwhale.ffa.utils.FFACache
@@ -56,7 +57,6 @@ import audio.funkwhale.ffa.utils.Userinfo
 import audio.funkwhale.ffa.utils.authorize
 import audio.funkwhale.ffa.utils.log
 import audio.funkwhale.ffa.utils.logError
-import audio.funkwhale.ffa.utils.maybeLoad
 import audio.funkwhale.ffa.utils.maybeNormalizeUrl
 import audio.funkwhale.ffa.utils.mustNormalizeUrl
 import audio.funkwhale.ffa.utils.onApi
@@ -69,7 +69,6 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.offline.DownloadService
 import com.google.gson.Gson
 import com.preference.PowerPreference
-import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.Dispatchers.IO
@@ -477,15 +476,15 @@ class MainActivity : AppCompatActivity() {
       binding.nowPlayingContainer?.nowPlayingDetailsTitle?.text = track.title
       binding.nowPlayingContainer?.nowPlayingDetailsArtist?.text = track.artist.name
 
-      Picasso.get()
-        .maybeLoad(maybeNormalizeUrl(track.album?.cover?.urls?.original))
+      val lic = this.layoutInflater.context
+
+      CoverArt.withContext(lic, maybeNormalizeUrl(track.album?.cover?.urls?.original))
         .fit()
         .centerCrop()
         .into(binding.nowPlayingContainer?.nowPlayingCover)
 
       binding.nowPlayingContainer?.nowPlayingDetailsCover?.let { nowPlayingDetailsCover ->
-        Picasso.get()
-          .maybeLoad(maybeNormalizeUrl(track.album?.cover()))
+        CoverArt.withContext(lic, maybeNormalizeUrl(track.album?.cover()))
           .fit()
           .centerCrop()
           .transform(RoundedCornersTransformation(16, 0))
@@ -498,8 +497,7 @@ class MainActivity : AppCompatActivity() {
             windowManager.defaultDisplay.getMetrics(this)
           }.widthPixels
 
-          val backgroundCover = Picasso.get()
-            .maybeLoad(maybeNormalizeUrl(track.album?.cover()))
+          val backgroundCover = CoverArt.withContext(lic, maybeNormalizeUrl(track.album?.cover()))
             .get()
             .run { Bitmap.createScaledBitmap(this, width, width, false).toDrawable(resources) }
             .apply {

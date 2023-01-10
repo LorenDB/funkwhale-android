@@ -10,9 +10,8 @@ import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.databinding.RowPlaylistBinding
 import audio.funkwhale.ffa.fragments.FFAAdapter
 import audio.funkwhale.ffa.model.Playlist
-import audio.funkwhale.ffa.utils.maybeLoad
+import audio.funkwhale.ffa.utils.CoverArt
 import audio.funkwhale.ffa.utils.toDurationString
-import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 
 class PlaylistsAdapter(
@@ -80,8 +79,7 @@ class PlaylistsAdapter(
         else -> RoundedCornersTransformation.CornerType.TOP_LEFT
       }
 
-      Picasso.get()
-        .maybeLoad(url)
+      CoverArt.withContext(layoutInflater.context, url)
         .transform(RoundedCornersTransformation(32, 0, corner))
         .into(imageView)
     }

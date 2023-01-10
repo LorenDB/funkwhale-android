@@ -19,6 +19,7 @@ import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.utils.Command
 import audio.funkwhale.ffa.utils.CommandBus
+import audio.funkwhale.ffa.utils.CoverArt
 import audio.funkwhale.ffa.utils.Event
 import audio.funkwhale.ffa.utils.EventBus
 import audio.funkwhale.ffa.utils.FFACache
@@ -28,7 +29,6 @@ import audio.funkwhale.ffa.utils.Request
 import audio.funkwhale.ffa.utils.RequestBus
 import audio.funkwhale.ffa.utils.Response
 import audio.funkwhale.ffa.utils.log
-import audio.funkwhale.ffa.utils.maybeLoad
 import audio.funkwhale.ffa.utils.maybeNormalizeUrl
 import audio.funkwhale.ffa.utils.onApi
 import com.google.android.exoplayer2.C
@@ -37,7 +37,6 @@ import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.Tracks
 import com.preference.PowerPreference
-import com.squareup.picasso.Picasso
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -379,10 +378,10 @@ class PlayerService : Service() {
           runBlocking(IO) {
             this@apply.putBitmap(
               MediaMetadataCompat.METADATA_KEY_ALBUM_ART,
-              Picasso.get().maybeLoad(coverUrl).get()
+              CoverArt.withContext(this@PlayerService.applicationContext, coverUrl).get()
             )
           }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
         }
       }.build()
     }

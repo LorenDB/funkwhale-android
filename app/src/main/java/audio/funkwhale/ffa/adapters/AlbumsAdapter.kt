@@ -8,9 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import audio.funkwhale.ffa.databinding.RowAlbumBinding
 import audio.funkwhale.ffa.fragments.FFAAdapter
 import audio.funkwhale.ffa.model.Album
-import audio.funkwhale.ffa.utils.maybeLoad
-import audio.funkwhale.ffa.utils.maybeNormalizeUrl
-import com.squareup.picasso.Picasso
+import audio.funkwhale.ffa.utils.CoverArt
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 
 class AlbumsAdapter(
@@ -45,8 +43,7 @@ class AlbumsAdapter(
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
     val album = data[position]
 
-    Picasso.get()
-      .maybeLoad(maybeNormalizeUrl(album.cover()))
+    CoverArt.withContext(layoutInflater.context, album.cover())
       .fit()
       .transform(RoundedCornersTransformation(8, 0))
       .into(holder.art)
