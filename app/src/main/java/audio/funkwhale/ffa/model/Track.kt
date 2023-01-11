@@ -10,6 +10,7 @@ import kotlinx.parcelize.Parcelize
 data class Track(
   val id: Int = 0,
   val title: String,
+  private val cover: Covers? ,
   val artist: Artist,
   val album: Album?,
   val disc_number: Int = 0,
@@ -18,6 +19,7 @@ data class Track(
   val copyright: String? = null,
   val license: String? = null
 ) : SearchResult, Parcelable {
+
   @IgnoredOnParcel
   var current: Boolean = false
 
@@ -35,6 +37,7 @@ data class Track(
     fun fromDownload(download: DownloadInfo): Track = Track(
       id = download.id,
       title = download.title,
+      cover = Covers(CoverUrls("")),
       artist = Artist(0, download.artist, listOf()),
       album = Album(0, Album.Artist(""), "", Covers(CoverUrls("")), ""),
       uploads = listOf(Upload(download.contentId, 0, 0))
@@ -71,7 +74,14 @@ data class Track(
     }
   }
 
-  override fun cover() = album?.cover?.urls?.original
+  override fun cover(): String? {
+    return if (cover?.urls?.original != null) {
+      cover.urls.original
+    } else {
+      album?.cover()
+    }
+  }
+
   override fun title() = title
   override fun subtitle() = artist.name
 

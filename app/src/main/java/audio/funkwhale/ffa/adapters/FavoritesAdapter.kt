@@ -66,7 +66,7 @@ class FavoritesAdapter(
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
     val favorite = data[position]
 
-    CoverArt.withContext(layoutInflater.context, maybeNormalizeUrl(favorite.album?.cover()))
+    CoverArt.withContext(layoutInflater.context, maybeNormalizeUrl(favorite.cover()))
       .fit()
       .placeholder(R.drawable.cover)
       .transform(RoundedCornersTransformation(16, 0))

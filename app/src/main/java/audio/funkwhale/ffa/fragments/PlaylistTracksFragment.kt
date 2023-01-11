@@ -145,31 +145,35 @@ class PlaylistTracksFragment : FFAFragment<PlaylistTrack, PlaylistTracksAdapter>
   }
 
   override fun onDataFetched(data: List<PlaylistTrack>) {
-    data.map { it.track.album }.toSet().map { it?.cover() }.take(4).forEachIndexed { index, url ->
-      val imageView = when (index) {
-        0 -> binding.coverTopLeft
-        1 -> binding.coverTopRight
-        2 -> binding.coverBottomLeft
-        3 -> binding.coverBottomRight
-        else -> binding.coverTopLeft
-      }
+    data.map { it.track.album }
+      .toSet()
+      .map { it?.cover() }
+      .take(4)
+      .forEachIndexed { index, url ->
+        val imageView = when (index) {
+          0 -> binding.coverTopLeft
+          1 -> binding.coverTopRight
+          2 -> binding.coverBottomLeft
+          3 -> binding.coverBottomRight
+          else -> binding.coverTopLeft
+        }
 
-      val corner = when (index) {
-        0 -> RoundedCornersTransformation.CornerType.TOP_LEFT
-        1 -> RoundedCornersTransformation.CornerType.TOP_RIGHT
-        2 -> RoundedCornersTransformation.CornerType.BOTTOM_LEFT
-        3 -> RoundedCornersTransformation.CornerType.BOTTOM_RIGHT
-        else -> RoundedCornersTransformation.CornerType.TOP_LEFT
-      }
+        val corner = when (index) {
+          0 -> RoundedCornersTransformation.CornerType.TOP_LEFT
+          1 -> RoundedCornersTransformation.CornerType.TOP_RIGHT
+          2 -> RoundedCornersTransformation.CornerType.BOTTOM_LEFT
+          3 -> RoundedCornersTransformation.CornerType.BOTTOM_RIGHT
+          else -> RoundedCornersTransformation.CornerType.TOP_LEFT
+        }
 
-      lifecycleScope.launch(Main) {
-        CoverArt.withContext(layoutInflater.context, maybeNormalizeUrl(url))
-          .fit()
-          .centerCrop()
-          .transform(RoundedCornersTransformation(16, 0, corner))
-          .into(imageView)
+        lifecycleScope.launch(Main) {
+          CoverArt.withContext(layoutInflater.context, maybeNormalizeUrl(url))
+            .fit()
+            .centerCrop()
+            .transform(RoundedCornersTransformation(16, 0, corner))
+            .into(imageView)
+        }
       }
-    }
   }
 
   private fun watchEventBus() {

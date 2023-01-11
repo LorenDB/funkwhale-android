@@ -70,7 +70,7 @@ class TracksAdapter(
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
     val track = data[position]
 
-    CoverArt.withContext(layoutInflater.context, maybeNormalizeUrl(track.album?.cover()))
+    CoverArt.withContext(layoutInflater.context, maybeNormalizeUrl(track.cover()))
       .fit()
       .transform(RoundedCornersTransformation(8, 0))
       .into(holder.cover)
