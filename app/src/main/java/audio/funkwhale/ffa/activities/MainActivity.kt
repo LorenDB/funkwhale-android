@@ -434,7 +434,7 @@ class MainActivity : AppCompatActivity() {
           .setListener(null)
           .start()
 
-        (binding.navHostFragment?.layoutParams as? ViewGroup.MarginLayoutParams)?.let {
+        (binding.navHostFragment.layoutParams as? ViewGroup.MarginLayoutParams)?.let {
           it.bottomMargin = it.bottomMargin * 2
         }
 
@@ -453,13 +453,13 @@ class MainActivity : AppCompatActivity() {
 
       val lic = this.layoutInflater.context
 
-      CoverArt.withContext(lic, maybeNormalizeUrl(track.album?.cover?.urls?.original))
+      CoverArt.withContext(lic, maybeNormalizeUrl(track.cover()))
         .fit()
         .centerCrop()
         .into(binding.nowPlayingContainer?.nowPlayingCover)
 
       binding.nowPlayingContainer?.nowPlayingDetailsCover?.let { nowPlayingDetailsCover ->
-        CoverArt.withContext(lic, maybeNormalizeUrl(track.album?.cover()))
+        CoverArt.withContext(lic, maybeNormalizeUrl(track.cover()))
           .fit()
           .centerCrop()
           .transform(RoundedCornersTransformation(16, 0))
@@ -472,7 +472,7 @@ class MainActivity : AppCompatActivity() {
             windowManager.defaultDisplay.getMetrics(this)
           }.widthPixels
 
-          val backgroundCover = CoverArt.withContext(lic, maybeNormalizeUrl(track.album?.cover()))
+          val backgroundCover = CoverArt.withContext(lic, maybeNormalizeUrl(track.cover()))
             .get()
             .run { Bitmap.createScaledBitmap(this, width, width, false).toDrawable(resources) }
             .apply {

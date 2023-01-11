@@ -2,6 +2,7 @@ package audio.funkwhale.ffa.model
 
 import org.junit.Test
 import strikt.api.expectThat
+import strikt.assertions.isEqualTo
 import strikt.assertions.isFalse
 import strikt.assertions.isTrue
 
@@ -42,13 +43,33 @@ class TrackTest {
     expectThat(createTrackObject(albumTitle = null).matchesFilter("album")).isFalse()
   }
 
+  @Test
+  fun coverReturnsAlbumCoverIfNoTrackCoverExists() {
+    expectThat(
+      createTrackObject(
+        trackCover = null,
+        albumCover = Covers(CoverUrls("albumCover"))
+      ).cover()
+    ).isEqualTo("albumCover")
+  }
+
+  @Test
+  fun coverReturnsTrackCoverIfTrackCoverExists() {
+    expectThat(
+      createTrackObject(trackCover = Covers(CoverUrls("trackCover"))).cover()
+    ).isEqualTo("trackCover")
+  }
+
   private fun createTrackObject(
     trackTitle: String = "trackTitle",
     artistName: String = "artistName",
-    albumTitle: String? = "albumTitle"
+    albumTitle: String? = "albumTitle",
+    trackCover: Covers? = Covers(urls = CoverUrls(original = "trackCover")),
+    albumCover: Covers? = Covers(urls = CoverUrls(original = "albumCover"))
   ) = Track(
     id = 0,
     title = trackTitle,
+    cover = trackCover,
     artist = Artist(id = 0, name = artistName, albums = listOf()),
     album =
     if (albumTitle == null)
@@ -57,7 +78,7 @@ class TrackTest {
       id = 0,
       title = albumTitle,
       artist = Album.Artist("albumArtist"),
-      cover = null,
+      cover = albumCover,
       release_date = null
     )
   )

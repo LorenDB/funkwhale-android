@@ -69,38 +69,38 @@ class PlaylistTracksAdapter(
 
   @SuppressLint("NewApi")
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-    val track = data[position]
+    val playlistTrack = data[position]
 
-    CoverArt.withContext(layoutInflater.context, maybeNormalizeUrl(track.track.album?.cover()))
+    CoverArt.withContext(layoutInflater.context, maybeNormalizeUrl(playlistTrack.track.cover()))
       .fit()
       .placeholder(R.drawable.cover)
       .transform(RoundedCornersTransformation(16, 0))
       .into(holder.cover)
 
-    holder.title.text = track.track.title
-    holder.artist.text = track.track.artist.name
+    holder.title.text = playlistTrack.track.title
+    holder.artist.text = playlistTrack.track.artist.name
 
     context?.let {
       holder.itemView.background = ContextCompat.getDrawable(context, R.drawable.ripple)
     }
 
-    if (track.track == currentTrack || track.track.current) {
+    if (playlistTrack.track == currentTrack || playlistTrack.track.current) {
       context?.let {
         holder.itemView.background = ContextCompat.getDrawable(context, R.drawable.current)
       }
     }
 
     context?.let {
-      when (track.track.favorite) {
+      when (playlistTrack.track.favorite) {
         true -> holder.favorite.setColorFilter(context.getColor(R.color.colorFavorite))
         false -> holder.favorite.setColorFilter(context.getColor(R.color.colorSelected))
       }
 
       holder.favorite.setOnClickListener {
         favoriteListener.let {
-          favoriteListener.onToggleFavorite(track.track.id, !track.track.favorite)
+          favoriteListener.onToggleFavorite(playlistTrack.track.id, !playlistTrack.track.favorite)
 
-          track.track.favorite = !track.track.favorite
+          playlistTrack.track.favorite = !playlistTrack.track.favorite
           notifyItemChanged(position)
         }
       }
@@ -115,11 +115,11 @@ class PlaylistTracksAdapter(
 
           setOnMenuItemClickListener {
             when (it.itemId) {
-              R.id.track_add_to_queue -> CommandBus.send(Command.AddToQueue(listOf(track.track)))
-              R.id.track_play_next -> CommandBus.send(Command.PlayNext(track.track))
-              R.id.queue_remove -> CommandBus.send(Command.RemoveFromQueue(track.track))
+              R.id.track_add_to_queue -> CommandBus.send(Command.AddToQueue(listOf(playlistTrack.track)))
+              R.id.track_play_next -> CommandBus.send(Command.PlayNext(playlistTrack.track))
+              R.id.queue_remove -> CommandBus.send(Command.RemoveFromQueue(playlistTrack.track))
               R.id.track_remove_from_playlist -> playlistListener.onRemoveTrackFromPlaylist(
-                track.track,
+                playlistTrack.track,
                 position
               )
             }

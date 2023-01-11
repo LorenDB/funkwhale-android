@@ -8,7 +8,7 @@ data class Album(
   val id: Int,
   val artist: Artist,
   val title: String,
-  val cover: Covers?,
+  private val cover: Covers?,
   val release_date: String?
 ) : SearchResult, Parcelable {
   @Parcelize
