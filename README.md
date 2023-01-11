@@ -7,9 +7,8 @@ You can get help and discuss Funkwhale on Matrix on [#funkwhale-android:matrix.o
 
 ## Installation
 
-Currently you can install a preview version of Funkwhale for Android™ through a selfhosted [F-Droid repository](https://fdroid.funkwhale.audio/develop/).
-You'll have to add this repository to your F-Droid client, please visit the link above for further instructions. Once you added the repository, you can
-use F-Droid as usual and search for "Funkwhale". 
+We have an official version available on F-Droid and the Google Play-Store, but you can also install a preview version of Funkwhale for Android™ through our selfhosted [F-Droid repository](https://fdroid.funkwhale.audio/develop/).
+You'll have to add this repository to your F-Droid client, please visit the link above for further instructions. Once you added the repository, you can use F-Droid as usual and search for "Funkwhale". 
 
 ## State
 
