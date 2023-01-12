@@ -13,7 +13,7 @@ buildscript {
   val navVersion: String by extra
 
   dependencies {
-    classpath("com.android.tools.build:gradle:7.3.1")
+    classpath("com.android.tools.build:gradle:7.4.0")
     classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.0")
     classpath("com.github.bjoernq:unmockplugin:0.7.9")
     classpath("com.github.ben-manes:gradle-versions-plugin:0.44.0")
