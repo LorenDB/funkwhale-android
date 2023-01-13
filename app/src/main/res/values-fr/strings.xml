@@ -129,4 +129,6 @@
     <string name="login_error">Connexion échouée : %s</string>
     <string name="settings_auto_skip_backwards_on_pause">Revenir en arrière lors d’une pause</string>
     <string name="settings_auto_skip_backwards_on_pause_summary">Nombre de secondes à revenir en arrière lorsque la lecture est en pause</string>
+    <string name="playlist">Liste de lecture</string>
+    <string name="hello_blank_fragment">Bonjour, fragment vide</string>
 </resources>
