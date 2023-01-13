@@ -46,7 +46,7 @@ abstract class FFAAdapter<D, VH : RecyclerView.ViewHolder> : RecyclerView.Adapte
   abstract override fun getItemId(position: Int): Long
 }
 
-abstract class FFAFragment<D : Any, A : FFAAdapter<D, *>>() : Fragment() {
+abstract class FFAFragment<D : Any, A : FFAAdapter<D, *>> : Fragment() {
   companion object {
     const val OFFSCREEN_PAGES = 20
   }

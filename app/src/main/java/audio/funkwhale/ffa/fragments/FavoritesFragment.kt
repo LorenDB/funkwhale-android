@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import audio.funkwhale.ffa.adapters.FavoriteListener
 import audio.funkwhale.ffa.adapters.FavoritesAdapter
 import audio.funkwhale.ffa.databinding.FragmentFavoritesBinding
+import audio.funkwhale.ffa.model.Favorite
 import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.repositories.FavoritesRepository
 import audio.funkwhale.ffa.repositories.TracksRepository
@@ -31,7 +32,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.java.KoinJavaComponent.inject
 
-class FavoritesFragment : FFAFragment<Track, FavoritesAdapter>() {
+class FavoritesFragment : FFAFragment<Favorite, FavoritesAdapter>() {
 
   private val exoDownloadManager: DownloadManager by inject(DownloadManager::class.java)
 
@@ -63,7 +64,7 @@ class FavoritesFragment : FFAFragment<Track, FavoritesAdapter>() {
         adapter.notifyDataSetChanged()
       }
 
-      override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) { }
+      override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
 
       override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
         adapter.filter = s.toString()
@@ -93,7 +94,7 @@ class FavoritesFragment : FFAFragment<Track, FavoritesAdapter>() {
     }
 
     binding.play.setOnClickListener {
-      CommandBus.send(Command.ReplaceQueue(adapter.data.shuffled()))
+      CommandBus.send(Command.ReplaceQueue(adapter.data.map { it.track }.shuffled()))
     }
   }
 
@@ -122,7 +123,7 @@ class FavoritesFragment : FFAFragment<Track, FavoritesAdapter>() {
 
     withContext(Main) {
       val data = adapter.data.map {
-        it.downloaded = downloaded.contains(it.id)
+        it.track.downloaded = downloaded.contains(it.id)
         it
       }.toMutableList()
 
@@ -138,7 +139,7 @@ class FavoritesFragment : FFAFragment<Track, FavoritesAdapter>() {
         adapter.data.withIndex().associate { it.value to it.index }.filter { it.key.id == info.id }
           .toList().getOrNull(0)?.let { match ->
             withContext(Main) {
-              adapter.data[match.second].downloaded = true
+              adapter.data[match.second].track.downloaded = true
               adapter.notifyItemChanged(match.second)
             }
           }

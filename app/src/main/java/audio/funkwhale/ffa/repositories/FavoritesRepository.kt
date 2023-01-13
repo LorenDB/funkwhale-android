@@ -2,11 +2,11 @@ package audio.funkwhale.ffa.repositories
 
 import android.content.Context
 import audio.funkwhale.ffa.model.FFAResponse
+import audio.funkwhale.ffa.model.Favorite
+import audio.funkwhale.ffa.model.FavoritesResponse
 import audio.funkwhale.ffa.model.FavoritedCache
 import audio.funkwhale.ffa.model.FavoritedResponse
-import audio.funkwhale.ffa.model.Track
-import audio.funkwhale.ffa.model.TracksCache
-import audio.funkwhale.ffa.model.TracksResponse
+import audio.funkwhale.ffa.model.FavoritesCache
 import audio.funkwhale.ffa.utils.FFACache
 import audio.funkwhale.ffa.utils.OAuth
 import audio.funkwhale.ffa.utils.Settings
@@ -28,7 +28,7 @@ import kotlinx.coroutines.runBlocking
 import org.koin.core.qualifier.named
 import org.koin.java.KoinJavaComponent.inject
 
-class FavoritesRepository(override val context: Context?) : Repository<Track, TracksCache>() {
+class FavoritesRepository(override val context: Context?) : Repository<Favorite, FavoritesCache>() {
 
   private val exoDownloadManager: DownloadManager by inject(DownloadManager::class.java)
   private val exoCache: Cache by inject(Cache::class.java, named("exoCache"))
@@ -36,34 +36,34 @@ class FavoritesRepository(override val context: Context?) : Repository<Track, Tr
 
   override val cacheId = "favorites.v2"
 
-  override val upstream = HttpUpstream<Track, FFAResponse<Track>>(
+  override val upstream = HttpUpstream<Favorite, FFAResponse<Favorite>>(
     context!!,
     HttpUpstream.Behavior.AtOnce,
-    "/api/v1/tracks/?favorites=true&playable=true&ordering=title",
-    object : TypeToken<TracksResponse>() {}.type,
+    "/api/v1/favorites/tracks/?scope=all&ordering=-creation_date",
+    object : TypeToken<FavoritesResponse>() {}.type,
     oAuth
   )
 
-  override fun cache(data: List<Track>) = TracksCache(data)
+  override fun cache(data: List<Favorite>) = FavoritesCache(data)
   override fun uncache(json: String) =
-    gsonDeserializerOf(TracksCache::class.java).deserialize(json.reader())
+    gsonDeserializerOf(FavoritesCache::class.java).deserialize(json.reader())
 
   private val favoritedRepository = FavoritedRepository(context!!)
 
-  override fun onDataFetched(data: List<Track>): List<Track> = runBlocking {
+  override fun onDataFetched(data: List<Favorite>): List<Favorite> = runBlocking {
     val downloaded = TracksRepository.getDownloadedIds(exoDownloadManager) ?: listOf()
 
-    data.map { track ->
-      track.favorite = true
-      track.downloaded = downloaded.contains(track.id)
+    data.map { favorite ->
+      favorite.track.favorite = true
+      favorite.track.downloaded = downloaded.contains(favorite.track.id)
 
-      track.bestUpload()?.let { upload ->
+      favorite.track.bestUpload()?.let { upload ->
         maybeNormalizeUrl(upload.listen_url)?.let { url ->
-          track.cached = exoCache.isCached(url, 0, upload.duration * 1000L)
+          favorite.track.cached = exoCache.isCached(url, 0, upload.duration * 1000L)
         }
       }
 
-      track
+      favorite
     }
   }
 
