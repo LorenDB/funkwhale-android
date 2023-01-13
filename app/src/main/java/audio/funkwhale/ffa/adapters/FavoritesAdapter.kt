@@ -8,11 +8,13 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.databinding.RowTrackBinding
 import audio.funkwhale.ffa.fragments.FFAAdapter
+import audio.funkwhale.ffa.model.Favorite
 import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.utils.Command
 import audio.funkwhale.ffa.utils.CommandBus
@@ -27,7 +29,7 @@ class FavoritesAdapter(
   private val context: Context?,
   private val favoriteListener: FavoriteListener,
   val fromQueue: Boolean = false,
-) : FFAAdapter<Track, FavoritesAdapter.ViewHolder>() {
+) : FFAAdapter<Favorite, FavoritesAdapter.ViewHolder>() {
 
   init {
     this.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
@@ -47,7 +49,7 @@ class FavoritesAdapter(
   override fun applyFilter() {
     data.clear()
     getUnfilteredData().map {
-      if (it.matchesFilter(filter)) {
+      if (it.track.matchesFilter(filter)) {
         data.add(it)
       }
     }
@@ -65,45 +67,43 @@ class FavoritesAdapter(
   @SuppressLint("NewApi")
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
     val favorite = data[position]
+    val track = favorite.track
 
-    CoverArt.withContext(layoutInflater.context, maybeNormalizeUrl(favorite.cover()))
+    CoverArt.withContext(layoutInflater.context, maybeNormalizeUrl(track.cover()))
       .fit()
       .placeholder(R.drawable.cover)
       .transform(RoundedCornersTransformation(16, 0))
       .into(holder.cover)
 
-    holder.title.text = favorite.title
-    holder.artist.text = favorite.artist.name
+    holder.title.text = track.title
+    holder.artist.text = track.artist.name
 
     context?.let {
-      holder.itemView.background = context.getDrawable(R.drawable.ripple)
+      holder.itemView.background = AppCompatResources.getDrawable(context, R.drawable.ripple)
     }
 
-    if (favorite.id == currentTrack?.id) {
+    if (track.id == currentTrack?.id) {
       context?.let {
-        holder.itemView.background = context.getDrawable(R.drawable.current)
+        holder.itemView.background = AppCompatResources.getDrawable(context, R.drawable.current)
       }
     }
 
     context?.let {
-      when (favorite.favorite) {
-        true -> holder.favorite.setColorFilter(context.getColor(R.color.colorFavorite))
-        false -> holder.favorite.setColorFilter(context.getColor(R.color.colorSelected))
-      }
+      holder.favorite.setColorFilter(context.getColor(R.color.colorFavorite))
 
-      when (favorite.cached || favorite.downloaded) {
+      when (track.cached || track.downloaded) {
         true -> holder.title.setCompoundDrawablesWithIntrinsicBounds(R.drawable.downloaded, 0, 0, 0)
         false -> holder.title.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
       }
 
-      if (favorite.cached && !favorite.downloaded) {
+      if (track.cached && !track.downloaded) {
         holder.title.compoundDrawables.forEach {
           it?.colorFilter =
             PorterDuffColorFilter(context.getColor(R.color.cached), PorterDuff.Mode.SRC_IN)
         }
       }
 
-      if (favorite.downloaded) {
+      if (track.downloaded) {
         holder.title.compoundDrawables.forEach {
           it?.colorFilter =
             PorterDuffColorFilter(context.getColor(R.color.downloaded), PorterDuff.Mode.SRC_IN)
@@ -111,8 +111,7 @@ class FavoritesAdapter(
       }
 
       holder.favorite.setOnClickListener {
-        favoriteListener.onToggleFavorite(favorite.id, !favorite.favorite)
-
+        favoriteListener.onToggleFavorite(track.id, !track.favorite)
         data.remove(favorite)
         notifyItemRemoved(holder.bindingAdapterPosition)
       }
@@ -125,10 +124,10 @@ class FavoritesAdapter(
 
           setOnMenuItemClickListener {
             when (it.itemId) {
-              R.id.track_add_to_queue -> CommandBus.send(Command.AddToQueue(listOf(favorite)))
-              R.id.track_play_next -> CommandBus.send(Command.PlayNext(favorite))
-              R.id.track_pin -> CommandBus.send(Command.PinTrack(favorite))
-              R.id.queue_remove -> CommandBus.send(Command.RemoveFromQueue(favorite))
+              R.id.track_add_to_queue -> CommandBus.send(Command.AddToQueue(listOf(track)))
+              R.id.track_play_next -> CommandBus.send(Command.PlayNext(track))
+              R.id.track_pin -> CommandBus.send(Command.PinTrack(track))
+              R.id.queue_remove -> CommandBus.send(Command.RemoveFromQueue(track))
             }
 
             true
@@ -169,10 +168,13 @@ class FavoritesAdapter(
       when (fromQueue) {
         true -> CommandBus.send(Command.PlayTrack(layoutPosition))
         false -> {
-          data.subList(layoutPosition, data.size).plus(data.subList(0, layoutPosition)).apply {
-            CommandBus.send(Command.ReplaceQueue(this))
-            context.toast("All tracks were added to your queue")
-          }
+          data
+            .subList(layoutPosition, data.size).plus(data.subList(0, layoutPosition))
+            .map { it.track }
+            .apply {
+              CommandBus.send(Command.ReplaceQueue(this))
+              context.toast("All tracks were added to your queue")
+            }
         }
       }
     }
