@@ -1,4 +1,5 @@
-image: $CI_REGISTRY/funkwhale/funkwhale-android:latest
+# This image lives in https://dev.funkwhale.audio/funkwhale/ci
+image: $CI_REGISTRY/funkwhale/ci/android:latest
 
 variables:
   COBERTURA_REPORT: '$CI_PROJECT_DIR/app/build/reports/cobertura.xml'
@@ -11,26 +12,6 @@ stages:
   - visualize
   - build
   - deploy
-
-build_ci_image:
-  stage: build_ci_env
-  image: egon0/docker-with-buildx-and-git:bash
-  tags:
-    - dind
-  services:
-    - docker:20-dind
-  before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  script:
-    - docker build -t $CI_REGISTRY_IMAGE docker
-  after_script:
-    - docker push $CI_REGISTRY_IMAGE
-  rules:
-    - if: '$BUILD_CI_IMAGE'
-  variables:
-    DOCKER_HOST: tcp://docker:2375/
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
 
 cache: &global_cache
   key: ${CI_PIPELINE_ID}
