@@ -33,6 +33,7 @@ import audio.funkwhale.ffa.utils.maybeNormalizeUrl
 import audio.funkwhale.ffa.utils.onApi
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.IllegalSeekPositionException
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.Tracks
@@ -154,12 +155,17 @@ class PlayerService : Service() {
       player.setMediaSource(queue.dataSources)
       player.prepare()
 
+
+
       FFACache.getLine(this, "progress")?.let {
-        player.seekTo(queue.current, it.toLong())
-
-        val (current, duration, percent) = getProgress(true)
-
-        ProgressBus.send(current, duration, percent)
+        try {
+          player.seekTo(queue.current, it.toLong())
+          val (current, duration, percent) = getProgress(true)
+          ProgressBus.send(current, duration, percent)
+        } catch (e: IllegalSeekPositionException) {
+          // The app remembered an incorrect position, let's reset it
+          FFACache.set(this, "current", "-1")
+        }
       }
     }
 
