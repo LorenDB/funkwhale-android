@@ -25,11 +25,13 @@
   <string name="settings_media_quality">Media quality</string>
   <string name="settings_media_quality_quality">Best quality</string>
   <string name="settings_media_quality_size">Smallest size</string>
+  <string name="settings_media_quality_summary_quality">Best available version will be played</string>
+  <string name="settings_media_quality_summary_size">Smallest available track will be played</string>
   <string name="settings_bandwidth_limitation">Bandwidth limitation</string>
   <string name="settings_bandwidth_limitation_unlimited">Unlimited</string>
   <string name="settings_bandwidth_limitation_limited">Limited</string>
-  <string name="settings_media_quality_summary_quality">Best available version will be played</string>
-  <string name="settings_media_quality_summary_size">Smallest available track will be played</string>
+  <string name="settings_bandwidth_limitation_summary_unlimited">Original content will be fetched without transcoding</string>
+  <string name="settings_bandwidth_limitation_summary_limited">Endpoint will deliver content that respects 320kbps maximum bitrate</string>
   <string name="settings_media_cache_size">Media cache size</string>
   <string name="settings_media_cache_size_summary">%d GB will be used to store tracks for offline playback</string>
   <string name="settings_play_order">Preferred playback order</string>

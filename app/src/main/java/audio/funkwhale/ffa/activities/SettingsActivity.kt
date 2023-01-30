@@ -114,6 +114,14 @@ class SettingsFragment :
         }
       }
 
+      preferenceManager.findPreference<ListPreference>("bandwidth_limitation")?.let {
+        it.summary = when (it.value) {
+          "unlimited" -> activity.getString(R.string.settings_bandwidth_limitation_summary_unlimited)
+          "limited" -> activity.getString(R.string.settings_bandwidth_limitation_summary_limited)
+          else -> activity.getString(R.string.settings_bandwidth_limitation_summary_unlimited)
+        }
+      }
+
       preferenceManager.findPreference<ListPreference>("play_order")?.let {
         it.summary = when (it.value) {
           "shuffle" -> activity.getString(R.string.settings_play_order_shuffle_summary)
