@@ -25,6 +25,9 @@
   <string name="settings_media_quality">Media quality</string>
   <string name="settings_media_quality_quality">Best quality</string>
   <string name="settings_media_quality_size">Smallest size</string>
+  <string name="settings_bandwidth_limitation">Bandwidth limitation</string>
+  <string name="settings_bandwidth_limitation_unlimited">Unlimited</string>
+  <string name="settings_bandwidth_limitation_limited">Limited</string>
   <string name="settings_media_quality_summary_quality">Best available version will be played</string>
   <string name="settings_media_quality_summary_size">Smallest available track will be played</string>
   <string name="settings_media_cache_size">Media cache size</string>
