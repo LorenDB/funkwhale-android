@@ -67,10 +67,19 @@ data class Track(
   fun bestUpload(): Upload? {
     if (uploads.isEmpty()) return null
 
-    return when (PowerPreference.getDefaultFile().getString("media_cache_quality")) {
+    var bestUpload = when (PowerPreference.getDefaultFile().getString("media_cache_quality")) {
       "quality" -> uploads.maxByOrNull { it.bitrate } ?: uploads[0]
       "size" -> uploads.minByOrNull { it.bitrate } ?: uploads[0]
       else -> uploads.maxByOrNull { it.bitrate } ?: uploads[0]
+    }
+
+    return when (PowerPreference.getDefaultFile().getString("bandwidth_limitation")) {
+      "unlimited" -> bestUpload
+      "limited" -> {
+        var listenUrl = bestUpload.listen_url
+        Upload(listenUrl.plus("&to=mp3&max_bitrate=320"), uploads[0].duration, 320_000)
+      }
+      else -> bestUpload
     }
   }
 
