@@ -197,7 +197,7 @@ dependencies {
     isTransitive = false
   }
 
-  implementation("com.github.AliAsadi:PowerPreference:2.1.0")
+  implementation("com.github.AliAsadi:PowerPreference:2.1.1")
   implementation("com.github.kittinunf.fuel:fuel:2.3.1")
   implementation("com.github.kittinunf.fuel:fuel-coroutines:2.3.1")
   implementation("com.github.kittinunf.fuel:fuel-android:2.3.1")
