@@ -8,7 +8,7 @@ plugins {
   id("androidx.navigation.safeargs.kotlin")
   id("kotlin-parcelize")
 
-  id("org.jlleitschuh.gradle.ktlint") version "11.1.0"
+  id("org.jlleitschuh.gradle.ktlint") version "11.2.0"
   id("com.gladed.androidgitversion") version "0.4.14"
   id("com.github.triplet.play") version "3.7.0"
   id("de.mobilej.unmock")
