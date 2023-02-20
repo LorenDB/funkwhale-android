@@ -143,12 +143,12 @@ trigger-fdroid-update-develop:
   stage: .post
   only:
     - develop
-  image: curlimages/curl:7.87.0
+  image: curlimages/curl:7.88.1
   script: curl "https://fdroid.funkwhale.audio/hooks/update-index?name=audio.funkwhale.ffa.dev&version=$CI_COMMIT_SHORT_SHA"
 
 trigger-fdroid-update-release:
   stage: .post
   only:
     - tags
-  image: curlimages/curl:7.87.0
+  image: curlimages/curl:7.88.1
   script: curl "https://fdroid.funkwhale.audio/hooks/update-index?name=audio.funkwhale.ffa&version=$CI_COMMIT_SHORT_SHA"
