@@ -1,2 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="login_cleartext">Povolit nešifrovaný provoz (HTTP)</string>
+    <string name="login_anonymous">Anonymní autentizace</string>
+    <string name="login_username">Uživatelské jméno</string>
+    <string name="login_password">Heslo</string>
+    <string name="login_submit">Přihlásit se</string>
+    <string name="login_error">Přihlášení selhalo: %s</string>
+    <string name="login_error_funkwhale_not_found">Nebyl nalezen žádný Funkwhale pod</string>
+    <string name="login_error_hostname">URL adresa není platná</string>
+    <string name="toolbar_search">Hledat</string>
+    <string name="title_downloads">Stažené</string>
+    <string name="title_settings">Nastavení</string>
+    <string name="title_oss_licences">Open-source licence</string>
+    <string name="search_placeholder">Prohledat interprety, alba, skladby</string>
+    <string name="search_no_results">Pro váš požadavek nebylo nic nalezeno</string>
+    <string name="settings_general">Obecné</string>
+    <string name="settings_media_quality_quality">Nejlepší kvalita</string>
+    <string name="settings_media_quality_size">Nejmenší velikost</string>
+    <string name="settings_media_quality_summary_quality">Bude přehrána nejlepší možná verze</string>
+    <string name="settings_media_quality_summary_size">Bude přehrána nejmenší možná skladba</string>
+    <string name="settings_play_order">Preferované pořadí přehrávání</string>
+    <string name="settings_play_order_shuffle">Promíchat alba</string>
+    <string name="login_welcome">Pro přístup k obsahu na vaší Funkwhale instanci zadejte následující informace</string>
+    <string name="login_logging_in">Přihlašujeme vás</string>
+    <string name="login_error_userinfo">Nepodařilo se získat informace o uživateli</string>
+    <string name="search_welcome">Pro prohledání vaší kolekce vložte klíčová slova výše a stiskněte enter</string>
+    <string name="settings_media_cache_size_summary">%d GB bude použito k ukládání skladeb pro offline přehrávání</string>
+</resources>
