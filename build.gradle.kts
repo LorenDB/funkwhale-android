@@ -1,7 +1,7 @@
 buildscript {
   extra.apply{
     set("navVersion", "2.5.3")
-    set("lifecycleVersion", "2.5.1")
+    set("lifecycleVersion", "2.6.1")
   }
 
   repositories {
