@@ -212,7 +212,7 @@ dependencies {
   implementation("androidx.navigation:navigation-dynamic-features-fragment:$navVersion")
 
   testImplementation("junit:junit:4.13.2")
-  testImplementation("io.mockk:mockk:1.13.3")
+  testImplementation("io.mockk:mockk:1.13.4")
   testImplementation("androidx.test:core:1.5.0")
   testImplementation("io.strikt:strikt-core:0.34.1")
   testImplementation("org.robolectric:robolectric:4.9.2")
