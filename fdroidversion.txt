@@ -1,2 +1,2 @@
-versionCode = 105000
-versionName = 0.1.5
+versionCode = 200000
+versionName = 0.2.0
