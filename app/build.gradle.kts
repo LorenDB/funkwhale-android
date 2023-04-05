@@ -217,7 +217,7 @@ dependencies {
   testImplementation("io.strikt:strikt-core:0.34.1")
   testImplementation("org.robolectric:robolectric:4.9.2")
 
-  androidTestImplementation("io.mockk:mockk-android:1.13.3")
+  androidTestImplementation("io.mockk:mockk-android:1.13.4")
   androidTestImplementation("androidx.navigation:navigation-testing:$navVersion")
 }
 
