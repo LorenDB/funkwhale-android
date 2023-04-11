@@ -71,7 +71,6 @@ class FavoritesAdapter(
 
     CoverArt.withContext(layoutInflater.context, maybeNormalizeUrl(track.cover()))
       .fit()
-      .placeholder(R.drawable.cover)
       .transform(RoundedCornersTransformation(16, 0))
       .into(holder.cover)
 

@@ -73,7 +73,6 @@ class PlaylistTracksAdapter(
 
     CoverArt.withContext(layoutInflater.context, maybeNormalizeUrl(playlistTrack.track.cover()))
       .fit()
-      .placeholder(R.drawable.cover)
       .transform(RoundedCornersTransformation(16, 0))
       .into(holder.cover)
 

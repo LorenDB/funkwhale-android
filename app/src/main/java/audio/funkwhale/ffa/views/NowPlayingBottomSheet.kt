@@ -10,6 +10,9 @@ import audio.funkwhale.ffa.utils.BottomSheetIneractable
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.card.MaterialCardView
 
+import androidx.core.content.res.use
+
+
 class NowPlayingBottomSheet @JvmOverloads constructor (
   context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : MaterialCardView(context, attrs), BottomSheetIneractable {
@@ -19,8 +22,10 @@ class NowPlayingBottomSheet @JvmOverloads constructor (
 
 
   init {
-    context.theme.obtainStyledAttributes(attrs, R.styleable.NowPlaying, defStyleAttr, 0).use {
-      targetHeaderId = it.getResourceId(R.styleable.NowPlaying_target_header, NO_ID)
+    targetHeaderId =context.theme.obtainStyledAttributes(
+      attrs, R.styleable.NowPlaying, defStyleAttr, 0
+    ).use {
+       it.getResourceId(R.styleable.NowPlaying_target_header, NO_ID)
     }
   }
 
