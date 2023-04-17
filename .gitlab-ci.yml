@@ -11,6 +11,7 @@ stages:
   - test
   - visualize
   - build
+  - test-after-build
   - deploy
 
 cache: &global_cache
@@ -69,6 +70,12 @@ test:
     <<: *global_cache
     # override the policy
     policy: pull-push
+  
+test_nonfree_code:
+  stage: test-after-build
+  image: registry.funkwhale.audio/funkwhale/ci/android-fdroidserver
+  script:
+    - fdroid scanner -v app/build/outputs/apk/debug/app-debug.apk
 
 coverage:
   stage: visualize
