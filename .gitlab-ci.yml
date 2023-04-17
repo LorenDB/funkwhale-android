@@ -76,7 +76,7 @@ test_nonfree_code:
   image: registry.funkwhale.audio/funkwhale/ci/android-fdroidserver
   script:
     - fdroid scanner -v app/build/outputs/apk/debug/app-debug.apk | tee output.txt
-    - ! grep "CRITICAL" output.txt
+    - exit $(grep -c "CRITICAL" output.txt)
 
 coverage:
   stage: visualize
