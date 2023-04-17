@@ -209,7 +209,6 @@ dependencies {
 
   implementation("androidx.navigation:navigation-fragment-ktx:$navVersion")
   implementation("androidx.navigation:navigation-ui-ktx:$navVersion")
-  implementation("androidx.navigation:navigation-dynamic-features-fragment:$navVersion")
 
   testImplementation("junit:junit:4.13.2")
   testImplementation("io.mockk:mockk:1.13.4")
