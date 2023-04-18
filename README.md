@@ -30,13 +30,9 @@ Funkwhale for Android™ will try to behave as you would expect a mobile music p
 
 ## Screenshots
 
-<img src="https://dev.funkwhale.audio/funkwhale/funkwhale-android/-/raw/develop/app/src/main/play/listings/en-US/graphics/phone-screenshots/1.png" width="200" /> 
-<img src="https://dev.funkwhale.audio/funkwhale/funkwhale-android/-/raw/develop/app/src/main/play/listings/en-US/graphics/phone-screenshots/2.png" width="200" /> 
-<img src="https://dev.funkwhale.audio/funkwhale/funkwhale-android/-/raw/develop/app/src/main/play/listings/en-US/graphics/phone-screenshots/3.png" width="200" /> 
-<img src="https://dev.funkwhale.audio/funkwhale/funkwhale-android/-/raw/develop/app/src/main/play/listings/en-US/graphics/phone-screenshots/4.png" width="200" /> 
-<img src="https://dev.funkwhale.audio/funkwhale/funkwhale-android/-/raw/develop/app/src/main/play/listings/en-US/graphics/phone-screenshots/5.png" width="200" /> 
-<img src="https://dev.funkwhale.audio/funkwhale/funkwhale-android/-/raw/develop/app/src/main/play/listings/en-US/graphics/phone-screenshots/6.png" width="200" /> 
-<img src="https://dev.funkwhale.audio/funkwhale/funkwhale-android/-/raw/develop/app/src/main/play/listings/en-US/graphics/phone-screenshots/7.png" width="200" />
+<img src="https://dev.funkwhale.audio/funkwhale/funkwhale-android/-/raw/develop/app/src/main/play/listings/en-US/graphics/phone-screenshots/1.png" width="33%" /> 
+<img src="https://dev.funkwhale.audio/funkwhale/funkwhale-android/-/raw/develop/app/src/main/play/listings/en-US/graphics/phone-screenshots/2.png" width="33%" /> 
+<img src="https://dev.funkwhale.audio/funkwhale/funkwhale-android/-/raw/develop/app/src/main/play/listings/en-US/graphics/phone-screenshots/3.png" width="33%" /> 
 
 ## Translation
 
