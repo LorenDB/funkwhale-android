@@ -10,7 +10,7 @@ plugins {
 
   id("org.jlleitschuh.gradle.ktlint") version "11.2.0"
   id("com.gladed.androidgitversion") version "0.4.14"
-  id("com.github.triplet.play") version "3.7.0"
+  id("com.github.triplet.play") version "3.8.1"
   id("de.mobilej.unmock")
   id("com.github.ben-manes.versions")
   id("org.jetbrains.kotlin.android")
