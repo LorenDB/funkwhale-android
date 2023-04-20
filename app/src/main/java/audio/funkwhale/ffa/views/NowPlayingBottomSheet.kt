@@ -5,27 +5,27 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.content.res.use
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.utils.BottomSheetIneractable
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.card.MaterialCardView
 
-import androidx.core.content.res.use
 
-
-class NowPlayingBottomSheet @JvmOverloads constructor (
+class NowPlayingBottomSheet @JvmOverloads constructor(
   context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : MaterialCardView(context, attrs), BottomSheetIneractable {
-  val behavior = BottomSheetBehavior<NowPlayingBottomSheet>(context, attrs)
-
+  private val behavior = BottomSheetBehavior<NowPlayingBottomSheet>()
   private val targetHeaderId: Int
 
+  val peekHeight get() = behavior.peekHeight
 
   init {
-    targetHeaderId =context.theme.obtainStyledAttributes(
+    targetHeaderId = context.theme.obtainStyledAttributes(
       attrs, R.styleable.NowPlaying, defStyleAttr, 0
     ).use {
-       it.getResourceId(R.styleable.NowPlaying_target_header, NO_ID)
+      it.getResourceId(R.styleable.NowPlaying_target_header, NO_ID)
     }
   }
 
@@ -40,6 +40,10 @@ class NowPlayingBottomSheet @JvmOverloads constructor (
       behavior.setPeekHeight(this.measuredHeight, false)
       this.setOnClickListener { this@NowPlayingBottomSheet.toggle() }
     } ?: hide()
+  }
+
+  fun addBottomSheetCallback(callback: BottomSheetCallback) {
+    behavior.addBottomSheetCallback(callback)
   }
 
   // Bottom sheet interactions

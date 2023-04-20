@@ -13,9 +13,9 @@
     app:layout_constraintTop_toTopOf="parent"
     app:layout_constraintVertical_weight="10">
     <LinearLayout
+      android:id="@+id/nav_host_fragment_wrapper"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:baselineAligned="false"
       android:orientation="horizontal">
 
       <androidx.fragment.app.FragmentContainerView

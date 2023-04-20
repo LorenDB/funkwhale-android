@@ -1,30 +1,24 @@
 package audio.funkwhale.ffa.activities
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
-import android.util.DisplayMetrics
-import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
-import android.widget.SeekBar
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.content.res.AppCompatResources
-import androidx.appcompat.widget.PopupMenu
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -33,53 +27,40 @@ import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.databinding.ActivityMainBinding
 import audio.funkwhale.ffa.fragments.AddToPlaylistDialog
 import audio.funkwhale.ffa.fragments.BrowseFragmentDirections
-import audio.funkwhale.ffa.fragments.LandscapeQueueFragment
 import audio.funkwhale.ffa.fragments.NowPlayingFragment
 import audio.funkwhale.ffa.fragments.QueueFragment
-import audio.funkwhale.ffa.fragments.TrackInfoDetailsFragment
 import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.playback.MediaControlsManager
 import audio.funkwhale.ffa.playback.PinService
 import audio.funkwhale.ffa.playback.PlayerService
 import audio.funkwhale.ffa.repositories.FavoritedRepository
-import audio.funkwhale.ffa.repositories.FavoritesRepository
-import audio.funkwhale.ffa.repositories.Repository
 import audio.funkwhale.ffa.utils.AppContext
 import audio.funkwhale.ffa.utils.Command
 import audio.funkwhale.ffa.utils.CommandBus
-import audio.funkwhale.ffa.utils.CoverArt
 import audio.funkwhale.ffa.utils.Event
 import audio.funkwhale.ffa.utils.EventBus
-import audio.funkwhale.ffa.utils.FFACache
 import audio.funkwhale.ffa.utils.OAuth
-import audio.funkwhale.ffa.utils.ProgressBus
 import audio.funkwhale.ffa.utils.Settings
 import audio.funkwhale.ffa.utils.Userinfo
 import audio.funkwhale.ffa.utils.authorize
 import audio.funkwhale.ffa.utils.log
 import audio.funkwhale.ffa.utils.logError
-import audio.funkwhale.ffa.utils.maybeNormalizeUrl
 import audio.funkwhale.ffa.utils.mustNormalizeUrl
 import audio.funkwhale.ffa.utils.onApi
 import audio.funkwhale.ffa.utils.toast
-import audio.funkwhale.ffa.utils.untilNetwork
-import audio.funkwhale.ffa.views.DisableableFrameLayout
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.coroutines.awaitStringResponse
-import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.offline.DownloadService
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
-import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
 import com.google.gson.Gson
 import com.preference.PowerPreference
-import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
-import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.java.KoinJavaComponent.inject
+
 
 class MainActivity : AppCompatActivity() {
   enum class ResultCode(val code: Int) {
@@ -101,6 +82,32 @@ class MainActivity : AppCompatActivity() {
     super.onCreate(savedInstanceState)
     AppContext.init(this)
     binding = ActivityMainBinding.inflate(layoutInflater)
+
+    binding.nowPlayingBottomSheet.hide()
+    binding.nowPlayingBottomSheet.addBottomSheetCallback(
+      object : BottomSheetBehavior.BottomSheetCallback() {
+        override fun onStateChanged(bottomSheet: View, newState: Int) {
+          // Set the proper margin on the other child
+          val anim = if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+            ValueAnimator.ofInt(binding.nowPlayingBottomSheet.peekHeight, 0)
+          } else {
+            ValueAnimator.ofInt(0, binding.nowPlayingBottomSheet.peekHeight)
+          }
+
+          anim.apply {
+            duration = 200
+            addUpdateListener {
+              val params =
+                binding.navHostFragmentWrapper.layoutParams as CoordinatorLayout.LayoutParams
+              params.setMargins(0, 0, 0, it.animatedValue as Int)
+            }
+            start()
+          }
+        }
+
+        override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+      }
+    )
 
     setContentView(binding.root)
 
@@ -125,10 +132,10 @@ class MainActivity : AppCompatActivity() {
     super.onResume()
 
     binding.nowPlaying.getFragment<NowPlayingFragment>().apply {
-      favoritedRepository.update(requireContext(), lifecycleScope)
+      favoritedRepository.update(this@MainActivity, lifecycleScope)
 
-      startService(Intent(requireContext(), PlayerService::class.java))
-      DownloadService.start(requireContext(), PinService::class.java)
+      startService(Intent(this@MainActivity, PlayerService::class.java))
+      DownloadService.start(this@MainActivity, PinService::class.java)
 
       CommandBus.send(Command.RefreshService)
 
@@ -237,6 +244,7 @@ class MainActivity : AppCompatActivity() {
           return false
         }
       }
+
       R.id.nav_downloads -> startActivity(Intent(this, DownloadsActivity::class.java))
       R.id.settings -> resultLauncher.launch(Intent(this, SettingsActivity::class.java))
     }
@@ -251,13 +259,13 @@ class MainActivity : AppCompatActivity() {
   private fun watchEventBus() {
     lifecycleScope.launch(Main) {
       EventBus.get().collect { event ->
-        when(event) {
+        when (event) {
           is Event.LogOut -> logout()
           is Event.PlaybackError -> toast(event.message)
           is Event.PlaybackStopped -> binding.nowPlayingBottomSheet.hide()
           is Event.TrackFinished -> incrementListenCount(event.track)
           is Event.QueueChanged -> {
-            if(binding.nowPlayingBottomSheet.isHidden) binding.nowPlayingBottomSheet.show()
+            if (binding.nowPlayingBottomSheet.isHidden) binding.nowPlayingBottomSheet.show()
             findViewById<View>(R.id.nav_queue)?.let { view ->
               ObjectAnimator.ofFloat(view, View.ROTATION, 0f, 360f).let {
                 it.duration = 500
@@ -266,71 +274,41 @@ class MainActivity : AppCompatActivity() {
               }
             }
           }
+
           else -> {}
         }
       }
     }
 
     lifecycleScope.launch(Main) {
-      CommandBus.get().collect { command ->
-        if (command is Command.StartService) {
-          Build.VERSION_CODES.O.onApi(
-            {
-              startForegroundService(
-                Intent(
-                  this@MainActivity,
-                  PlayerService::class.java
-                ).apply {
-                  putExtra(PlayerService.INITIAL_COMMAND_KEY, command.command.toString())
-                }
-              )
-            },
-            {
-              startService(
-                Intent(this@MainActivity, PlayerService::class.java).apply {
-                  putExtra(PlayerService.INITIAL_COMMAND_KEY, command.command.toString())
-                }
-              )
-            }
+      CommandBus.get().flowWithLifecycle(
+        this@MainActivity.lifecycle, Lifecycle.State.RESUMED
+      ).collect { command ->
+        when(command) {
+          is Command.StartService -> startService(command.command)
+          is Command.RefreshTrack -> refreshTrack(command.track)
+          is Command.AddToPlaylist -> AddToPlaylistDialog.show(
+            layoutInflater,
+            this@MainActivity,
+            lifecycleScope,
+            command.tracks
           )
-        } else if (command is Command.RefreshTrack) {
-          refreshCurrentTrack(command.track)
-        } else if (command is Command.AddToPlaylist) {
-          if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
-            AddToPlaylistDialog.show(
-              layoutInflater,
-              this@MainActivity,
-              lifecycleScope,
-              command.tracks
-            )
-          }
+          else -> {}
         }
       }
     }
   }
 
-  private fun refreshCurrentTrack(track: Track?) {
-    track?.let {
-      if (binding.nowPlaying.visibility == View.GONE) {
-        binding.nowPlaying.visibility = View.VISIBLE
-        binding.nowPlaying.alpha = 0f
+  private fun startService(command: Command) {
+    val intent = Intent(this@MainActivity, PlayerService::class.java).apply {
+      putExtra(PlayerService.INITIAL_COMMAND_KEY, command.toString())
+    }
+    ContextCompat.startForegroundService(this, intent)
+  }
 
-        binding.nowPlaying.animate()
-          .alpha(1.0f)
-          .setDuration(400)
-          .setListener(null)
-          .start()
-
-        (binding.navHostFragment.layoutParams as? ViewGroup.MarginLayoutParams)?.let {
-          it.bottomMargin = it.bottomMargin * 2
-        }
-
-        binding.landscapeQueue?.let { landscape_queue ->
-          (landscape_queue.layoutParams as? ViewGroup.MarginLayoutParams)?.let {
-            it.bottomMargin = it.bottomMargin * 2
-          }
-        }
-      }
+  private fun refreshTrack(track: Track?) {
+    if (track != null) {
+      binding.nowPlayingBottomSheet.show()
     }
   }
 
