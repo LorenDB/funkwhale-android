@@ -18,7 +18,7 @@
       android:defaultValue="unlimited"
       android:entries="@array/bandwidth_limitation"
       android:entryValues="@array/bandwidth_limitation_values"
-      android:icon="@drawable/network"
+      android:icon="@drawable/network_beta"
       android:key="bandwidth_limitation"
       android:title="Bandwidth limitation" />
 
