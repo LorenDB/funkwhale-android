@@ -23,6 +23,11 @@
     <string name="settings_media_quality_size">Kleine Dateigröße</string>
     <string name="settings_media_quality_summary_quality">Versionen mit größerer Dateigröße werden verwendet</string>
     <string name="settings_media_quality_summary_size">Songs mit kleinerer Dateigröße werden verwendet</string>
+    <string name="settings_bandwidth_limitation">Bandbreitenbegrenzung</string>
+    <string name="settings_bandwidth_limitation_unlimited">Unbegrenzt</string>
+    <string name="settings_bandwidth_limitation_limited">Begrenzt</string>
+    <string name="settings_bandwidth_limitation_summary_unlimited">Originalinhalte werden ohne Transcodierung abgerufen</string>
+    <string name="settings_bandwidth_limitation_summary_limited">Endpoint stellt Inhalte bereit, die eine maximale Bitrate von 320 kbps respektieren</string>
     <string name="settings_media_cache_size">Zwischenspeichergröße</string>
     <string name="settings_media_cache_size_summary">%d GB werden für offline verfügbare Songs verwendet</string>
     <string name="settings_other">Andere</string>

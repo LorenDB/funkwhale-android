@@ -19,6 +19,11 @@
     <string name="settings_media_quality_quality">Qualitat màxima</string>
     <string name="settings_media_quality_size">Mida més petita</string>
     <string name="settings_media_quality_summary_quality">Es reproduirà la millor versió disponible</string>
+    <string name="settings_bandwidth_limitation">Limitació d\'ample de banda</string>
+    <string name="settings_bandwidth_limitation_unlimited">Il·limitat</string>
+    <string name="settings_bandwidth_limitation_limited">Limitat</string>
+    <string name="settings_bandwidth_limitation_summary_unlimited">El contingut original es recuperarà sense transcodificar</string>
+    <string name="settings_bandwidth_limitation_summary_limited">Endpoint oferirà contingut que respecti la taxa de bits màxima de 320 kbps</string>
     <string name="settings_media_cache_size">Mida de la memòria cau dels mitjans</string>
     <string name="settings_play_order">Ordre de reproducció preferit</string>
     <string name="settings_play_order_shuffle">Àlbums aleatoris</string>

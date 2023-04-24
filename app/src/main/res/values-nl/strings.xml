@@ -19,6 +19,11 @@
     <string name="settings_media_quality">Media kwaliteit</string>
     <string name="settings_media_quality_quality">Beste kwaliteit</string>
     <string name="settings_media_quality_summary_quality">Best beschikbare versie zal worden afgespeeld</string>
+    <string name="settings_bandwidth_limitation">Beperking van de bandbreedte</string>
+    <string name="settings_bandwidth_limitation_unlimited">Onbeperkt</string>
+    <string name="settings_bandwidth_limitation_limited">Beperkt</string>
+    <string name="settings_bandwidth_limitation_summary_unlimited">Originele inhoud wordt opgehaald zonder transcodering</string>
+    <string name="settings_bandwidth_limitation_summary_limited">Endpoint levert inhoud die de maximale bitsnelheid van 320 kbps respecteert</string>
     <string name="settings_media_cache_size">Media cache grootte</string>
     <string name="settings_play_order">Voorkeur afspeelvolgorde</string>
     <string name="settings_play_order_shuffle">Shuffle albums</string>

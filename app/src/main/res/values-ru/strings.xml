@@ -85,6 +85,11 @@
     <string name="settings_night_mode">Тёмный режим</string>
     <string name="settings_other">Другие</string>
     <string name="settings_media_cache_size_summary">%d ГБ будет использовано для сохранения треков для оффлайн воспроизведения</string>
+    <string name="settings_bandwidth_limitation">Ограничение пропускной способности</string>
+    <string name="settings_bandwidth_limitation_unlimited">Неограниченный</string>
+    <string name="settings_bandwidth_limitation_limited">Ограниченное</string>
+    <string name="settings_bandwidth_limitation_summary_unlimited">Исходный контент будет загружен без перекодирования</string>
+    <string name="settings_bandwidth_limitation_summary_limited">Конечная точка будет доставлять контент с максимальным битрейтом 320 кбит/с.</string>
     <string name="settings_media_cache_size">Размера медиакеша</string>
     <string name="settings_media_quality_summary_size">Будет проиграна наихудшая версия</string>
     <string name="settings_media_quality_summary_quality">Будет проиграна наилучшая версия</string>

@@ -71,6 +71,11 @@
     <string name="settings_night_mode">深色模式</string>
     <string name="settings_other">其它</string>
     <string name="settings_media_cache_size_summary">%d GB 将用于存储歌曲以进行脱机播放</string>
+    <string name="settings_bandwidth_limitation">带宽限制</string>
+    <string name="settings_bandwidth_limitation_unlimited">无限</string>
+    <string name="settings_bandwidth_limitation_limited">有限的</string>
+    <string name="settings_bandwidth_limitation_summary_unlimited">将获取原始内容而不转码</string>
+    <string name="settings_bandwidth_limitation_summary_limited">端点将交付符合 320kbps 最大比特率的内容</string>
     <string name="settings_media_cache_size">媒体缓存大小</string>
     <string name="settings_media_quality_summary_size">将播放歌曲的最小体积版本</string>
     <string name="settings_media_quality_summary_quality">将播放歌曲的最佳质量版本</string>

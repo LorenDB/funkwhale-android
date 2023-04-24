@@ -14,6 +14,11 @@
     <string name="settings_play_order_shuffle">Barallar álbumes</string>
     <string name="settings_play_order">Orde preferida de reprodución</string>
     <string name="settings_media_cache_size_summary">Utilizarase %d GB de almacenaxe para reprodución sen conexión</string>
+    <string name="settings_bandwidth_limitation">Limitación de ancho de banda</string>
+    <string name="settings_bandwidth_limitation_unlimited">Ilimitado</string>
+    <string name="settings_bandwidth_limitation_limited">Limitado</string>
+    <string name="settings_bandwidth_limitation_summary_unlimited">O contido orixinal buscarase sen transcodificalo</string>
+    <string name="settings_bandwidth_limitation_summary_limited">Endpoint ofrecerá contido que respecta a taxa de bits máxima de 320 kbps</string>
     <string name="settings_media_cache_size">Tamaño da caché</string>
     <string name="settings_media_quality_summary_size">Reproducirase a canción co menor tamaño dispoñible</string>
     <string name="settings_media_quality_summary_quality">Reproducirase a mellor calidade dispoñible</string>

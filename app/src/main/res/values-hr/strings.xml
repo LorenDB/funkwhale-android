@@ -100,6 +100,11 @@
     <string name="settings_play_order_shuffle">Izmiješaj albume</string>
     <string name="settings_play_order">Preferirani poredak reprodukcije</string>
     <string name="settings_media_cache_size_summary">%d GB će se koristiti za pohranjivanje datoteka u svrhu izvanmrežne reprodukcije</string>
+    <string name="settings_bandwidth_limitation">Ograničenje propusnosti</string>
+    <string name="settings_bandwidth_limitation_unlimited">Neograničen</string>
+    <string name="settings_bandwidth_limitation_limited">Ograničeno</string>
+    <string name="settings_bandwidth_limitation_summary_unlimited">Izvorni sadržaj bit će dohvaćen bez transkodiranja</string>
+    <string name="settings_bandwidth_limitation_summary_limited">Endpoint će isporučivati ​​sadržaj koji poštuje maksimalnu brzinu prijenosa od 320 kbps</string>
     <string name="settings_media_cache_size">Veličina medijske predmemorije (cache)</string>
     <string name="settings_media_quality_summary_size">Svirat će se najmanja dostupna datoteka</string>
     <string name="settings_media_quality_summary_quality">Svirat će se najbolja dostupna verzija</string>

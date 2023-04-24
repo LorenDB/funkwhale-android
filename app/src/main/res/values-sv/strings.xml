@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_media_quality_summary_size">Spår med minsta möjliga storlek kommer spelas</string>
+    <string name="settings_bandwidth_limitation">Bandbreddsbegränsning</string>
+    <string name="settings_bandwidth_limitation_unlimited">Obegränsat</string>
+    <string name="settings_bandwidth_limitation_limited">Begränsad</string>
+    <string name="settings_bandwidth_limitation_summary_unlimited">Originalinnehåll kommer att hämtas utan omkodning</string>
+    <string name="settings_bandwidth_limitation_summary_limited">Endpoint kommer att leverera innehåll som respekterar 320 kbps maximal bithastighet</string>
     <string name="settings_media_cache_size">Cachningsstorlek för media</string>
     <string name="login_hostname">Servernamn</string>
     <string name="login_anonymous">Anonym autentisering</string>

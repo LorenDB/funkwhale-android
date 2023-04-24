@@ -97,6 +97,11 @@
     <string name="settings_play_order_shuffle">Album casuali</string>
     <string name="settings_play_order">Ordine di riproduzione preferito</string>
     <string name="settings_media_cache_size_summary">%d GB verranno utilizzati per memorizzare le tracce per la riproduzione offline</string>
+    <string name="settings_bandwidth_limitation">Limitazione della larghezza di banda</string>
+    <string name="settings_bandwidth_limitation_unlimited">Illimitata</string>
+    <string name="settings_bandwidth_limitation_limited">Limitata</string>
+    <string name="settings_bandwidth_limitation_summary_unlimited">Il contenuto originale verrà recuperato senza transcodifica</string>
+    <string name="settings_bandwidth_limitation_summary_limited">Endpoint fornirà contenuti che rispettano il bitrate massimo di 320 kbps</string>
     <string name="settings_media_cache_size">Dimensioni della cache multimediale</string>
     <string name="settings_media_quality_summary_size">Verrà riprodotta la traccia più piccola disponibile</string>
     <string name="settings_media_quality_summary_quality">Verrà riprodotta la migliore versione disponibile</string>

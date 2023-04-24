@@ -112,6 +112,11 @@
     <string name="settings_other">Inne</string>
     <string name="settings_play_order">Preferowana kolejność odtwarzania</string>
     <string name="settings_media_cache_size_summary">%d GB zostanie przeznaczone na utwory dostępne offline</string>
+    <string name="settings_bandwidth_limitation">Ograniczenie przepustowości</string>
+    <string name="settings_bandwidth_limitation_unlimited">Nieograniczony</string>
+    <string name="settings_bandwidth_limitation_limited">Ograniczony</string>
+    <string name="settings_bandwidth_limitation_summary_unlimited">Oryginalna treść zostanie pobrana bez transkodowania</string>
+    <string name="settings_bandwidth_limitation_summary_limited">Endpoint dostarczy treści, które respektują maksymalną przepływność 320 kb/s</string>
     <string name="settings_media_cache_size">Wielkość pamięci podręcznej mediów</string>
     <string name="settings_media_quality_summary_size">Odtwarzana będzie najmniejsza dostępna wersja</string>
     <string name="settings_media_quality_summary_quality">Odtwarzana będzie najlepsza dostępna jakość</string>

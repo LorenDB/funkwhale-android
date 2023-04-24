@@ -24,6 +24,11 @@
     <string name="title_downloads">ダウンロード</string>
     <string name="search_placeholder">アーティスト、アルバム、曲を探す</string>
     <string name="settings_general">一般設定</string>
+    <string name="settings_bandwidth_limitation">帯域幅制限</string>
+    <string name="settings_bandwidth_limitation_unlimited">無制限</string>
+    <string name="settings_bandwidth_limitation_limited">限定</string>
+    <string name="settings_bandwidth_limitation_summary_unlimited">元のコンテンツはコード変換せずに取得されます</string>
+    <string name="settings_bandwidth_limitation_summary_limited">エンドポイントは、320kbps の最大ビットレートを尊重するコンテンツを配信します</string>
     <string name="settings_media_cache_size">メディアのキャッシュサイズ</string>
     <string name="login_anonymous">匿名での認証</string>
     <string name="login_hostname">ホストネーム</string>

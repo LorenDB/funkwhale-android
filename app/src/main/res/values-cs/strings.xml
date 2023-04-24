@@ -47,6 +47,11 @@
     <string name="filters_followed">Sledovaný obsah</string>
     <string name="login_hostname">Název hosta</string>
     <string name="settings_media_quality">Kvalita média</string>
+    <string name="settings_bandwidth_limitation">Omezení šířky pásma</string>
+    <string name="settings_bandwidth_limitation_unlimited">Neomezený</string>
+    <string name="settings_bandwidth_limitation_limited">Omezený</string>
+    <string name="settings_bandwidth_limitation_summary_unlimited">Původní obsah bude načten bez překódování</string>
+    <string name="settings_bandwidth_limitation_summary_limited">Endpoint bude poskytovat obsah, který respektuje maximální bitovou rychlost 320 kbps</string>
     <string name="settings_media_cache_size">Velikost paměti cache pro média</string>
     <string name="settings_play_order_shuffle_summary">Preferujete promíchání skladeb v albech</string>
     <string name="settings_play_order_in_order">Přehrát alba v jejich pořadí</string>
