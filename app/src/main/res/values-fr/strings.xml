@@ -28,7 +28,7 @@
     <string name="settings_bandwidth_limitation_unlimited">Illimitée</string>
     <string name="settings_bandwidth_limitation_limited">Limitée</string>
     <string name="settings_bandwidth_limitation_summary_unlimited">Le contenu original sera téléchargé sans transcodage</string>
-    <string name="settings_bandwidth_limitation_summary_limited">"Le serveur délivrera du contenu transcodé avec un débit maximum de 320kbps "</string>
+    <string name="settings_bandwidth_limitation_summary_limited">Le serveur délivrera du contenu transcodé avec un débit maximum de 320kbps</string>
     <string name="settings_media_cache_size">Taille du cache</string>
     <string name="settings_media_cache_size_summary">%d Go seront utilisés pour mettre en cache les pistes pour la lecture hors-ligne</string>
     <string name="settings_play_order">Ordre de lecture préféré</string>
