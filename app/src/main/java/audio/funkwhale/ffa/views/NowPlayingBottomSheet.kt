@@ -3,6 +3,7 @@ package audio.funkwhale.ffa.views
 import android.content.Context
 import android.util.AttributeSet
 import android.util.TypedValue
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -51,6 +52,8 @@ class NowPlayingBottomSheet @JvmOverloads constructor(
       this.setOnClickListener { this@NowPlayingBottomSheet.toggle() }
     } ?: hide()
   }
+
+  override fun onTouchEvent(event: MotionEvent): Boolean = true
 
   fun addBottomSheetCallback(callback: BottomSheetCallback) {
     behavior.addBottomSheetCallback(callback)
