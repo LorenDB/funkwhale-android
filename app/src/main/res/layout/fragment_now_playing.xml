@@ -34,8 +34,8 @@
 
     <ImageButton
       android:id="@+id/now_playing_details_info"
-      android:layout_width="32dp"
-      android:layout_height="32dp"
+      android:layout_width="48dp"
+      android:layout_height="48dp"
       android:layout_margin="8dp"
       app:layout_constraintEnd_toEndOf="@id/detail_image_placeholder"
       app:layout_constraintTop_toTopOf="@id/detail_image_placeholder"
