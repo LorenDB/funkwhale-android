@@ -6,6 +6,7 @@ import android.transition.CircularPropagation
 import android.util.Log
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import audio.funkwhale.ffa.BuildConfig
+import audio.funkwhale.ffa.FFA
 import audio.funkwhale.ffa.R
 import com.squareup.picasso.Downloader
 import com.squareup.picasso.NetworkPolicy
@@ -72,6 +73,19 @@ open class CoverArt private constructor() {
 
     // Cache with some useful concurrency semantics.  See its docs for details.
     val fileCache = Bottleneck<File>()
+
+    private val picasso = with (FFA.get()) {
+                                     Picasso.Builder(this)
+                                         .addRequestHandler(CoverNetworkRequestHandler(this))
+    // Be careful with this.  There's at least one place in Picasso where it
+    // doesn't null-check when logging, so it'll throw errors in places you
+    // wouldn't get them with logging turned off.  /sigh
+                                         .loggingEnabled(false) // (BuildConfig.DEBUG)
+    // Occasionally, we may get transient HTTP issues, or bogus files.
+    // Listen for Picasso errors and invalidate those files
+                                         .listener(invalidateIn(this))
+                                         .build()
+    }
 
     /**
      * We don't need to hang onto the Context, just the Path it gets us.
@@ -204,17 +218,6 @@ open class CoverArt private constructor() {
     /**
      * Low-level Picasso wiring.
      */
-    private fun buildPicasso(context: Context) = Picasso.Builder(context)
-      // The bulk of the work happens here
-      .addRequestHandler(CoverNetworkRequestHandler(context))
-      // Be careful with this.  There's at least one place in Picasso where it
-      // doesn't null-check when logging, so it'll throw errors in places you
-      // wouldn't get them with logging turned off.  /sigh
-      .loggingEnabled(false) // (BuildConfig.DEBUG)
-      // Occasionally, we may get transient HTTP issues, or bogus files.
-      // Listen for Picasso errors and invalidate those files
-      .listener(invalidateIn(context))
-      .build()
 
     /**
      * We don't want to cache the HTTP part of the flow, because:
@@ -254,9 +257,9 @@ open class CoverArt private constructor() {
      * The primary entrypoint for the codebase.
      */
     fun withContext(context: Context, url: String?): RequestCreator {
-      val request = buildPicasso(context).load(url)
+      val request = picasso.load(url)
       if(url == null) request.placeholder(R.drawable.cover)
-      else request.placeholder(CircularProgressDrawable(context))
+      else request.placeholder(CircularProgressDrawable(FFA.get()))
       return request.error(R.drawable.cover)
     }
   }
