@@ -39,7 +39,7 @@ class AlbumsGridAdapter(
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
     val album = data[position]
 
-    CoverArt.withContext(layoutInflater.context, maybeNormalizeUrl(album.cover()))
+    CoverArt.requestCreator(maybeNormalizeUrl(album.cover()))
       .fit()
       .transform(RoundedCornersTransformation(16, 0))
       .into(holder.cover)

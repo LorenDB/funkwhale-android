@@ -68,7 +68,7 @@ class MediaControlsManager(
           .run {
             coverUrl?.let {
               try {
-                setLargeIcon(CoverArt.withContext(context, coverUrl).get())
+                setLargeIcon(CoverArt.requestCreator(coverUrl).get())
               } catch (_: Exception) {
               }
 

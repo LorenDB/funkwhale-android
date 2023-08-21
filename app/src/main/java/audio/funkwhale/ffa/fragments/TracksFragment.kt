@@ -118,7 +118,7 @@ class TracksFragment : FFAFragment<Track, TracksAdapter>() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    CoverArt.withContext(layoutInflater.context, maybeNormalizeUrl(args.album.cover()))
+    CoverArt.requestCreator(maybeNormalizeUrl(args.album.cover()))
       .noFade()
       .fit()
       .centerCrop()

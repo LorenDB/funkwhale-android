@@ -167,7 +167,7 @@ class PlaylistTracksFragment : FFAFragment<PlaylistTrack, PlaylistTracksAdapter>
         }
 
         lifecycleScope.launch(Main) {
-          CoverArt.withContext(layoutInflater.context, maybeNormalizeUrl(url))
+          CoverArt.requestCreator(maybeNormalizeUrl(url))
             .fit()
             .centerCrop()
             .transform(RoundedCornersTransformation(16, 0, corner))

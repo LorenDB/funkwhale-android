@@ -385,7 +385,7 @@ class PlayerService : Service() {
           runBlocking(IO) {
             this@apply.putBitmap(
               MediaMetadataCompat.METADATA_KEY_ALBUM_ART,
-              CoverArt.withContext(this@PlayerService.applicationContext, coverUrl).get()
+              CoverArt.requestCreator(coverUrl).get()
             )
           }
         } catch (_: Exception) {

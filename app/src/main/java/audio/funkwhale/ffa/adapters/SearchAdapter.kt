@@ -189,7 +189,7 @@ class SearchAdapter(
       else -> tracks[position]
     }
 
-    CoverArt.withContext(fragment.layoutInflater.context, maybeNormalizeUrl(item.cover()))
+    CoverArt.requestCreator(maybeNormalizeUrl(item.cover()))
       .fit()
       .transform(RoundedCornersTransformation(16, 0))
       .into(rowTrackViewHolder?.cover)

@@ -79,7 +79,7 @@ class PlaylistsAdapter(
         else -> RoundedCornersTransformation.CornerType.TOP_LEFT
       }
 
-      CoverArt.withContext(layoutInflater.context, url)
+      CoverArt.requestCreator(url)
         .transform(RoundedCornersTransformation(32, 0, corner))
         .into(imageView)
     }

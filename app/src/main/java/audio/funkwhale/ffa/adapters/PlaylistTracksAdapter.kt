@@ -71,7 +71,7 @@ class PlaylistTracksAdapter(
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
     val playlistTrack = data[position]
 
-    CoverArt.withContext(layoutInflater.context, maybeNormalizeUrl(playlistTrack.track.cover()))
+    CoverArt.requestCreator(maybeNormalizeUrl(playlistTrack.track.cover()))
       .fit()
       .transform(RoundedCornersTransformation(16, 0))
       .into(holder.cover)

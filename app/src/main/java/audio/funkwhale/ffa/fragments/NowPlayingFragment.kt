@@ -170,7 +170,7 @@ class NowPlayingFragment: Fragment(R.layout.fragment_now_playing) {
       return
     }
 
-    CoverArt.withContext(requireContext(), maybeNormalizeUrl(track.album?.cover()))
+    CoverArt.requestCreator(maybeNormalizeUrl(track.album?.cover()))
       .into(binding.header.nowPlayingCover)
   }
 

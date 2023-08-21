@@ -256,7 +256,7 @@ open class CoverArt private constructor() {
     /**
      * The primary entrypoint for the codebase.
      */
-    fun withContext(context: Context, url: String?): RequestCreator {
+    fun requestCreator(url: String?): RequestCreator {
       val request = picasso.load(url)
       if(url == null) request.placeholder(R.drawable.cover)
       else request.placeholder(CircularProgressDrawable(FFA.get()))

@@ -62,7 +62,7 @@ class ArtistsAdapter(
     val artist = active[position]
 
     artist.cover()?.let { coverUrl ->
-      CoverArt.withContext(layoutInflater.context, maybeNormalizeUrl(coverUrl))
+      CoverArt.requestCreator(maybeNormalizeUrl(coverUrl))
         .fit()
         .transform(RoundedCornersTransformation(8, 0))
         .into(holder.art)

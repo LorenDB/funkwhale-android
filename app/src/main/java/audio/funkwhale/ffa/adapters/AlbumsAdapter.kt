@@ -43,7 +43,7 @@ class AlbumsAdapter(
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
     val album = data[position]
 
-    CoverArt.withContext(layoutInflater.context, album.cover())
+    CoverArt.requestCreator(album.cover())
       .fit()
       .transform(RoundedCornersTransformation(8, 0))
       .into(holder.art)

@@ -79,7 +79,7 @@ class AlbumsFragment : FFAFragment<Album, AlbumsAdapter>() {
     super.onViewCreated(view, savedInstanceState)
 
     binding.cover.let { cover ->
-      CoverArt.withContext(layoutInflater.context, maybeNormalizeUrl(artistArt))
+      CoverArt.requestCreator(maybeNormalizeUrl(artistArt))
         .noFade()
         .fit()
         .centerCrop()

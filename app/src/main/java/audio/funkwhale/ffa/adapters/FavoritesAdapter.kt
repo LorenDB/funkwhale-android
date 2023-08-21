@@ -69,7 +69,7 @@ class FavoritesAdapter(
     val favorite = data[position]
     val track = favorite.track
 
-    CoverArt.withContext(layoutInflater.context, maybeNormalizeUrl(track.cover()))
+    CoverArt.requestCreator(maybeNormalizeUrl(track.cover()))
       .fit()
       .transform(RoundedCornersTransformation(16, 0))
       .into(holder.cover)
