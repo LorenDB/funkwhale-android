@@ -1,7 +1,6 @@
 package audio.funkwhale.ffa.utils
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.BroadcastReceiver
@@ -23,7 +22,7 @@ object AppContext {
   const val PAGE_SIZE = 50
   const val TRANSITION_DURATION = 300L
 
-  fun init(context: Activity) {
+  fun init(context: Context) {
     setupNotificationChannels(context)
 
     // CastContext.getSharedInstance(context)

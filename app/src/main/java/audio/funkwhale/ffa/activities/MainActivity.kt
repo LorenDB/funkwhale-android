@@ -69,7 +69,9 @@ class MainActivity : AppCompatActivity() {
     LOGOUT(1001)
   }
 
-  private val favoritedRepository = FavoritedRepository(this)
+  private val favoritedRepository by lazy {
+    FavoritedRepository(applicationContext)
+  }
   private var menu: Menu? = null
 
   private lateinit var binding: ActivityMainBinding
@@ -82,8 +84,7 @@ class MainActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    AppContext.init(this)
-
+    AppContext.init(applicationContext)
     binding = ActivityMainBinding.inflate(layoutInflater)
 
     (supportFragmentManager.findFragmentById(R.id.now_playing) as NowPlayingFragment).apply {
@@ -141,15 +142,15 @@ class MainActivity : AppCompatActivity() {
     super.onResume()
 
     binding.nowPlaying.getFragment<NowPlayingFragment>().apply {
-      favoritedRepository.update(this@MainActivity, lifecycleScope)
+      favoritedRepository.update(applicationContext, lifecycleScope)
 
-      startService(Intent(this@MainActivity, PlayerService::class.java))
-      DownloadService.start(this@MainActivity, PinService::class.java)
+      startService(Intent(applicationContext, PlayerService::class.java))
+      DownloadService.start(applicationContext, PinService::class.java)
 
       CommandBus.send(Command.RefreshService)
 
       lifecycleScope.launch(IO) {
-        Userinfo.get(this@MainActivity, oAuth)
+        Userinfo.get(applicationContext, oAuth)
       }
     }
   }
@@ -343,7 +344,7 @@ class MainActivity : AppCompatActivity() {
         try {
           Fuel
             .post(mustNormalizeUrl("/api/v1/history/listenings/"))
-            .authorize(this@MainActivity, oAuth)
+            .authorize(applicationContext, oAuth)
             .header("Content-Type", "application/json")
             .body(Gson().toJson(mapOf("track" to track.id)))
             .awaitStringResponse()
