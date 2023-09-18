@@ -40,6 +40,9 @@ import audio.funkwhale.ffa.utils.CommandBus
 import audio.funkwhale.ffa.utils.Event
 import audio.funkwhale.ffa.utils.EventBus
 import audio.funkwhale.ffa.utils.OAuth
+import audio.funkwhale.ffa.utils.Request
+import audio.funkwhale.ffa.utils.RequestBus
+import audio.funkwhale.ffa.utils.Response
 import audio.funkwhale.ffa.utils.Settings
 import audio.funkwhale.ffa.utils.Userinfo
 import audio.funkwhale.ffa.utils.authorize
@@ -48,6 +51,7 @@ import audio.funkwhale.ffa.utils.logError
 import audio.funkwhale.ffa.utils.mustNormalizeUrl
 import audio.funkwhale.ffa.utils.onApi
 import audio.funkwhale.ffa.utils.toast
+import audio.funkwhale.ffa.utils.wait
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.coroutines.awaitStringResponse
 import com.google.android.exoplayer2.offline.DownloadService
@@ -56,8 +60,10 @@ import com.google.gson.Gson
 import com.preference.PowerPreference
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.channels.consume
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent.inject
 
@@ -83,7 +89,6 @@ class MainActivity : AppCompatActivity() {
     AppContext.init(this)
     binding = ActivityMainBinding.inflate(layoutInflater)
 
-    binding.nowPlayingBottomSheet.hide()
     binding.nowPlayingBottomSheet.addBottomSheetCallback(
       object : BottomSheetBehavior.BottomSheetCallback() {
         override fun onStateChanged(bottomSheet: View, newState: Int) {
@@ -125,7 +130,15 @@ class MainActivity : AppCompatActivity() {
       MediaControlsManager.NOTIFICATION_ACTION_OPEN_QUEUE.toString() -> launchDialog(QueueFragment())
     }
 
-    watchEventBus()
+    lifecycleScope.launch {
+      RequestBus.send(Request.GetQueue).wait<Response.Queue>()?.let {
+        if(it.queue.isNotEmpty()) binding.nowPlayingBottomSheet.show()
+        else binding.nowPlayingBottomSheet.hide()
+      }
+      // Watch the event bus only after to prevent concurrency in displaying the bottom sheet
+      watchEventBus()
+    }
+
   }
 
   override fun onResume() {

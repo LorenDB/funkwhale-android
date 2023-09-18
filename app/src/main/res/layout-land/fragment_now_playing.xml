@@ -13,38 +13,32 @@
       android:id="@+id/header"
       layout="@layout/partial_now_playing_header" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-      android:id="@+id/cover_container"
-      android:layout_width="wrap_content"
+    <audio.funkwhale.ffa.views.SquareImageView
+      android:id="@+id/now_playing_detail_cover"
+      android:layout_width="0dp"
       android:layout_height="0dp"
+      android:scaleType="fitCenter"
+      app:layout_constraintTop_toBottomOf="@id/header"
       app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintDimensionRatio="H,1:1"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/header">
+      app:srcCompat="@drawable/cover"
+      tools:src="@tools:sample/avatars" />
 
-      <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/now_playing_detail_cover"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:scaleType="fitCenter"
-        app:layout_constraintDimensionRatio="H,1:1"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/cover"
-        tools:src="@tools:sample/avatars" />
-
-      <ImageButton
-        android:id="@+id/now_playing_details_info"
-        style="@style/IconButton"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_gravity="top|end"
-        android:layout_margin="8dp"
-        android:background="@drawable/circle"
-        android:contentDescription="@string/alt_track_info"
-        android:src="@drawable/more"
-        app:layout_constraintEnd_toEndOf="@id/now_playing_detail_cover"
-        app:layout_constraintTop_toTopOf="@id/now_playing_detail_cover"
-        app:tint="@color/controlForeground" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    <ImageButton
+      android:id="@+id/now_playing_details_info"
+      style="@style/IconButton"
+      android:layout_width="32dp"
+      android:layout_height="32dp"
+      android:layout_gravity="top|end"
+      android:layout_margin="8dp"
+      android:background="@drawable/circle"
+      android:contentDescription="@string/alt_track_info"
+      android:src="@drawable/more"
+      app:layout_constraintEnd_toEndOf="@id/now_playing_detail_cover"
+      app:layout_constraintTop_toTopOf="@id/now_playing_detail_cover"
+      app:tint="@color/controlForeground"
+    />
 
 
     <include
@@ -57,7 +51,7 @@
       app:layout_constraintTop_toBottomOf="@id/header"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toEndOf="@id/cover_container"
+      app:layout_constraintStart_toEndOf="@id/now_playing_detail_cover"
     />
 
   </androidx.constraintlayout.widget.ConstraintLayout>

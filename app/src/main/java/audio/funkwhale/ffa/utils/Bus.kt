@@ -98,7 +98,8 @@ object CommandBus {
 }
 
 object RequestBus {
-  private var _requests = MutableSharedFlow<Request>()
+  // `replay` allows send requests before the PlayerService starts listening
+  private var _requests = MutableSharedFlow<Request>(replay = 100)
   var requests = _requests.asSharedFlow()
   fun send(request: Request): Channel<Response> {
     return Channel<Response>().also {

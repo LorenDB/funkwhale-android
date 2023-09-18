@@ -48,7 +48,7 @@
       app:layout_constraintEnd_toEndOf="@id/now_playing_cover"
       android:indeterminate="true"
       android:indeterminateTint="@color/controlForeground"
-      android:visibility="@{isBuffering ? View.VISIBLE : View.GONE, default=gone}" />
+      android:visibility="@{isBuffering ? View.VISIBLE : View.INVISIBLE, default=invisible}" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
       android:id="@+id/header_controls"
