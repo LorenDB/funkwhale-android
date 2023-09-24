@@ -11,11 +11,11 @@
     android:layout_height="0dp"
     app:layout_constraintTop_toTopOf="parent"
     app:layout_constraintBottom_toTopOf="@id/appbar_wrapper">
+
     <FrameLayout
-      android:id="@+id/nav_host_fragment_wrapper"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-    >
+      android:id="@+id/nav_host_fragment_wrapper">
       <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"
@@ -30,18 +30,17 @@
 
     <audio.funkwhale.ffa.views.NowPlayingBottomSheet
       android:id="@+id/now_playing_bottom_sheet"
-      style="?attr/bottomSheetStyle"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      app:cardCornerRadius="3dp"
-      app:cardElevation="12dp"
-      app:target_header="@id/header">
+      android:background="@color/elevatedSurface"
+      app:target_header="@id/constraint_layout_placeholder">
       <androidx.fragment.app.FragmentContainerView
         android:id="@+id/now_playing"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:name="audio.funkwhale.ffa.fragments.NowPlayingFragment"
-        tools:layout="@layout/fragment_now_playing"/>
+        tools:layout="@layout/fragment_now_playing"
+      />
     </audio.funkwhale.ffa.views.NowPlayingBottomSheet>
   </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

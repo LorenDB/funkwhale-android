@@ -16,9 +16,11 @@
     <variable name="isPlaying" type="LiveData&lt;Boolean>" />
     <variable name="progress" type="LiveData&lt;Integer>" />
   </data>
+
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:alpha="0">
     <TextView
       android:id="@+id/current_playing_details_title"
       android:layout_width="0dp"
@@ -84,8 +86,8 @@
       android:id="@+id/now_playing_details_progress"
       android:layout_width="0dp"
       android:layout_height="wrap_content"
-      android:max="100"
       android:layout_margin="8dp"
+      android:max="100"
       android:progress="@{progress, default=40}"
       android:progressBackgroundTint="#cacaca"
       android:progressTint="@color/controlForeground"

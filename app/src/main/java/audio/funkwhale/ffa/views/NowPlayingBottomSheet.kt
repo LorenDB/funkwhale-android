@@ -2,20 +2,21 @@ package audio.funkwhale.ffa.views
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.res.use
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.utils.BottomSheetIneractable
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
-import com.google.android.material.card.MaterialCardView
 
 
 class NowPlayingBottomSheet @JvmOverloads constructor(
   context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : MaterialCardView(context, attrs), BottomSheetIneractable {
+) : FrameLayout(context, attrs, defStyleAttr), BottomSheetIneractable {
   private val behavior = BottomSheetBehavior<NowPlayingBottomSheet>()
   private val targetHeaderId: Int
 
@@ -27,6 +28,14 @@ class NowPlayingBottomSheet @JvmOverloads constructor(
     ).use {
       it.getResourceId(R.styleable.NowPlaying_target_header, NO_ID)
     }
+
+    // Put default peek height to actionBarSize so it is not 0
+    val tv = TypedValue()
+    if (context.theme.resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+      behavior.peekHeight = TypedValue.complexToDimensionPixelSize(
+        tv.data, resources.displayMetrics
+      )
+    }
   }
 
   override fun setLayoutParams(params: ViewGroup.LayoutParams?) {
@@ -37,7 +46,7 @@ class NowPlayingBottomSheet @JvmOverloads constructor(
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
     findViewById<View>(targetHeaderId)?.apply {
-      behavior.setPeekHeight(this.measuredHeight, false)
+      behavior.setPeekHeight(this.height, false)
       this.setOnClickListener { this@NowPlayingBottomSheet.toggle() }
     } ?: hide()
   }

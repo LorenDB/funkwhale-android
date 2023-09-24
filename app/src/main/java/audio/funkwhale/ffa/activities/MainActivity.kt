@@ -3,6 +3,7 @@ package audio.funkwhale.ffa.activities
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
+import android.app.Fragment
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -49,7 +50,6 @@ import audio.funkwhale.ffa.utils.authorize
 import audio.funkwhale.ffa.utils.log
 import audio.funkwhale.ffa.utils.logError
 import audio.funkwhale.ffa.utils.mustNormalizeUrl
-import audio.funkwhale.ffa.utils.onApi
 import audio.funkwhale.ffa.utils.toast
 import audio.funkwhale.ffa.utils.wait
 import com.github.kittinunf.fuel.Fuel
@@ -60,10 +60,6 @@ import com.google.gson.Gson
 import com.preference.PowerPreference
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.channels.consume
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent.inject
 
@@ -87,32 +83,28 @@ class MainActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     AppContext.init(this)
+
     binding = ActivityMainBinding.inflate(layoutInflater)
 
-    binding.nowPlayingBottomSheet.addBottomSheetCallback(
-      object : BottomSheetBehavior.BottomSheetCallback() {
-        override fun onStateChanged(bottomSheet: View, newState: Int) {
-          // Set the proper margin on the other child
-          val anim = if (newState == BottomSheetBehavior.STATE_HIDDEN) {
-            ValueAnimator.ofInt(binding.nowPlayingBottomSheet.peekHeight, 0)
-          } else {
-            ValueAnimator.ofInt(0, binding.nowPlayingBottomSheet.peekHeight)
+    (supportFragmentManager.findFragmentById(R.id.now_playing) as NowPlayingFragment).apply {
+      onDetailsMenuItemClicked { binding.nowPlayingBottomSheet.close() }
+      binding.nowPlayingBottomSheet.addBottomSheetCallback(
+        object : BottomSheetBehavior.BottomSheetCallback() {
+          override fun onStateChanged(bottomSheet: View, newState: Int) {
+            // Add padding to the main fragment so that player control don't overlap
+            // artists and albums
+            addSiblingFragmentPadding()
           }
 
-          anim.apply {
-            duration = 200
-            addUpdateListener {
-              val params =
-                binding.navHostFragmentWrapper.layoutParams as CoordinatorLayout.LayoutParams
-              params.setMargins(0, 0, 0, it.animatedValue as Int)
-            }
-            start()
+          override fun onSlide(bottomSheet: View, slideOffset: Float) {
+            // Animate the cover and other elements of the bottom sheet
+            onBottomSheetDrag(slideOffset)
           }
         }
+      )
+    }
 
-        override fun onSlide(bottomSheet: View, slideOffset: Float) {}
-      }
-    )
+    addSiblingFragmentPadding()
 
     setContentView(binding.root)
 
@@ -132,8 +124,11 @@ class MainActivity : AppCompatActivity() {
 
     lifecycleScope.launch {
       RequestBus.send(Request.GetQueue).wait<Response.Queue>()?.let {
-        if(it.queue.isNotEmpty()) binding.nowPlayingBottomSheet.show()
-        else binding.nowPlayingBottomSheet.hide()
+        if (it.queue.isNotEmpty() && binding.nowPlayingBottomSheet.isHidden) {
+          binding.nowPlayingBottomSheet.show()
+        } else if (it.queue.isEmpty()) {
+          binding.nowPlayingBottomSheet.hide()
+        }
       }
       // Watch the event bus only after to prevent concurrency in displaying the bottom sheet
       watchEventBus()
@@ -265,6 +260,20 @@ class MainActivity : AppCompatActivity() {
     return true
   }
 
+  private fun addSiblingFragmentPadding() {
+    val anim = if (binding.nowPlayingBottomSheet.isHidden) {
+      ValueAnimator.ofInt(binding.nowPlayingBottomSheet.peekHeight, 0)
+    } else {
+      ValueAnimator.ofInt(0, binding.nowPlayingBottomSheet.peekHeight)
+    }
+
+    anim.duration = 200
+    anim.addUpdateListener {
+      binding.navHostFragmentWrapper.setPadding(0, 0, 0, it.animatedValue as Int)
+    }
+    anim.start()
+  }
+
   private fun launchDialog(fragment: DialogFragment) =
     fragment.show(supportFragmentManager.beginTransaction(), "")
 
@@ -297,7 +306,7 @@ class MainActivity : AppCompatActivity() {
       CommandBus.get().flowWithLifecycle(
         this@MainActivity.lifecycle, Lifecycle.State.RESUMED
       ).collect { command ->
-        when(command) {
+        when (command) {
           is Command.StartService -> startService(command.command)
           is Command.RefreshTrack -> refreshTrack(command.track)
           is Command.AddToPlaylist -> AddToPlaylistDialog.show(
@@ -306,6 +315,7 @@ class MainActivity : AppCompatActivity() {
             lifecycleScope,
             command.tracks
           )
+
           else -> {}
         }
       }

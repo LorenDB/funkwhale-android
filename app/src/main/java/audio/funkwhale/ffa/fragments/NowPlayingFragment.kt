@@ -18,7 +18,6 @@ import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.repositories.FavoritedRepository
 import audio.funkwhale.ffa.repositories.FavoritesRepository
 import audio.funkwhale.ffa.repositories.Repository
-import audio.funkwhale.ffa.utils.BottomSheetIneractable
 import audio.funkwhale.ffa.utils.Command
 import audio.funkwhale.ffa.utils.CommandBus
 import audio.funkwhale.ffa.utils.CoverArt
@@ -30,24 +29,17 @@ import audio.funkwhale.ffa.utils.maybeNormalizeUrl
 import audio.funkwhale.ffa.utils.toIntOrElse
 import audio.funkwhale.ffa.utils.untilNetwork
 import audio.funkwhale.ffa.viewmodel.NowPlayingViewModel
-import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.lang.Float.max
 
-class NowPlayingFragment : Fragment(R.layout.fragment_now_playing) {
+class NowPlayingFragment: Fragment(R.layout.fragment_now_playing) {
   private val binding by lazy { FragmentNowPlayingBinding.bind(requireView()) }
   private val viewModel by viewModels<NowPlayingViewModel>()
   private val favoriteRepository by lazy { FavoritesRepository(requireContext()) }
   private val favoritedRepository by lazy { FavoritedRepository(requireContext()) }
 
-  private val bottomSheet: BottomSheetIneractable? by lazy {
-    var view = this.view?.parent
-    while (view != null) {
-      if(view is BottomSheetIneractable) return@lazy view
-      view = view.parent
-    }
-    null
-  }
+  private var onDetailsMenuItemClickedCb: () -> Unit = {}
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     binding.lifecycleOwner = viewLifecycleOwner
@@ -83,7 +75,10 @@ class NowPlayingFragment : Fragment(R.layout.fragment_now_playing) {
       nowPlayingDetailsAddToPlaylist.setOnClickListener { onAddToPlaylist() }
     }
 
+    binding.nowPlayingDetailsInfo.setOnClickListener { openInfoMenu() }
+
     with(binding.header) {
+      lifecycleOwner = viewLifecycleOwner
       isBuffering = viewModel.isBuffering
       isPlaying = viewModel.isPlaying
       progress = viewModel.progress
@@ -100,8 +95,6 @@ class NowPlayingFragment : Fragment(R.layout.fragment_now_playing) {
       }
     }
 
-    binding.nowPlayingDetailsInfo.setOnClickListener { openInfoMenu() }
-
     lifecycleScope.launch(Dispatchers.Main) {
       CommandBus.get().collect { onCommand(it) }
     }
@@ -113,6 +106,14 @@ class NowPlayingFragment : Fragment(R.layout.fragment_now_playing) {
     lifecycleScope.launch(Dispatchers.Main) {
       ProgressBus.get().collect { onProgress(it) }
     }
+  }
+
+  fun onBottomSheetDrag(value: Float) {
+    binding.nowPlayingRoot.progress = max(value, 0f)
+  }
+
+  fun onDetailsMenuItemClicked(cb: () -> Unit) {
+    onDetailsMenuItemClickedCb = cb
   }
 
 
@@ -170,19 +171,10 @@ class NowPlayingFragment : Fragment(R.layout.fragment_now_playing) {
   private fun onTrackChange(track: Track?) {
     if (track == null) {
       binding.header.nowPlayingCover.setImageResource(R.drawable.cover)
-      binding.nowPlayingDetailCover.setImageResource(R.drawable.cover)
       return
     }
 
     CoverArt.withContext(requireContext(), maybeNormalizeUrl(track.album?.cover()))
-      .fit()
-      .centerCrop()
-      .into(binding.nowPlayingDetailCover)
-
-    CoverArt.withContext(requireContext(), maybeNormalizeUrl(track.album?.cover()))
-      .fit()
-      .centerCrop()
-      .transform(RoundedCornersTransformation(16, 0))
       .into(binding.header.nowPlayingCover)
   }
 
@@ -199,7 +191,7 @@ class NowPlayingFragment : Fragment(R.layout.fragment_now_playing) {
       inflate(R.menu.track_info)
 
       setOnMenuItemClickListener {
-        bottomSheet?.close()
+        onDetailsMenuItemClickedCb()
 
         when (it.itemId) {
           R.id.track_info_artist -> findNavController().navigate(

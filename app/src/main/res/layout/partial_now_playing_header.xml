@@ -14,29 +14,34 @@
     <variable name="currentTrackArtist" type="LiveData&lt;String>" />
   </data>
 
-  <androidx.constraintlayout.widget.ConstraintLayout
-    android:layout_width="match_parent"
-    android:layout_height="?attr/actionBarSize">
+  <merge>
+    <!-- Placeholder for setting constraints and interacting -->
+    <View
+      android:id="@+id/constraint_layout_placeholder"
+      android:layout_width="match_parent"
+      android:layout_height="?attr/actionBarSize"
+      app:layout_constraintTop_toTopOf="parent"
+    />
 
     <com.google.android.material.progressindicator.LinearProgressIndicator
       android:id="@+id/now_playing_progress"
-      android:layout_width="0dp"
+      android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      app:layout_constraintTop_toTopOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toTopOf="@id/constraint_layout_placeholder"
       android:progress="@{progress, default=40}"
-      android:progressTint="@color/colorPrimaryDark" />
+      android:progressTint="@color/colorPrimaryDark"
+    />
 
     <audio.funkwhale.ffa.views.SquareImageView
       android:id="@+id/now_playing_cover"
       android:layout_width="0dp"
       android:layout_height="0dp"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/now_playing_progress"
-      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintStart_toStartOf="@id/constraint_layout_placeholder"
+      app:layout_constraintTop_toBottomOf="@id/now_playing_progress"
+      app:layout_constraintBottom_toBottomOf="@id/constraint_layout_placeholder"
       app:srcCompat="@drawable/cover"
-      tools:src="@tools:sample/avatars" />
+      tools:src="@tools:sample/avatars"
+    />
 
     <ProgressBar
       android:id="@+id/now_playing_buffering"
@@ -46,9 +51,8 @@
       app:layout_constraintTop_toTopOf="@id/now_playing_cover"
       app:layout_constraintBottom_toBottomOf="@id/now_playing_cover"
       app:layout_constraintEnd_toEndOf="@id/now_playing_cover"
-      android:indeterminate="true"
-      android:indeterminateTint="@color/controlForeground"
-      android:visibility="@{isBuffering ? View.VISIBLE : View.INVISIBLE, default=invisible}" />
+      android:visibility="@{isBuffering ? View.VISIBLE : View.INVISIBLE, default=invisible}"
+    />
 
     <androidx.constraintlayout.widget.ConstraintLayout
       android:id="@+id/header_controls"
@@ -56,9 +60,10 @@
       android:layout_height="0dp"
       app:layout_constraintHorizontal_weight="10"
       app:layout_constraintStart_toEndOf="@id/now_playing_cover"
-      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintEnd_toEndOf="@id/constraint_layout_placeholder"
       app:layout_constraintTop_toBottomOf="@id/now_playing_progress"
-      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintBottom_toBottomOf="@id/constraint_layout_placeholder"
+      android:background="@color/elevatedSurface"
       android:padding="4dp">
 
       <TextView
@@ -71,7 +76,8 @@
         android:text="@{currentTrackTitle}"
         android:ellipsize="end"
         android:lines="1"
-        tools:text="Supermassive Black Hole" />
+        tools:text="Supermassive Black Hole"
+      />
 
       <TextView
         android:layout_width="0dp"
@@ -82,7 +88,8 @@
         android:ellipsize="end"
         android:lines="1"
         android:text="@{currentTrackArtist}"
-        tools:text="Muse" />
+        tools:text="Muse"
+      />
 
       <com.google.android.material.button.MaterialButton
         android:id="@+id/now_playing_toggle"
@@ -91,7 +98,8 @@
         android:layout_height="match_parent"
         app:layout_constraintEnd_toStartOf="@id/now_playing_next"
         android:layout_marginEnd="16dp"
-        app:icon="@{isPlaying ? @drawable/pause : @drawable/play, default=@drawable/play}" />
+        app:icon="@{isPlaying ? @drawable/pause : @drawable/play, default=@drawable/play}"
+      />
 
       <ImageButton
         android:id="@+id/now_playing_next"
@@ -100,7 +108,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         style="@style/IconButton"
         android:contentDescription="@string/control_next"
-        android:src="@drawable/next" />
+        android:src="@drawable/next"
+      />
     </androidx.constraintlayout.widget.ConstraintLayout>
-  </androidx.constraintlayout.widget.ConstraintLayout>
+  </merge>
+
 </layout>

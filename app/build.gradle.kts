@@ -181,7 +181,7 @@ dependencies {
   implementation("androidx.recyclerview:recyclerview:1.2.1")
   implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
   implementation("com.google.android.material:material:1.8.0")
-  implementation("com.android.support.constraint:constraint-layout:2.0.4")
+  implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 
   implementation("com.google.android.exoplayer:exoplayer-core:2.18.1")
   implementation("com.google.android.exoplayer:exoplayer-ui:2.18.1")
