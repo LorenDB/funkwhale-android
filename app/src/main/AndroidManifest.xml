@@ -22,11 +22,13 @@
             android:name=".activities.SplashActivity"
             android:launchMode="singleInstance"
             android:noHistory="true"
+            android:screenOrientation="portrait"
             android:exported="true">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
@@ -38,7 +40,9 @@
             android:launchMode="singleInstance"
             android:screenOrientation="portrait" />
 
-        <activity android:name=".activities.MainActivity" />
+        <activity
+            android:name=".activities.MainActivity"
+            android:screenOrientation="portrait" />
 
         <activity
             android:name=".activities.DownloadsActivity"

@@ -109,6 +109,7 @@ class MainActivity : AppCompatActivity() {
     setContentView(binding.root)
 
     setSupportActionBar(binding.appbar)
+    supportActionBar?.setDisplayShowTitleEnabled(false)
 
     onBackPressedDispatcher.addCallback(this) {
       if (binding.nowPlayingBottomSheet.isOpen) {

@@ -10,7 +10,7 @@
     android:layout_width="match_parent"
     android:layout_height="0dp"
     app:layout_constraintTop_toTopOf="parent"
-    app:layout_constraintBottom_toTopOf="@id/appbar_wrapper">
+    app:layout_constraintBottom_toTopOf="@id/appbar">
 
     <FrameLayout
       android:layout_width="match_parent"
@@ -32,7 +32,8 @@
       android:id="@+id/now_playing_bottom_sheet"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:background="@color/elevatedSurface"
+      android:backgroundTint="@color/elevatedSurface"
+      app:cardElevation="16dp"
       app:target_header="@id/constraint_layout_placeholder">
       <androidx.fragment.app.FragmentContainerView
         android:id="@+id/now_playing"
@@ -44,21 +45,14 @@
     </audio.funkwhale.ffa.views.NowPlayingBottomSheet>
   </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-  <androidx.coordinatorlayout.widget.CoordinatorLayout
-    android:id="@+id/appbar_wrapper"
+  <androidx.appcompat.widget.Toolbar
+    android:id="@+id/appbar"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:layout_constraintBottom_toBottomOf="parent">
-
-    <com.google.android.material.bottomappbar.BottomAppBar
-      android:id="@+id/appbar"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_gravity="bottom"
-      android:theme="@style/AppTheme.AppBar"
-      app:backgroundTint="@color/elevatedSurface"
-      app:layout_insetEdge="bottom"
-      app:navigationIcon="@drawable/funkwhaleshape"
-      tools:menu="@menu/toolbar" />
-  </androidx.coordinatorlayout.widget.CoordinatorLayout>
+    android:layout_height="?attr/actionBarSize"
+    app:layout_constraintBottom_toBottomOf="parent"
+    android:theme="@style/AppTheme.AppBar"
+    android:background="@color/elevatedSurface"
+    app:navigationIcon="@drawable/funkwhaleshape"
+    tools:menu="@menu/toolbar"
+  />
 </androidx.constraintlayout.widget.ConstraintLayout>

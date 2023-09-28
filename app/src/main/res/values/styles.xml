@@ -68,9 +68,9 @@
   <style name="AppTheme.AppBar" parent="ThemeOverlay.MaterialComponents.Toolbar.Primary">
     <item name="android:drawableTint" tools:targetApi="m">@color/colorPrimary</item>
     <item name="android:tint">@color/colorPrimary</item>
-
     <item name="actionBarPopupTheme">@style/AppTheme.PopupMenu</item>
     <item name="popupTheme">@style/AppTheme.PopupMenu</item>
+    <item name="android:elevation">16dp</item>
   </style>
 
   <style name="AppTheme.PopupMenu" parent="ThemeOverlay.MaterialComponents.Toolbar.Primary">

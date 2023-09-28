@@ -6,6 +6,7 @@ import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.cardview.widget.CardView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.res.use
 import audio.funkwhale.ffa.R
@@ -16,7 +17,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCa
 
 class NowPlayingBottomSheet @JvmOverloads constructor(
   context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : FrameLayout(context, attrs, defStyleAttr), BottomSheetIneractable {
+) : CardView(context, attrs, defStyleAttr), BottomSheetIneractable {
   private val behavior = BottomSheetBehavior<NowPlayingBottomSheet>()
   private val targetHeaderId: Int
 
