@@ -12,6 +12,7 @@ import android.media.MediaMetadata
 import android.os.Build
 import android.os.IBinder
 import android.support.v4.media.MediaMetadataCompat
+import android.util.Log
 import android.view.KeyEvent
 import androidx.core.app.NotificationManagerCompat
 import androidx.media.session.MediaButtonReceiver
@@ -468,8 +469,11 @@ class PlayerService : Service() {
 
     override fun onPlaybackStateChanged(playbackState: Int) {
       super.onPlaybackStateChanged(playbackState)
-      EventBus.send(Event.Buffering(playbackState == Player.STATE_BUFFERING))
+
       when (playbackState) {
+        Player.STATE_BUFFERING -> {
+          EventBus.send(Event.Buffering(true))
+        }
         Player.STATE_ENDED -> {
           setPlaybackState(false)
 
@@ -487,6 +491,10 @@ class PlayerService : Service() {
           if (!player.playWhenReady) {
             mediaControlsManager.remove()
           }
+        }
+
+        Player.STATE_READY -> {
+          EventBus.send(Event.Buffering(false))
         }
       }
     }

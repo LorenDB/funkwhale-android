@@ -13,6 +13,14 @@
     <Constraint android:id="@id/constraint_layout_placeholder">
       <PropertySet android:visibility="visible" />
     </Constraint>
+    <!--
+      I don't know why MotionLayout tries to control visibility for the buffer progress bar,
+      but it's messing with its display…
+    -->
+    <ConstraintOverride
+      android:id="@id/now_playing_buffering"
+      motion:visibilityMode="ignore"
+    />
   </ConstraintSet>
 
   <ConstraintSet android:id="@+id/end">
@@ -22,7 +30,14 @@
       motion:layout_constraintStart_toStartOf="@id/detail_image_placeholder"
       motion:layout_constraintTop_toBottomOf="@id/detail_image_placeholder"
       motion:layout_constraintTop_toTopOf="@id/detail_image_placeholder"
-      motion:transitionEasing="accelerate"
+    />
+    <!--
+      I don't know why MotionLayout tries to control visibility for the buffer progress bar,
+      but it's messing with its display…
+    -->
+    <ConstraintOverride
+      android:id="@id/now_playing_buffering"
+      motion:visibilityMode="ignore"
     />
     <Constraint android:id="@id/now_playing_progress">
       <PropertySet android:alpha="0" android:visibility="gone" />
@@ -50,6 +65,13 @@
         motion:percentX="1"
         motion:framePosition="50"
         motion:motionTarget="@id/now_playing_cover"
+        motion:curveFit="spline"
+      />
+
+      <KeyPosition
+        motion:percentX="1"
+        motion:framePosition="50"
+        motion:motionTarget="@id/now_playing_buffering"
         motion:curveFit="spline"
       />
 

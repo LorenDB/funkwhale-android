@@ -1,6 +1,7 @@
 package audio.funkwhale.ffa.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.SeekBar
@@ -8,8 +9,13 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.liveData
+import androidx.lifecycle.map
 import androidx.navigation.fragment.findNavController
 import audio.funkwhale.ffa.MainNavDirections
 import audio.funkwhale.ffa.R
@@ -100,10 +106,6 @@ class NowPlayingFragment: Fragment(R.layout.fragment_now_playing) {
     }
 
     lifecycleScope.launch(Dispatchers.Main) {
-      EventBus.get().collect { onEvent(it) }
-    }
-
-    lifecycleScope.launch(Dispatchers.Main) {
       ProgressBus.get().collect { onProgress(it) }
     }
   }
@@ -132,12 +134,6 @@ class NowPlayingFragment: Fragment(R.layout.fragment_now_playing) {
   private fun onCommand(command: Command) = when (command) {
     is Command.RefreshTrack -> refreshCurrentTrack(command.track)
     is Command.SetRepeatMode -> viewModel.repeatMode.postValue(command.mode)
-    else -> {}
-  }
-
-  private fun onEvent(event: Event): Unit = when (event) {
-    is Event.Buffering -> viewModel.isBuffering.postValue(event.value)
-    is Event.StateChanged -> viewModel.isPlaying.postValue(event.playing)
     else -> {}
   }
 
