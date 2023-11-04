@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- LAUNCH_SINGLE_INSTANCE -> overrides library mode because of
+     bug in Android 14 (34) which causes infinite loop
+     should be fixed soon with version 14.1 -->
+    <integer name="launch_mode_for_app_auth">3</integer>
+</resources>
