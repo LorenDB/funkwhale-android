@@ -189,7 +189,7 @@ dependencies {
   implementation("com.google.android.exoplayer:exoplayer-ui:2.18.1")
   implementation("com.google.android.exoplayer:extension-mediasession:2.18.1")
 
-  implementation("io.insert-koin:koin-core:3.3.2")
+  implementation("io.insert-koin:koin-core:3.5.0")
   implementation("io.insert-koin:koin-android:3.5.0")
   testImplementation("io.insert-koin:koin-test:3.3.2")
 
