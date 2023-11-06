@@ -191,7 +191,7 @@ dependencies {
 
   implementation("io.insert-koin:koin-core:3.5.0")
   implementation("io.insert-koin:koin-android:3.5.0")
-  testImplementation("io.insert-koin:koin-test:3.3.2")
+  testImplementation("io.insert-koin:koin-test:3.5.0")
 
   implementation("com.github.PaulWoitaschek.ExoPlayer-Extensions:extension-opus:789a4f83169cff5c7a91655bb828fde2cfde671a") {
     isTransitive = false
