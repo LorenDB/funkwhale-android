@@ -23,7 +23,6 @@
             android:name=".activities.SplashActivity"
             android:launchMode="singleInstance"
             android:noHistory="true"
-            android:screenOrientation="portrait"
             android:exported="true">
 
             <intent-filter>
@@ -42,8 +41,7 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".activities.MainActivity"
-            android:screenOrientation="portrait" />
+            android:name=".activities.MainActivity" />
 
         <activity
             android:name=".activities.DownloadsActivity"
