@@ -74,7 +74,9 @@ class NowPlayingBottomSheet @JvmOverloads constructor(
 
   override fun show() {
     behavior.isHideable = false
-    close()
+    if (behavior.state == BottomSheetBehavior.STATE_HIDDEN) {
+      close()
+    }
   }
 
   override fun hide() {
