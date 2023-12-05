@@ -132,4 +132,6 @@
     <string name="settings_auto_skip_backwards_on_pause">Rebobinar ao pausar</string>
     <string name="settings_auto_skip_backwards_on_pause_summary">Número de segundos a rebobinar cando se pausou a reprodución</string>
     <string name="playlist">Lista de reprodución</string>
+    <string name="control_repeat_mode">Modo repetición</string>
+    <string name="control_add_to_favorties">Engadir a favoritos</string>
 </resources>
