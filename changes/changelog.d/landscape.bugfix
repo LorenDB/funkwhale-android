@@ -1,1 +1,0 @@
-Fix landscape view induced MainActivity leak.

@@ -1,3 +1,22 @@
+0.3.0 (2023-12-12)
+Features:
+
+- Add option to limit bandwidth usage by streaming transcoded music
+- Improve player bottom sheet, in particular fling support
+
+
+Enhancements:
+
+- Refactor CoverArt.withContext().
+
+
+Bugfixes:
+
+- Fix buffering progress bar display
+- Fix landscape view induced MainActivity leak.
+- Fix Too Many Receivers exception
+
+
 0.2.1 (2023-04-18)
 Bugfixes:
 
