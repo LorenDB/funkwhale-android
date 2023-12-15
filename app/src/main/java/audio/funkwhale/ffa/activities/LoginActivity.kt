@@ -1,9 +1,11 @@
 package audio.funkwhale.ffa.activities
 
+import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
@@ -64,6 +66,13 @@ class LoginActivity : AppCompatActivity() {
   override fun onResume() {
     super.onResume()
     with(binding) {
+      val preferences = getPreferences(Context.MODE_PRIVATE)
+      val hn = preferences?.getString("hostname", "")
+      if (hn != null && !hn.isEmpty()) {
+        hostname.text = Editable.Factory.getInstance().newEditable(hn)
+      }
+      cleartext.setChecked(preferences?.getBoolean("cleartext", false) ?: false)
+      anonymous.setChecked(preferences?.getBoolean("anonymous", false) ?: false)
       login.setOnClickListener {
         var hostname = hostname.text.toString().trim().trim('/')
 
@@ -95,6 +104,12 @@ class LoginActivity : AppCompatActivity() {
             else e.message
 
           hostnameField.error = message
+        }
+        if (hostnameField.error == null) {
+          val preferences = getPreferences(Context.MODE_PRIVATE)
+          preferences?.edit()?.putString("hostname", hostname)?.commit()
+          preferences?.edit()?.putBoolean("cleartext", cleartext.isChecked)?.commit()
+          preferences?.edit()?.putBoolean("anonymous", anonymous.isChecked)?.commit()
         }
       }
     }
