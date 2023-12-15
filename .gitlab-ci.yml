@@ -39,7 +39,7 @@ cache: &global_cache
   before_script: 
     - git fetch --unshallow --tags
   after_script:
-    - export versionCode=`$ANDROID_HOME/build-tools/30.0.2/aapt dump badging $apk_file | grep versionCode | awk '{print $3}' | sed s/versionCode=//g | sed s/\'//g`
+    - export versionCode=`$ANDROID_HOME/build-tools/30.0.3/aapt dump badging $apk_file | grep versionCode | awk '{print $3}' | sed s/versionCode=//g | sed s/\'//g`
     - apt update && apt install gettext-base
     - cat $metadata_template | envsubst > $metadata_file
   extends: .gradle-default
