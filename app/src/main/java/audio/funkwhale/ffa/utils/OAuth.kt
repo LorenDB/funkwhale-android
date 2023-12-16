@@ -103,6 +103,7 @@ class OAuth(private val authorizationServiceFactory: AuthorizationServiceFactory
           if (e != null) {
             Log.e("OAuth", "performTokenRequest failed: $e")
             Log.e("OAuth", Log.getStackTraceString(e))
+            EventBus.send(Event.LogOut)
           } else {
             state.apply {
               Log.i("OAuth", "applying new authState")

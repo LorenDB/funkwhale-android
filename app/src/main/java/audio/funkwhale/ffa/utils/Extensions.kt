@@ -63,6 +63,7 @@ fun Request.authorize(context: Context, oAuth: OAuth): Request {
               Log.e("Request.authorize()", "performActionWithFreshToken failed: $e")
               if (e.type != 2 || e.code != 2002) {
                 Log.e("Request.authorize()", Log.getStackTraceString(e))
+                EventBus.send(Event.LogOut)
               }
             }
             if (token != old && token != null) {
