@@ -53,9 +53,6 @@ fun Request.authorize(context: Context, oAuth: OAuth): Request {
     this@authorize.apply {
       if (!Settings.isAnonymous()) {
         oAuth.state().let { state ->
-          state.accessTokenExpirationTime?.let {
-            Log.i("Request.authorize()", "Accesstoken expiration: ${Date(it).format()}")
-          }
           val old = state.accessToken
           val auth = ClientSecretPost(oAuth.state().clientSecret)
           val done = CompletableDeferred<Boolean>()
@@ -64,10 +61,9 @@ fun Request.authorize(context: Context, oAuth: OAuth): Request {
           state.performActionWithFreshTokens(tokenService, auth) { token, _, e ->
             if (e != null) {
               Log.e("Request.authorize()", "performActionWithFreshToken failed: $e")
-              Log.e("Request.authorize()", Log.getStackTraceString(e))
-            }
-            if (token == old) {
-              Log.i("Request.authorize()", "Accesstoken not renewed")
+              if (e.type != 2 || e.code != 2002) {
+                Log.e("Request.authorize()", Log.getStackTraceString(e))
+              }
             }
             if (token != old && token != null) {
               state.save()

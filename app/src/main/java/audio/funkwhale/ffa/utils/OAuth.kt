@@ -83,7 +83,7 @@ class OAuth(private val authorizationServiceFactory: AuthorizationServiceFactory
         refreshAccessToken(state, context)
       } else {
         state.isAuthorized
-      }.also { it.logInfo("tryRefreshAccessToken()") }
+      }
     }
     return false
   }
