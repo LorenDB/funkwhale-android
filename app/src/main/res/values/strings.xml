@@ -82,7 +82,7 @@
   <string name="control_previous">Previous track</string>
   <string name="control_next">Next track</string>
   <string name="control_repeat_mode">Repeat mode</string>
-  <string name="control_add_to_favorties">Add to favorties</string>
+  <string name="control_add_to_favorites">Add to favorites</string>
   <string name="error_playback">This track could not be played</string>
   <plurals name="album_count">
     <item quantity="one">%d album</item>

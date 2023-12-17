@@ -81,7 +81,7 @@
     <string name="radio_random_title">Ausazkoa</string>
     <string name="radio_random_description">Ausaz hautatutakoak, agian zerbait berria aurkituko duzu!</string>
     <string name="radio_less_listened_title">Gutxien entzundakoak</string>
-    <string name="control_add_to_favorties">Gehitu gogokoenetara</string>
+    <string name="control_add_to_favorites">Gehitu gogokoenetara</string>
     <string name="playlist_added_to">%s zerrendan gehitu da</string>
     <string name="filters">Iragazkiak</string>
     <string name="fiters_all">Musika guztia</string>

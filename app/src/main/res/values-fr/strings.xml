@@ -136,6 +136,6 @@
     <string name="settings_auto_skip_backwards_on_pause_summary">Nombre de secondes à revenir en arrière lorsque la lecture est en pause</string>
     <string name="playlist">Liste de lecture</string>
     <string name="hello_blank_fragment">Bonjour, fragment vide</string>
-    <string name="control_add_to_favorties">Ajouter aux favoris</string>
+    <string name="control_add_to_favorites">Ajouter aux favoris</string>
     <string name="control_repeat_mode">Mode répétition</string>
 </resources>

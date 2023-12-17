@@ -65,7 +65,7 @@
       android:layout_width="48dp"
       android:layout_height="48dp"
       android:layout_margin="8dp"
-      android:contentDescription="@string/control_add_to_favorties"
+      android:contentDescription="@string/control_add_to_favorites"
       android:src="@drawable/favorite"
       app:layout_constraintBottom_toBottomOf="@+id/current_playing_details_artist"
       app:layout_constraintEnd_toEndOf="parent"
