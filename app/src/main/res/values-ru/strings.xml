@@ -125,9 +125,9 @@
     <string name="playback_queue_save">Сохранить</string>
     <string name="playback_queue_clear">Очистить</string>
     <string name="playback_play">Играть</string>
-    <string name="settings_play_order_in_order_summary">Предпочитаемый порядок проигрывания альбомов</string>
+    <string name="settings_play_order_in_order_summary">Вы предпочитаете слушать альбомы в порядке</string>
     <string name="settings_play_order_in_order">Проигрывать альбомы в порядке</string>
-    <string name="settings_play_order_shuffle_summary">Перемешивать трэки в альбомах</string>
+    <string name="settings_play_order_shuffle_summary">Вы предпочитаете перетасовывать дорожки альбомов</string>
     <string name="settings_play_order_shuffle">Перемешать альбомы</string>
     <string name="settings_play_order">Предпочитаемый порядок</string>
     <string name="login_error">Ошибка входа: %s</string>
@@ -136,6 +136,6 @@
     <string name="hello_blank_fragment">Привет пустой фрагмент</string>
     <string name="playlist">Плейлист</string>
     <string name="control_repeat_mode">Режим повтора</string>
-    <string name="settings_auto_skip_backwards_on_pause">Откатиться вспять при паузе</string>
+    <string name="settings_auto_skip_backwards_on_pause">Откатиться назад при паузе</string>
     <string name="settings_auto_skip_backwards_on_pause_summary">Количество секунд для отката назад, когда воспроизведение приостановлено</string>
 </resources>
