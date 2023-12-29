@@ -133,4 +133,6 @@
     </plurals>
     <string name="login_cleartext">Sta cleartext verkeer toe (HTTP)</string>
     <string name="settings_media_quality_summary_size">Lichtst beschikbaar nummer zal worden afgespeeld</string>
+    <string name="control_repeat_mode">Herhalingsmodus</string>
+    <string name="control_add_to_favorties">Toevoegen aan favorieten</string>
 </resources>
