@@ -177,7 +177,7 @@ dependencies {
   implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
   implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
   implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
-  implementation("androidx.preference:preference-ktx:1.2.0")
+  implementation("androidx.preference:preference-ktx:1.2.1")
   implementation("androidx.recyclerview:recyclerview:1.2.1")
   implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
   implementation("com.google.android.material:material:1.9.0") {
