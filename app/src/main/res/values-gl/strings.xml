@@ -134,4 +134,5 @@
     <string name="playlist">Lista de reprodución</string>
     <string name="control_repeat_mode">Modo repetición</string>
     <string name="control_add_to_favorites">Engadir a favoritos</string>
+    <string name="hello_blank_fragment">Borrar esta cadea</string>
 </resources>
