@@ -168,7 +168,7 @@ dependencies {
 
   implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 
-  implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.20")
+  implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.0")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
 

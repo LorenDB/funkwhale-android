@@ -72,6 +72,14 @@
         </service>
 
         <service
+            android:name=".playback.FFAMediaLibraryService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.media.browse.MediaBrowserService" />
+            </intent-filter>
+        </service>
+
+        <service
             android:name=".playback.PinService"
             android:exported="false">
 
@@ -83,11 +91,14 @@
         </service>
 
         <receiver android:name="androidx.media.session.MediaButtonReceiver"
-            android:exported="false">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
+
+      <meta-data android:name="com.google.android.gms.car.application"
+          android:resource="@xml/automotive_app_desc" />
 
       <meta-data android:name="io.sentry.dsn" android:value="https://4e377f47d01242baae2d9d8bd689c3ef@am.funkwhale.audio/4" />
     </application>
