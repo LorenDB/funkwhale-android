@@ -58,6 +58,8 @@ class FFAMediaLibraryService : MediaBrowserServiceCompat() {
   override fun onCreate() {
     super.onCreate()
     sessionToken = mediaSession.session.sessionToken
+
+    mediaSession.ensureServiceStarted()
   }
 
   override fun onGetRoot(clientPackageName: String, clientUid: Int, rootHints: Bundle?): BrowserRoot? {

@@ -48,7 +48,6 @@ class MediaSession(private val context: Context) {
       setPlaybackState(playbackStateBuilder.build())
 
       isActive = true
-      active = true
     }
   }
 
@@ -56,10 +55,12 @@ class MediaSession(private val context: Context) {
     MediaSessionConnector(session).also {
       it.setQueueNavigator(FFAQueueNavigator())
 
-      it.setPlaybackPreparer(FFAPlaybackPreparer(context, scope))
+      it.setPlaybackPreparer(FFAPlaybackPreparer(context, this, scope))
 
       it.setMediaButtonEventHandler { _, intent ->
         if (!active) {
+          ensureServiceStarted()
+
           Intent(context, PlayerService::class.java).let { player ->
             player.action = intent.action
 
@@ -76,6 +77,18 @@ class MediaSession(private val context: Context) {
         }
 
         false
+      }
+    }
+  }
+
+  fun ensureServiceStarted() {
+    if (!active) {
+      Intent(context, PlayerService::class.java).let {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+          context.startForegroundService(it)
+        } else {
+          context.startService(it)
+        }
       }
     }
   }
@@ -108,7 +121,7 @@ class FFAQueueNavigator : MediaSessionConnector.QueueNavigator {
   override fun onTimelineChanged(player: Player) {}
 }
 
-class FFAPlaybackPreparer(private val context: Context, private val scope: CoroutineScope) : MediaSessionConnector.PlaybackPreparer {
+class FFAPlaybackPreparer(private val context: Context, private val mediaSession: MediaSession, private val scope: CoroutineScope) : MediaSessionConnector.PlaybackPreparer {
   override fun onCommand(player: Player, command: String, extras: Bundle?, cb: ResultReceiver?) = false
 
   override fun getSupportedPrepareActions(): Long {
@@ -116,9 +129,13 @@ class FFAPlaybackPreparer(private val context: Context, private val scope: Corou
       PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID
   }
 
-  override fun onPrepare(playWhenReady: Boolean) {}
+  override fun onPrepare(playWhenReady: Boolean) {
+    mediaSession.ensureServiceStarted()
+  }
 
   override fun onPrepareFromMediaId(mediaId: String, playWhenReady: Boolean, extras: Bundle?) {
+    mediaSession.ensureServiceStarted()
+
     scope.launch {
       when {
         mediaId.startsWith("radio_") -> {
@@ -168,7 +185,11 @@ class FFAPlaybackPreparer(private val context: Context, private val scope: Corou
     }
   }
 
-  override fun onPrepareFromSearch(query: String, playWhenReady: Boolean, extras: Bundle?) {}
+  override fun onPrepareFromSearch(query: String, playWhenReady: Boolean, extras: Bundle?) {
+    mediaSession.ensureServiceStarted()
+  }
 
-  override fun onPrepareFromUri(uri: android.net.Uri, playWhenReady: Boolean, extras: Bundle?) {}
+  override fun onPrepareFromUri(uri: android.net.Uri, playWhenReady: Boolean, extras: Bundle?) {
+    mediaSession.ensureServiceStarted()
+  }
 }
