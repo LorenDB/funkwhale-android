@@ -202,7 +202,7 @@ class TracksAdapter(
     var from = -1
     var to = -1
 
-    override fun isLongPressDragEnabled() = false
+    override fun isLongPressDragEnabled() = true
 
     override fun isItemViewSwipeEnabled() = false
 
