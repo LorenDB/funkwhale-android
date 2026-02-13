@@ -151,6 +151,15 @@ abstract class FFAFragment<D : Any, A : FFAAdapter<D, *>> : Fragment() {
           }
 
           if (first) {
+            // If network fetch returns empty data (likely due to error), don't clear cached data.
+            // Note: This means we can't distinguish between empty-due-to-error vs legitimately-empty
+            // responses. In the rare case where the server legitimately returns empty, cached data
+            // will persist. This trade-off prioritizes data preservation for the common offline case.
+            if (data.isEmpty()) {
+              moreLoading = false
+              swiper.isRefreshing = false
+              return@launch
+            }
             adapter.getUnfilteredData().clear()
           }
 
@@ -159,14 +168,22 @@ abstract class FFAFragment<D : Any, A : FFAAdapter<D, *>> : Fragment() {
           adapter.getUnfilteredData().addAll(data)
           adapter.applyFilter()
 
+          // Prepare cache data on main thread to avoid race conditions.
+          // We still check isNotEmpty here to handle pagination case (first=false) where
+          // we might receive empty data for additional pages but have existing data in adapter.
+          val cacheData = if (adapter.getUnfilteredData().isNotEmpty()) {
+            repository.cache(adapter.getUnfilteredData())?.let { cached ->
+              Gson().toJson(cached)
+            }
+          } else null
+
           withContext(IO) {
             try {
-              repository.cacheId?.let { cacheId ->
-                FFACache.set(
-                  context,
-                  cacheId,
-                  Gson().toJson(repository.cache(adapter.getUnfilteredData())).toString()
-                )
+              // Only save to cache if we have data to prevent clearing cache on network errors
+              cacheData?.let { jsonData ->
+                repository.cacheId?.let { cacheId ->
+                  FFACache.set(context, cacheId, jsonData)
+                }
               }
             } catch (e: ConcurrentModificationException) {
             }
