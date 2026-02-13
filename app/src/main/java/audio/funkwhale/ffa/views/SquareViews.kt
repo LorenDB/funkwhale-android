@@ -17,7 +17,7 @@ open class SquareView : View {
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
-    val dimension = if(measuredWidth == 0 && measuredHeight > 0) measuredHeight else measuredWidth
+    val dimension = if (measuredWidth == 0 && measuredHeight > 0) measuredHeight else measuredWidth
 
     setMeasuredDimension(dimension, dimension)
   }
@@ -32,7 +32,7 @@ open class SquareImageView : AppCompatImageView {
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
-    val dimension = if(measuredWidth == 0 && measuredHeight > 0) measuredHeight else measuredWidth
+    val dimension = if (measuredWidth == 0 && measuredHeight > 0) measuredHeight else measuredWidth
 
     setMeasuredDimension(dimension, dimension)
   }
@@ -82,7 +82,7 @@ open class SwipeableSquareImageView : AppCompatImageView {
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
-    val dimension = if(measuredWidth == 0 && measuredHeight > 0) measuredHeight else measuredWidth
+    val dimension = if (measuredWidth == 0 && measuredHeight > 0) measuredHeight else measuredWidth
 
     setMeasuredDimension(dimension, dimension)
   }

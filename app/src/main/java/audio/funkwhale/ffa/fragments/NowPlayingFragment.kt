@@ -35,6 +35,8 @@ import audio.funkwhale.ffa.utils.maybeNormalizeUrl
 import audio.funkwhale.ffa.utils.toIntOrElse
 import audio.funkwhale.ffa.utils.untilNetwork
 import audio.funkwhale.ffa.viewmodel.NowPlayingViewModel
+import audio.funkwhale.ffa.views.SwipeableConstraintLayout
+import audio.funkwhale.ffa.views.SwipeableSquareImageView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.Float.max
@@ -101,7 +103,7 @@ class NowPlayingFragment: Fragment(R.layout.fragment_now_playing) {
       }
 
       // Set up swipe gestures on the album cover
-      nowPlayingCover.setOnSwipeListener(object : audio.funkwhale.ffa.views.SwipeableSquareImageView.OnSwipeListener {
+      nowPlayingCover.setOnSwipeListener(object : SwipeableSquareImageView.OnSwipeListener {
         override fun onSwipeLeft() {
           CommandBus.send(Command.NextTrack)
         }
@@ -112,7 +114,7 @@ class NowPlayingFragment: Fragment(R.layout.fragment_now_playing) {
       })
 
       // Set up swipe gestures on the header controls (playback bar)
-      headerControls.setOnSwipeListener(object : audio.funkwhale.ffa.views.SwipeableConstraintLayout.OnSwipeListener {
+      headerControls.setOnSwipeListener(object : SwipeableConstraintLayout.OnSwipeListener {
         override fun onSwipeLeft() {
           CommandBus.send(Command.NextTrack)
         }
