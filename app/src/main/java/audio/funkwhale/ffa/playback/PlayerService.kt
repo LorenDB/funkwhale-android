@@ -135,6 +135,7 @@ class PlayerService : Service() {
 
     player = ExoPlayer.Builder(this).build().apply {
       playWhenReady = false
+      volume = 1f
 
       playerEventListener = PlayerEventListener().also {
         addListener(it)
