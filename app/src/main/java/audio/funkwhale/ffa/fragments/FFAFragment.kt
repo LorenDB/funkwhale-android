@@ -151,11 +151,13 @@ abstract class FFAFragment<D : Any, A : FFAAdapter<D, *>> : Fragment() {
           }
 
           if (first) {
-            // Only clear existing data if we have new data to replace it with
-            // This prevents losing cached data when network fetch fails
-            if (data.isNotEmpty()) {
-              adapter.getUnfilteredData().clear()
+            // If network fetch returns empty data (likely due to error), don't clear cached data
+            if (data.isEmpty()) {
+              moreLoading = false
+              swiper.isRefreshing = false
+              return@launch
             }
+            adapter.getUnfilteredData().clear()
           }
 
           onDataFetched(data)
@@ -163,16 +165,19 @@ abstract class FFAFragment<D : Any, A : FFAAdapter<D, *>> : Fragment() {
           adapter.getUnfilteredData().addAll(data)
           adapter.applyFilter()
 
+          // Prepare cache data on main thread to avoid race conditions
+          val cacheData = if (adapter.getUnfilteredData().isNotEmpty()) {
+            repository.cache(adapter.getUnfilteredData())?.let { cached ->
+              Gson().toJson(cached).toString()
+            }
+          } else null
+
           withContext(IO) {
             try {
               // Only save to cache if we have data to prevent clearing cache on network errors
-              if (adapter.getUnfilteredData().isNotEmpty()) {
+              cacheData?.let { jsonData ->
                 repository.cacheId?.let { cacheId ->
-                  FFACache.set(
-                    context,
-                    cacheId,
-                    Gson().toJson(repository.cache(adapter.getUnfilteredData())).toString()
-                  )
+                  FFACache.set(context, cacheId, jsonData)
                 }
               }
             } catch (e: ConcurrentModificationException) {

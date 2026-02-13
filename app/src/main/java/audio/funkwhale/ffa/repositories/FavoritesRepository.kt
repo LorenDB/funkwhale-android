@@ -131,10 +131,11 @@ class FavoritedRepository(override val context: Context?) : Repository<Int, Favo
 
   fun update(context: Context?, scope: CoroutineScope) {
     fetch(Origin.Network.origin).untilNetwork(scope, IO) { favorites, _, _, _ ->
-      // Only update cache if we received data to prevent clearing cache on network errors.
-      // Note: This means if a user deletes their last favorite and the list becomes empty,
-      // the cache might not be updated if there's a network issue. However, this trade-off
-      // is acceptable as it prevents data loss in the more common case of network failures.
+      // Only update cache if we received data. This prevents clearing cache on network errors.
+      // Note: This also means if the server legitimately returns empty (e.g., user deleted 
+      // their last favorite), we won't clear the cache. This trade-off prioritizes data 
+      // preservation over immediate consistency when we can't distinguish between empty-due-to-error
+      // versus legitimately-empty responses.
       if (favorites.isNotEmpty()) {
         FFACache.set(context, cacheId, Gson().toJson(cache(favorites)).toString())
       }
