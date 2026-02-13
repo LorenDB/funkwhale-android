@@ -32,7 +32,7 @@
       android:progressTint="@color/colorPrimaryDark"
     />
 
-    <audio.funkwhale.ffa.views.SquareImageView
+    <audio.funkwhale.ffa.views.SwipeableSquareImageView
       android:id="@+id/now_playing_cover"
       android:layout_width="0dp"
       android:layout_height="0dp"
@@ -55,7 +55,7 @@
       android:visibility="@{isBuffering ? View.VISIBLE : View.INVISIBLE, default=invisible}"
     />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <audio.funkwhale.ffa.views.SwipeableConstraintLayout
       android:id="@+id/header_controls"
       android:layout_width="0dp"
       android:layout_height="0dp"
@@ -111,7 +111,7 @@
         android:contentDescription="@string/control_next"
         android:src="@drawable/next"
       />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </audio.funkwhale.ffa.views.SwipeableConstraintLayout>
   </merge>
 
 </layout>

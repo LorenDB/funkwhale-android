@@ -99,6 +99,28 @@ class NowPlayingFragment: Fragment(R.layout.fragment_now_playing) {
       nowPlayingToggle.setOnClickListener {
         CommandBus.send(Command.ToggleState)
       }
+
+      // Set up swipe gestures on the album cover
+      nowPlayingCover.setOnSwipeListener(object : audio.funkwhale.ffa.views.SwipeableSquareImageView.OnSwipeListener {
+        override fun onSwipeLeft() {
+          CommandBus.send(Command.NextTrack)
+        }
+
+        override fun onSwipeRight() {
+          CommandBus.send(Command.PreviousTrack)
+        }
+      })
+
+      // Set up swipe gestures on the header controls (playback bar)
+      headerControls.setOnSwipeListener(object : audio.funkwhale.ffa.views.SwipeableConstraintLayout.OnSwipeListener {
+        override fun onSwipeLeft() {
+          CommandBus.send(Command.NextTrack)
+        }
+
+        override fun onSwipeRight() {
+          CommandBus.send(Command.PreviousTrack)
+        }
+      })
     }
 
     lifecycleScope.launch(Dispatchers.Main) {
