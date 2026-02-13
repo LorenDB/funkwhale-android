@@ -168,7 +168,7 @@ abstract class FFAFragment<D : Any, A : FFAAdapter<D, *>> : Fragment() {
           // Prepare cache data on main thread to avoid race conditions
           val cacheData = if (adapter.getUnfilteredData().isNotEmpty()) {
             repository.cache(adapter.getUnfilteredData())?.let { cached ->
-              Gson().toJson(cached).toString()
+              Gson().toJson(cached)
             }
           } else null
 
