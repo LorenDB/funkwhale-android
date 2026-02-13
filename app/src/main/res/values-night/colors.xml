@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <color name="surface">#000000</color>
-  <color name="elevatedSurface">#1a1a1a</color>
+  <color name="elevatedSurface">#121212</color>
 
   <color name="colorPrimary">#949fa7</color>
   <color name="colorPrimaryDark">#8a8b8f</color>
 
   <color name="colorAccent">#d35400</color>
 
-  <color name="colorSelected">#2a2a2a</color>
+  <color name="colorSelected">#1f1f1f</color>
   <color name="colorFavorite">#b34700</color>
 
   <color name="itemTitle">#abffffff</color>
