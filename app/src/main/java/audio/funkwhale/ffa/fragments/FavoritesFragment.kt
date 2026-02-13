@@ -96,6 +96,10 @@ class FavoritesFragment : FFAFragment<Favorite, FavoritesAdapter>() {
     binding.play.setOnClickListener {
       CommandBus.send(Command.ReplaceQueue(adapter.data.map { it.track }.shuffled()))
     }
+
+    binding.downloadAll.setOnClickListener {
+      CommandBus.send(Command.PinTracks(adapter.data.map { it.track }))
+    }
   }
 
   private fun watchEventBus() {

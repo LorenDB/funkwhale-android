@@ -62,20 +62,41 @@
           android:layout_marginBottom="6dp"
           android:text="@string/favorites" />
 
-        <com.google.android.material.button.MaterialButton
-          android:id="@+id/play"
+        <LinearLayout
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_centerHorizontal="true"
           android:layout_marginTop="8dp"
-          android:backgroundTint="@color/colorPrimary"
-          android:paddingHorizontal="16dp"
-          android:paddingVertical="8dp"
-          android:text="@string/playback_shuffle"
-          android:textColor="@android:color/white"
-          app:icon="@drawable/play"
-          app:iconTint="@android:color/white"
-          app:rippleColor="@color/ripple" />
+          android:orientation="horizontal">
+
+          <com.google.android.material.button.MaterialButton
+            android:id="@+id/play"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:backgroundTint="@color/colorPrimary"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"
+            android:text="@string/playback_shuffle"
+            android:textColor="@android:color/white"
+            app:icon="@drawable/play"
+            app:iconTint="@android:color/white"
+            app:rippleColor="@color/ripple" />
+
+          <com.google.android.material.button.MaterialButton
+            android:id="@+id/download_all"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/colorPrimary"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"
+            android:text="@string/playback_queue_download"
+            android:textColor="@android:color/white"
+            app:icon="@drawable/downloads"
+            app:iconTint="@android:color/white"
+            app:rippleColor="@color/ripple" />
+
+        </LinearLayout>
 
       </RelativeLayout>
 
