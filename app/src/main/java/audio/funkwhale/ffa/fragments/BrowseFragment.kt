@@ -32,7 +32,9 @@ class BrowseFragment : Fragment() {
 
       // Restore the last selected tab position
       val lastTabPosition = PowerPreference.getDefaultFile().getInt("last_tab_position", 0)
-      binding.tabs.getTabAt(lastTabPosition)?.select()
+      if (lastTabPosition in 0 until binding.tabs.tabCount) {
+        binding.tabs.getTabAt(lastTabPosition)?.select()
+      }
 
       // Save tab position when user changes tabs
       binding.tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
