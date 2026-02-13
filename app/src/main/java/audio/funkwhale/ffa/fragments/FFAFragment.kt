@@ -151,7 +151,11 @@ abstract class FFAFragment<D : Any, A : FFAAdapter<D, *>> : Fragment() {
           }
 
           if (first) {
-            adapter.getUnfilteredData().clear()
+            // Only clear existing data if we have new data to replace it with
+            // This prevents losing cached data when network fetch fails
+            if (data.isNotEmpty()) {
+              adapter.getUnfilteredData().clear()
+            }
           }
 
           onDataFetched(data)
@@ -161,12 +165,15 @@ abstract class FFAFragment<D : Any, A : FFAAdapter<D, *>> : Fragment() {
 
           withContext(IO) {
             try {
-              repository.cacheId?.let { cacheId ->
-                FFACache.set(
-                  context,
-                  cacheId,
-                  Gson().toJson(repository.cache(adapter.getUnfilteredData())).toString()
-                )
+              // Only save to cache if we have data to prevent clearing cache on network errors
+              if (adapter.getUnfilteredData().isNotEmpty()) {
+                repository.cacheId?.let { cacheId ->
+                  FFACache.set(
+                    context,
+                    cacheId,
+                    Gson().toJson(repository.cache(adapter.getUnfilteredData())).toString()
+                  )
+                }
               }
             } catch (e: ConcurrentModificationException) {
             }
