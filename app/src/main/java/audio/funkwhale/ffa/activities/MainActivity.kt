@@ -116,7 +116,9 @@ class MainActivity : AppCompatActivity() {
       if (binding.nowPlayingBottomSheet.isOpen) {
         binding.nowPlayingBottomSheet.close()
       } else {
-        navigation.navigateUp()
+        if (!navigation.navigateUp()) {
+          finish()
+        }
       }
     }
 
