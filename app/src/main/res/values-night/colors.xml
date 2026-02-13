@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <color name="surface">#000000</color>
-  <color name="elevatedSurface">#0a0a0a</color>
+  <color name="elevatedSurface">#1a1a1a</color>
 
   <color name="colorPrimary">#949fa7</color>
   <color name="colorPrimaryDark">#8a8b8f</color>
 
   <color name="colorAccent">#d35400</color>
 
-  <color name="colorSelected">#1a1a1a</color>
+  <color name="colorSelected">#2a2a2a</color>
   <color name="colorFavorite">#b34700</color>
 
   <color name="itemTitle">#abffffff</color>
@@ -26,5 +26,5 @@
   <color name="downloaded">@color/controlColor</color>
   <color name="cached">#aeaeae</color>
 
-  <color name="ripple">#1a1a1a</color>
+  <color name="ripple">#2a2a2a</color>
 </resources>
