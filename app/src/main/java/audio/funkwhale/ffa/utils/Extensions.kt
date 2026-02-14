@@ -1,8 +1,14 @@
 package audio.funkwhale.ffa.utils
 
+import android.app.Activity
 import android.content.Context
 import android.os.Build
 import android.util.Log
+import android.view.View
+import android.view.WindowManager
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import audio.funkwhale.ffa.model.DownloadInfo
@@ -148,3 +154,11 @@ inline fun <T, U, V, W, R> LiveData<T>.mergeWith(
 }
 
 public fun String?.toIntOrElse(default: Int): Int = this?.toIntOrNull(radix = 10) ?: default
+
+fun Activity.enableEdgeToEdge() {
+  WindowCompat.setDecorFitsSystemWindows(window, false)
+  
+  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+    window.isNavigationBarContrastEnforced = false
+  }
+}

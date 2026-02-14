@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import audio.funkwhale.ffa.databinding.ActivityLicencesBinding
 import audio.funkwhale.ffa.databinding.RowLicenceBinding
+import audio.funkwhale.ffa.utils.enableEdgeToEdge
 
 class LicencesActivity : AppCompatActivity() {
 
@@ -23,6 +24,7 @@ class LicencesActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    enableEdgeToEdge()
 
     binding = ActivityLicencesBinding.inflate(layoutInflater)
     setContentView(binding.root)
