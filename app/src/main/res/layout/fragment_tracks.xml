@@ -6,7 +6,7 @@
     style="@style/AppTheme.Fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorSurface"
+    android:background="@color/surface"
     android:clipChildren="false"
     android:clipToPadding="false"
     android:transitionGroup="true">
@@ -27,7 +27,7 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/colorSurface"
+                android:background="@color/surface"
                 android:elevation="1dp">
 
                 <LinearLayout
