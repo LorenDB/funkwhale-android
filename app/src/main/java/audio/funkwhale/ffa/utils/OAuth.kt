@@ -34,10 +34,15 @@ fun AuthState.save() {
 class AuthorizationServiceFactory {
 
   fun create(context: Context): AuthorizationService {
-    // Configure AppAuth to use system default browser by disabling Custom Tabs
-    // This ensures the user's default browser is used instead of an inline portal
+    // Configure AppAuth to use system default browser by disabling Custom Tabs.
+    // Custom Tabs provide an embedded browser experience but don't respect the user's
+    // default browser choice. By rejecting all browsers for Custom Tabs (returning false
+    // for all BrowserDescriptors), AppAuth falls back to using a standard ACTION_VIEW
+    // intent, which opens the URL in the system default browser.
+    // Trade-off: Users lose the embedded browser UI but gain consistency with their
+    // chosen default browser.
     val appAuthConfig = AppAuthConfiguration.Builder()
-      .setBrowserMatcher { _ -> false } // Reject all browsers for Custom Tabs
+      .setBrowserMatcher { browserDescriptor -> false } // Reject all browsers for Custom Tabs
       .build()
     
     return AuthorizationService(context, appAuthConfig)
