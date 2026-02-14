@@ -22,7 +22,7 @@
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?attr/colorSurface"
+        android:background="@color/surface"
         android:clipChildren="false"
         android:clipToPadding="false" />
 
