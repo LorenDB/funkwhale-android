@@ -13,6 +13,7 @@ import com.github.kittinunf.fuel.gson.jsonBody
 import com.github.kittinunf.result.Result
 import com.preference.PowerPreference
 import kotlinx.coroutines.runBlocking
+import net.openid.appauth.AppAuthConfiguration
 import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationException
 import net.openid.appauth.AuthorizationRequest
@@ -33,7 +34,13 @@ fun AuthState.save() {
 class AuthorizationServiceFactory {
 
   fun create(context: Context): AuthorizationService {
-    return AuthorizationService(context)
+    // Configure AppAuth to use system default browser by disabling Custom Tabs
+    // This ensures the user's default browser is used instead of an inline portal
+    val appAuthConfig = AppAuthConfiguration.Builder()
+      .setBrowserMatcher { _ -> false } // Reject all browsers for Custom Tabs
+      .build()
+    
+    return AuthorizationService(context, appAuthConfig)
   }
 }
 
