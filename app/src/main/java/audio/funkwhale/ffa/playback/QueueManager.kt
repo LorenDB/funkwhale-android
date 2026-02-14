@@ -71,7 +71,7 @@ class QueueManager(val context: Context) {
     metadata = tracks.toMutableList()
     dataSources.clear()
     dataSources.addMediaSources(sources)
-    current = startIndex
+    current = if (tracks.isEmpty()) -1 else startIndex.coerceIn(0, tracks.size - 1)
 
     persist()
 

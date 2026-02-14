@@ -190,10 +190,7 @@ class PlayerService : Service() {
           queue.replace(command.queue, command.startIndex)
           player.setMediaSource(queue.dataSources)
           player.prepare()
-          
-          if (command.startIndex > 0) {
-            player.seekTo(command.startIndex, C.TIME_UNSET)
-          }
+          player.seekTo(command.startIndex, C.TIME_UNSET)
 
           setPlaybackState(true)
 
