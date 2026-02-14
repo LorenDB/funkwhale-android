@@ -12,6 +12,7 @@
         android:id="@+id/tabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/surface"
         android:elevation="4dp"
         app:tabMode="scrollable"
         app:tabSelectedTextColor="@color/controlColor"
