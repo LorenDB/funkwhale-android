@@ -168,11 +168,9 @@ class PlaylistTracksAdapter(
     val actions = binding.actions
 
     override fun onClick(view: View?) {
-      data.subList(layoutPosition, data.size).plus(data.subList(0, layoutPosition)).apply {
-        CommandBus.send(Command.ReplaceQueue(this.map { it.track }))
+      CommandBus.send(Command.ReplaceQueue(data.map { it.track }, startIndex = layoutPosition))
 
-        context.toast("All tracks were added to your queue")
-      }
+      context.toast("All tracks were added to your queue")
     }
   }
 
