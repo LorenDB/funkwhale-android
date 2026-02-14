@@ -157,7 +157,7 @@ public fun String?.toIntOrElse(default: Int): Int = this?.toIntOrNull(radix = 10
 
 fun Activity.enableEdgeToEdge() {
   WindowCompat.setDecorFitsSystemWindows(window, false)
-  
+
   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
     window.isNavigationBarContrastEnforced = false
   }
