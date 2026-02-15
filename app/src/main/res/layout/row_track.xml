@@ -23,6 +23,7 @@
         android:layout_width="18dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
+        android:scaleType="centerCrop"
         android:src="@drawable/reorder"
         android:tint="#787878"
         android:visibility="gone"
@@ -33,6 +34,7 @@
         android:layout_width="48dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
+        android:scaleType="centerCrop"
         tools:src="@tools:sample/avatars" />
 
     <LinearLayout
