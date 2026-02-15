@@ -23,7 +23,6 @@
         android:layout_width="18dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
-        android:scaleType="centerCrop"
         android:src="@drawable/reorder"
         android:tint="#787878"
         android:visibility="gone"
