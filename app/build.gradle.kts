@@ -7,8 +7,6 @@ plugins {
   id("kotlin-android")
   id("androidx.navigation.safeargs.kotlin")
   id("kotlin-parcelize")
-  id("kotlin-kapt")
-
   id("org.jlleitschuh.gradle.ktlint") version "11.2.0"
   id("com.gladed.androidgitversion") version "0.4.14"
   id("com.github.triplet.play") version "3.8.1"
@@ -52,7 +50,6 @@ android {
 
   buildFeatures {
     viewBinding = true
-    dataBinding = true
   }
 
   packagingOptions {
