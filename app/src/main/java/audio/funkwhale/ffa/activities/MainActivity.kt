@@ -47,6 +47,7 @@ import audio.funkwhale.ffa.utils.Response
 import audio.funkwhale.ffa.utils.Settings
 import audio.funkwhale.ffa.utils.Userinfo
 import audio.funkwhale.ffa.utils.authorize
+import audio.funkwhale.ffa.utils.enableEdgeToEdge
 import audio.funkwhale.ffa.utils.log
 import audio.funkwhale.ffa.utils.logError
 import audio.funkwhale.ffa.utils.mustNormalizeUrl
@@ -84,6 +85,7 @@ class MainActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    enableEdgeToEdge()
     AppContext.init(applicationContext)
     binding = ActivityMainBinding.inflate(layoutInflater)
 

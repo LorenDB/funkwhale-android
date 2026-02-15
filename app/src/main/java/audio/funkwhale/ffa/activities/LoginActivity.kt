@@ -18,6 +18,7 @@ import audio.funkwhale.ffa.utils.AppContext
 import audio.funkwhale.ffa.utils.FuelResult
 import audio.funkwhale.ffa.utils.OAuth
 import audio.funkwhale.ffa.utils.Userinfo
+import audio.funkwhale.ffa.utils.enableEdgeToEdge
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.coroutines.awaitObjectResponseResult
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
@@ -37,6 +38,7 @@ class LoginActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    enableEdgeToEdge()
 
     binding = ActivityLoginBinding.inflate(layoutInflater)
     setContentView(binding.root)

@@ -8,6 +8,7 @@ import audio.funkwhale.ffa.adapters.DownloadsAdapter
 import audio.funkwhale.ffa.databinding.ActivityDownloadsBinding
 import audio.funkwhale.ffa.utils.Event
 import audio.funkwhale.ffa.utils.EventBus
+import audio.funkwhale.ffa.utils.enableEdgeToEdge
 import audio.funkwhale.ffa.utils.getMetadata
 import com.google.android.exoplayer2.offline.Download
 import com.google.android.exoplayer2.offline.DownloadManager
@@ -26,6 +27,7 @@ class DownloadsActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    enableEdgeToEdge()
 
     binding = ActivityDownloadsBinding.inflate(layoutInflater)
 

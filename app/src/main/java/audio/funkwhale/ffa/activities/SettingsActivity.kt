@@ -20,6 +20,7 @@ import audio.funkwhale.ffa.databinding.ActivitySettingsBinding
 import audio.funkwhale.ffa.utils.Command
 import audio.funkwhale.ffa.utils.CommandBus
 import audio.funkwhale.ffa.utils.FFACache
+import audio.funkwhale.ffa.utils.enableEdgeToEdge
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -27,6 +28,7 @@ class SettingsActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    enableEdgeToEdge()
 
     binding = ActivitySettingsBinding.inflate(layoutInflater)
 

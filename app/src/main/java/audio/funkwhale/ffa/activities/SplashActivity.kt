@@ -9,6 +9,7 @@ import audio.funkwhale.ffa.FFA
 import audio.funkwhale.ffa.utils.AppContext
 import audio.funkwhale.ffa.utils.OAuth
 import audio.funkwhale.ffa.utils.Settings
+import audio.funkwhale.ffa.utils.enableEdgeToEdge
 import org.koin.java.KoinJavaComponent.inject
 
 class SplashActivity : AppCompatActivity() {
@@ -17,6 +18,7 @@ class SplashActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    enableEdgeToEdge()
 
     getSharedPreferences(AppContext.PREFS_CREDENTIALS, Context.MODE_PRIVATE)
       .apply {
