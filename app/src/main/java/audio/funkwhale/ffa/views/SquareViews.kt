@@ -40,11 +40,10 @@ open class SquareImageView : AppCompatImageView {
 
 open class SwipeableSquareImageView : AppCompatImageView {
   private var swipeListener: OnSwipeListener? = null
-  private var isHorizontalSwipe = false
+  private var gestureState = GestureState.NONE
   private var initialX = 0f
   private var initialY = 0f
   private var currentX = 0f
-  private var swipeStarted = false
 
   constructor(context: Context) : super(context)
   constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
@@ -52,8 +51,16 @@ open class SwipeableSquareImageView : AppCompatImageView {
 
   companion object {
     private const val SWIPE_THRESHOLD = 150f
-    private const val HORIZONTAL_DETECTION_THRESHOLD = 30f
+    private const val GESTURE_DETECTION_THRESHOLD = 20f
     private const val MAX_TRANSLATION = 300f
+    private const val TAP_THRESHOLD = 10f
+  }
+  
+  private enum class GestureState {
+    NONE,           // No gesture detected yet
+    TAP,            // Looks like a tap (minimal movement)
+    HORIZONTAL,     // Horizontal swipe detected
+    VERTICAL        // Vertical movement detected
   }
 
   override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -62,22 +69,38 @@ open class SwipeableSquareImageView : AppCompatImageView {
         initialX = event.x
         initialY = event.y
         currentX = event.x
-        isHorizontalSwipe = false
-        swipeStarted = false
+        gestureState = GestureState.NONE
         return true
       }
       MotionEvent.ACTION_MOVE -> {
-        currentX = event.x
-        val diffX = currentX - initialX
-        val diffY = abs(event.y - initialY)
-        
-        // Detect horizontal swipe
-        if (!isHorizontalSwipe && abs(diffX) > HORIZONTAL_DETECTION_THRESHOLD && abs(diffX) > diffY * 1.5f) {
-          isHorizontalSwipe = true
-          swipeStarted = true
+        if (gestureState == GestureState.NONE) {
+          // Determine gesture type based on movement
+          val diffX = abs(event.x - initialX)
+          val diffY = abs(event.y - initialY)
+          
+          if (diffX > GESTURE_DETECTION_THRESHOLD || diffY > GESTURE_DETECTION_THRESHOLD) {
+            gestureState = when {
+              diffX > diffY * 1.5f -> {
+                // Horizontal movement dominant
+                parent?.requestDisallowInterceptTouchEvent(true)
+                GestureState.HORIZONTAL
+              }
+              diffY > diffX * 1.5f -> {
+                // Vertical movement dominant - let parent handle (for bottom sheet)
+                GestureState.VERTICAL
+              }
+              else -> {
+                // Movement is diagonal or unclear - wait more
+                GestureState.NONE
+              }
+            }
+          }
         }
         
-        if (isHorizontalSwipe) {
+        if (gestureState == GestureState.HORIZONTAL) {
+          currentX = event.x
+          val diffX = currentX - initialX
+          
           // Apply live translation with diminishing returns
           val dampedTranslation = dampTranslation(diffX)
           translationX = dampedTranslation
@@ -86,10 +109,15 @@ open class SwipeableSquareImageView : AppCompatImageView {
           alpha = 1f - (abs(dampedTranslation) / MAX_TRANSLATION) * 0.3f
           
           return true
+        } else if (gestureState == GestureState.VERTICAL) {
+          // Let parent handle vertical gestures (bottom sheet drag)
+          return false
         }
       }
       MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-        if (swipeStarted) {
+        parent?.requestDisallowInterceptTouchEvent(false)
+        
+        if (gestureState == GestureState.HORIZONTAL) {
           val diffX = currentX - initialX
           
           // Check if we've swiped far enough to trigger action
@@ -108,10 +136,11 @@ open class SwipeableSquareImageView : AppCompatImageView {
             springBack()
           }
           
-          isHorizontalSwipe = false
-          swipeStarted = false
+          gestureState = GestureState.NONE
           return true
         }
+        
+        gestureState = GestureState.NONE
       }
     }
     
