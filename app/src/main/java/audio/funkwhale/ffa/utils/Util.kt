@@ -2,7 +2,7 @@ package audio.funkwhale.ffa.utils
 
 import android.content.Context
 import android.widget.Toast
-import com.google.android.exoplayer2.util.Log
+import android.util.Log
 import com.preference.PowerPreference
 import java.net.URI
 

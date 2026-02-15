@@ -4,13 +4,16 @@ import android.content.Context
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.utils.OAuth
 import audio.funkwhale.ffa.utils.Settings
-import com.google.android.exoplayer2.upstream.DataSource
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
-import com.google.android.exoplayer2.upstream.FileDataSource
-import com.google.android.exoplayer2.upstream.cache.Cache
-import com.google.android.exoplayer2.upstream.cache.CacheDataSource
-import com.google.android.exoplayer2.util.Util
+import androidx.annotation.OptIn
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.common.util.Util
+import androidx.media3.datasource.DataSource
+import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.datasource.FileDataSource
+import androidx.media3.datasource.cache.Cache
+import androidx.media3.datasource.cache.CacheDataSource
 
+@OptIn(UnstableApi::class)
 class CacheDataSourceFactoryProvider(
   private val oAuth: OAuth,
   private val exoCache: Cache,

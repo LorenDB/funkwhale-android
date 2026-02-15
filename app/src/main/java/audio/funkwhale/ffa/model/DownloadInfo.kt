@@ -1,6 +1,6 @@
 package audio.funkwhale.ffa.model
 
-import com.google.android.exoplayer2.offline.Download
+import androidx.media3.exoplayer.offline.Download
 
 data class DownloadInfo(
   val id: Int,

@@ -3,12 +3,15 @@ package audio.funkwhale.ffa.playback
 import android.content.Context
 import android.net.Uri
 import audio.funkwhale.ffa.utils.OAuth
-import com.google.android.exoplayer2.upstream.DataSource
-import com.google.android.exoplayer2.upstream.DataSpec
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
-import com.google.android.exoplayer2.upstream.HttpDataSource
-import com.google.android.exoplayer2.upstream.TransferListener
+import androidx.annotation.OptIn
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.DataSource
+import androidx.media3.datasource.DataSpec
+import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.datasource.HttpDataSource
+import androidx.media3.datasource.TransferListener
 
+@OptIn(UnstableApi::class)
 class OAuthDatasource(
   private val context: Context,
   private val http: HttpDataSource,
@@ -40,6 +43,7 @@ class OAuthDatasource(
   }
 }
 
+@OptIn(UnstableApi::class)
 class OAuth2DatasourceFactory(
   private val context: Context,
   private val http: DefaultHttpDataSource.Factory,

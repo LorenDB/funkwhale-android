@@ -17,8 +17,8 @@ import audio.funkwhale.ffa.utils.untilNetwork
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.coroutines.awaitByteArrayResponseResult
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
-import com.google.android.exoplayer2.offline.DownloadManager
-import com.google.android.exoplayer2.upstream.cache.Cache
+import androidx.media3.datasource.cache.Cache
+import androidx.media3.exoplayer.offline.DownloadManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.CoroutineScope

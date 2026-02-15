@@ -14,12 +14,14 @@ import audio.funkwhale.ffa.utils.Request
 import audio.funkwhale.ffa.utils.RequestBus
 import audio.funkwhale.ffa.utils.Response
 import audio.funkwhale.ffa.utils.mustNormalizeUrl
-import com.google.android.exoplayer2.offline.Download
-import com.google.android.exoplayer2.offline.DownloadManager
-import com.google.android.exoplayer2.offline.DownloadRequest
-import com.google.android.exoplayer2.offline.DownloadService
-import com.google.android.exoplayer2.scheduler.Scheduler
-import com.google.android.exoplayer2.ui.DownloadNotificationHelper
+import androidx.annotation.OptIn
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.offline.Download
+import androidx.media3.exoplayer.offline.DownloadManager
+import androidx.media3.exoplayer.offline.DownloadNotificationHelper
+import androidx.media3.exoplayer.offline.DownloadRequest
+import androidx.media3.exoplayer.offline.DownloadService
+import androidx.media3.exoplayer.scheduler.Scheduler
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
@@ -28,6 +30,7 @@ import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent
 import java.util.Collections
 
+@OptIn(UnstableApi::class)
 class PinService : DownloadService(AppContext.NOTIFICATION_DOWNLOADS) {
 
   private val scope: CoroutineScope = CoroutineScope(Job() + Main)

@@ -11,8 +11,8 @@ import audio.funkwhale.ffa.databinding.RowDownloadBinding
 import audio.funkwhale.ffa.model.DownloadInfo
 import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.playback.PinService
-import com.google.android.exoplayer2.offline.Download
-import com.google.android.exoplayer2.offline.DownloadService
+import androidx.media3.exoplayer.offline.Download
+import androidx.media3.exoplayer.offline.DownloadService
 
 class DownloadsAdapter(
   private val layoutInflater: LayoutInflater,

@@ -55,7 +55,7 @@ import audio.funkwhale.ffa.utils.toast
 import audio.funkwhale.ffa.utils.wait
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.coroutines.awaitStringResponse
-import com.google.android.exoplayer2.offline.DownloadService
+import androidx.media3.exoplayer.offline.DownloadService
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.Gson
 import com.preference.PowerPreference

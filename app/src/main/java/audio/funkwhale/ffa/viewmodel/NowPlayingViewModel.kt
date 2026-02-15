@@ -17,7 +17,7 @@ import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.model.Track
 import audio.funkwhale.ffa.utils.Event
 import audio.funkwhale.ffa.utils.EventBus
-import com.google.android.exoplayer2.Player
+import androidx.media3.common.Player
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.debounce

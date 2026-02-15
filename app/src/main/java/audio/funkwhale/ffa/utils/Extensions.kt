@@ -15,7 +15,7 @@ import audio.funkwhale.ffa.model.DownloadInfo
 import audio.funkwhale.ffa.repositories.Repository
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Request
-import com.google.android.exoplayer2.offline.Download
+import androidx.media3.exoplayer.offline.Download
 import com.google.gson.Gson
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope

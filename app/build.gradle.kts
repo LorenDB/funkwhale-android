@@ -180,9 +180,11 @@ dependencies {
   }
   implementation("androidx.constraintlayout:constraintlayout:2.2.0")
 
-  implementation("com.google.android.exoplayer:exoplayer-core:2.18.1")
-  implementation("com.google.android.exoplayer:exoplayer-ui:2.18.1")
-  implementation("com.google.android.exoplayer:extension-mediasession:2.18.1")
+  implementation("androidx.media3:media3-exoplayer:1.5.1")
+  implementation("androidx.media3:media3-ui:1.5.1")
+  implementation("androidx.media3:media3-session:1.5.1")
+  implementation("androidx.media3:media3-datasource:1.5.1")
+  implementation("androidx.media3:media3-database:1.5.1")
 
   implementation("io.insert-koin:koin-core:4.0.1")
   implementation("io.insert-koin:koin-android:4.0.1")

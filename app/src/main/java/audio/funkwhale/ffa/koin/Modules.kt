@@ -5,17 +5,20 @@ import audio.funkwhale.ffa.playback.CacheDataSourceFactoryProvider
 import audio.funkwhale.ffa.playback.MediaSession
 import audio.funkwhale.ffa.utils.AuthorizationServiceFactory
 import audio.funkwhale.ffa.utils.OAuth
-import com.google.android.exoplayer2.database.DatabaseProvider
-import com.google.android.exoplayer2.database.StandaloneDatabaseProvider
-import com.google.android.exoplayer2.offline.DownloadManager
-import com.google.android.exoplayer2.upstream.cache.Cache
-import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
-import com.google.android.exoplayer2.upstream.cache.NoOpCacheEvictor
-import com.google.android.exoplayer2.upstream.cache.SimpleCache
+import androidx.annotation.OptIn
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.database.DatabaseProvider
+import androidx.media3.database.StandaloneDatabaseProvider
+import androidx.media3.datasource.cache.Cache
+import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
+import androidx.media3.datasource.cache.NoOpCacheEvictor
+import androidx.media3.datasource.cache.SimpleCache
+import androidx.media3.exoplayer.offline.DownloadManager
 import com.preference.PowerPreference
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
+@OptIn(UnstableApi::class)
 fun exoplayerModule(context: Context) = module {
 
   single<DatabaseProvider>(named("exoDatabase")) {

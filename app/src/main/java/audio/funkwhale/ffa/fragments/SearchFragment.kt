@@ -24,7 +24,7 @@ import audio.funkwhale.ffa.utils.Event
 import audio.funkwhale.ffa.utils.EventBus
 import audio.funkwhale.ffa.utils.getMetadata
 import audio.funkwhale.ffa.viewmodel.SearchViewModel
-import com.google.android.exoplayer2.offline.Download
+import androidx.media3.exoplayer.offline.Download
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

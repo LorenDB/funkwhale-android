@@ -33,12 +33,12 @@ import audio.funkwhale.ffa.utils.Response
 import audio.funkwhale.ffa.utils.log
 import audio.funkwhale.ffa.utils.maybeNormalizeUrl
 import audio.funkwhale.ffa.utils.onApi
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.IllegalSeekPositionException
-import com.google.android.exoplayer2.PlaybackException
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.Tracks
+import androidx.media3.common.C
+import androidx.media3.common.PlaybackException
+import androidx.media3.common.Player
+import androidx.media3.common.Tracks
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.ExoPlayer
 import com.preference.PowerPreference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -50,6 +50,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.koin.java.KoinJavaComponent.inject
 
+@UnstableApi
 class PlayerService : Service() {
   companion object {
     const val INITIAL_COMMAND_KEY = "start_command"
@@ -164,7 +165,7 @@ class PlayerService : Service() {
           player.seekTo(queue.current, it.toLong())
           val (current, duration, percent) = getProgress(true)
           ProgressBus.send(current, duration, percent)
-        } catch (e: IllegalSeekPositionException) {
+        } catch (e: IllegalStateException) {
           // The app remembered an incorrect position, let's reset it
           FFACache.set(this, "current", "-1")
         }

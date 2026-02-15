@@ -18,8 +18,7 @@ import audio.funkwhale.ffa.utils.CommandBus
 import audio.funkwhale.ffa.utils.Request
 import audio.funkwhale.ffa.utils.RequestBus
 import audio.funkwhale.ffa.utils.Response
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
+import androidx.media3.common.Player
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.Job
@@ -51,8 +50,8 @@ class MediaSession(private val context: Context) {
     }
   }
 
-  val connector: MediaSessionConnector by lazy {
-    MediaSessionConnector(session).also {
+  val connector: PlayerSessionConnector by lazy {
+    PlayerSessionConnector(session).also {
       it.setQueueNavigator(FFAQueueNavigator())
 
       it.setPlaybackPreparer(FFAPlaybackPreparer(context, this, scope))
@@ -94,7 +93,7 @@ class MediaSession(private val context: Context) {
   }
 }
 
-class FFAQueueNavigator : MediaSessionConnector.QueueNavigator {
+class FFAQueueNavigator : PlayerSessionConnector.QueueNavigator {
   override fun onSkipToQueueItem(player: Player, id: Long) {
     CommandBus.send(Command.PlayTrack(id.toInt()))
   }
@@ -121,7 +120,7 @@ class FFAQueueNavigator : MediaSessionConnector.QueueNavigator {
   override fun onTimelineChanged(player: Player) {}
 }
 
-class FFAPlaybackPreparer(private val context: Context, private val mediaSession: MediaSession, private val scope: CoroutineScope) : MediaSessionConnector.PlaybackPreparer {
+class FFAPlaybackPreparer(private val context: Context, private val mediaSession: MediaSession, private val scope: CoroutineScope) : PlayerSessionConnector.PlaybackPreparer {
   override fun onCommand(player: Player, command: String, extras: Bundle?, cb: ResultReceiver?) = false
 
   override fun getSupportedPrepareActions(): Long {

@@ -12,12 +12,15 @@ import audio.funkwhale.ffa.utils.FFACache
 import audio.funkwhale.ffa.utils.log
 import audio.funkwhale.ffa.utils.mustNormalizeUrl
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.source.ConcatenatingMediaSource
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import androidx.annotation.OptIn
+import androidx.media3.common.MediaItem
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.source.ConcatenatingMediaSource
+import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import com.google.gson.Gson
 import org.koin.java.KoinJavaComponent.inject
 
+@OptIn(UnstableApi::class)
 class QueueManager(val context: Context) {
 
   private val cacheDataSourceFactoryProvider: CacheDataSourceFactoryProvider by inject(
