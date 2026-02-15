@@ -6,7 +6,7 @@ plugins {
   id("org.jetbrains.kotlin.android")
   id("androidx.navigation.safeargs.kotlin")
   id("org.jetbrains.kotlin.plugin.parcelize")
-  id("org.jlleitschuh.gradle.ktlint") version "11.2.0"
+  id("org.jlleitschuh.gradle.ktlint") version "12.1.2"
   id("com.gladed.androidgitversion") version "0.4.14"
   id("com.github.triplet.play") version "3.8.1"
   id("de.mobilej.unmock")
@@ -39,7 +39,7 @@ android {
   namespace = "audio.funkwhale.ffa"
 
   testCoverage {
-    version = "0.8.7"
+    version = "0.8.12"
   }
 
   kotlinOptions {
@@ -163,30 +163,30 @@ dependencies {
 
   implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 
-  implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.0")
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+  implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.21")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
 
-  implementation("androidx.appcompat:appcompat:1.6.1")
-  implementation("androidx.core:core-ktx:1.9.0")
+  implementation("androidx.appcompat:appcompat:1.7.0")
+  implementation("androidx.core:core-ktx:1.15.0")
   implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
   implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
   implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
   implementation("androidx.preference:preference-ktx:1.2.1")
-  implementation("androidx.recyclerview:recyclerview:1.2.1")
+  implementation("androidx.recyclerview:recyclerview:1.3.2")
   implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
-  implementation("com.google.android.material:material:1.9.0") {
+  implementation("com.google.android.material:material:1.12.0") {
     exclude("androidx.constraintlayout")
   }
-  implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+  implementation("androidx.constraintlayout:constraintlayout:2.2.0")
 
   implementation("com.google.android.exoplayer:exoplayer-core:2.18.1")
   implementation("com.google.android.exoplayer:exoplayer-ui:2.18.1")
   implementation("com.google.android.exoplayer:extension-mediasession:2.18.1")
 
-  implementation("io.insert-koin:koin-core:3.5.3")
-  implementation("io.insert-koin:koin-android:3.5.3")
-  testImplementation("io.insert-koin:koin-test:3.5.3")
+  implementation("io.insert-koin:koin-core:4.0.1")
+  implementation("io.insert-koin:koin-android:4.0.1")
+  testImplementation("io.insert-koin:koin-test:4.0.1")
 
   implementation("com.github.PaulWoitaschek.ExoPlayer-Extensions:extension-opus:789a4f83169cff5c7a91655bb828fde2cfde671a") {
     isTransitive = false
@@ -200,22 +200,22 @@ dependencies {
   implementation("com.github.kittinunf.fuel:fuel-coroutines:2.3.1")
   implementation("com.github.kittinunf.fuel:fuel-android:2.3.1")
   implementation("com.github.kittinunf.fuel:fuel-gson:2.3.1")
-  implementation("com.google.code.gson:gson:2.10.1")
+  implementation("com.google.code.gson:gson:2.11.0")
   implementation("com.squareup.picasso:picasso:2.71828")
   implementation("jp.wasabeef:picasso-transformations:2.4.0")
-  implementation("net.openid:appauth:0.11.1")
+  implementation("net.openid:appauth:0.11.2")
 
   implementation("androidx.navigation:navigation-fragment-ktx:$navVersion")
   implementation("androidx.navigation:navigation-ui-ktx:$navVersion")
 
   testImplementation("junit:junit:4.13.2")
-  testImplementation("io.mockk:mockk:1.13.4")
-  testImplementation("androidx.test:core:1.5.0")
+  testImplementation("io.mockk:mockk:1.13.13")
+  testImplementation("androidx.test:core:1.6.1")
   testImplementation("io.strikt:strikt-core:0.34.1")
-  testImplementation("org.robolectric:robolectric:4.9.2")
-  debugImplementation("io.sentry:sentry-android:6.17.0")
+  testImplementation("org.robolectric:robolectric:4.14.1")
+  debugImplementation("io.sentry:sentry-android:8.14.0")
 
-  androidTestImplementation("io.mockk:mockk-android:1.13.4")
+  androidTestImplementation("io.mockk:mockk-android:1.13.13")
   androidTestImplementation("androidx.navigation:navigation-testing:$navVersion")
 }
 

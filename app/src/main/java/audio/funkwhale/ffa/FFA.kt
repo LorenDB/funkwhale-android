@@ -8,6 +8,7 @@ import audio.funkwhale.ffa.koin.exoplayerModule
 import audio.funkwhale.ffa.utils.AppContext
 import audio.funkwhale.ffa.utils.FFACache
 import com.preference.PowerPreference
+import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -27,6 +28,7 @@ class FFA : Application() {
     super.onCreate()
 
     startKoin {
+      androidContext(this@FFA)
       modules(
         authModule(),
         exoplayerModule(this@FFA)
