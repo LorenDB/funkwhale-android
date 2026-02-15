@@ -4,15 +4,14 @@ import java.util.Properties
 
 plugins {
   id("com.android.application")
-  id("kotlin-android")
+  id("org.jetbrains.kotlin.android")
   id("androidx.navigation.safeargs.kotlin")
-  id("kotlin-parcelize")
+  id("org.jetbrains.kotlin.plugin.parcelize")
   id("org.jlleitschuh.gradle.ktlint") version "11.2.0"
   id("com.gladed.androidgitversion") version "0.4.14"
   id("com.github.triplet.play") version "3.8.1"
   id("de.mobilej.unmock")
   id("com.github.ben-manes.versions")
-  id("org.jetbrains.kotlin.android")
   jacoco
 }
 
