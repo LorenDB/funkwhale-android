@@ -73,8 +73,10 @@ class TrackSwipeGestureListener(
         if (diffX > DIRECTION_THRESHOLD || diffY > DIRECTION_THRESHOLD) {
           directionLocked = true
           isHorizontalSwipe = diffX > diffY
-          if (isHorizontalSwipe) {
-            swipeableView.parent?.requestDisallowInterceptTouchEvent(true)
+          if (!isHorizontalSwipe) {
+            // Vertical swipe detected: allow parents (e.g. BottomSheetBehavior)
+            // to intercept so they can handle the vertical drag.
+            swipeableView.parent?.requestDisallowInterceptTouchEvent(false)
           }
         }
       }
@@ -128,20 +130,26 @@ class TrackSwipeGestureListener(
    * consumed and the parent can intercept them.
    */
   fun onTouchEvent(event: MotionEvent): Boolean {
-    gestureDetector.onTouchEvent(event)
-
-    if (event.actionMasked == MotionEvent.ACTION_UP ||
-        event.actionMasked == MotionEvent.ACTION_CANCEL) {
-      swipeableView.parent?.requestDisallowInterceptTouchEvent(false)
-
-      if (isHorizontalSwipe && !isAnimating) {
-        // Snap back if not flung with enough velocity
-        snapBack()
+    when (event.actionMasked) {
+      MotionEvent.ACTION_DOWN -> {
+        // Temporarily prevent parents (e.g. BottomSheetBehavior) from
+        // intercepting until we determine the swipe direction.
+        swipeableView.parent?.requestDisallowInterceptTouchEvent(true)
       }
+      MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+        swipeableView.parent?.requestDisallowInterceptTouchEvent(false)
 
-      directionLocked = false
-      isHorizontalSwipe = false
+        if (isHorizontalSwipe && !isAnimating) {
+          // Snap back if not flung with enough velocity
+          snapBack()
+        }
+
+        directionLocked = false
+        isHorizontalSwipe = false
+      }
     }
+
+    gestureDetector.onTouchEvent(event)
 
     return true
   }

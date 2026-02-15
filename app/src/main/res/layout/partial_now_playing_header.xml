@@ -72,6 +72,8 @@
         android:id="@+id/header_track_info"
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:clickable="true"
+        android:focusable="true"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/now_playing_toggle"
