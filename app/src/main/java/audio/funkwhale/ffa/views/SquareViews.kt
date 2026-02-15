@@ -5,7 +5,6 @@ import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
-import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatImageView
 import kotlin.math.abs
 
@@ -54,13 +53,11 @@ open class SwipeableSquareImageView : AppCompatImageView {
       override fun onDown(e: MotionEvent): Boolean = true
 
       override fun onFling(
-        e1: MotionEvent?,
+        e1: MotionEvent,
         e2: MotionEvent,
         velocityX: Float,
         velocityY: Float
       ): Boolean {
-        if (e1 == null) return false
-
         val diffX = e2.x - e1.x
         val diffY = e2.y - e1.y
 
