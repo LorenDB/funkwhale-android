@@ -2,15 +2,15 @@ import java.io.FileInputStream
 import java.util.Properties
 
 plugins {
-  id("com.android.application")
-  id("org.jetbrains.kotlin.android")
-  id("androidx.navigation.safeargs.kotlin")
-  id("org.jetbrains.kotlin.plugin.parcelize")
-  id("org.jlleitschuh.gradle.ktlint") version "12.1.2"
-  id("com.gladed.androidgitversion") version "0.4.14"
-  id("com.github.triplet.play") version "3.8.1"
-  id("de.mobilej.unmock")
-  id("com.github.ben-manes.versions")
+  alias(libs.plugins.android.application)
+  alias(libs.plugins.kotlin.android)
+  alias(libs.plugins.navigation.safeargs)
+  alias(libs.plugins.kotlin.parcelize)
+  alias(libs.plugins.ktlint)
+  alias(libs.plugins.androidgitversion)
+  alias(libs.plugins.play)
+  alias(libs.plugins.unmock)
+  alias(libs.plugins.versions)
   jacoco
 }
 
@@ -39,7 +39,7 @@ android {
   namespace = "audio.funkwhale.ffa"
 
   testCoverage {
-    version = "0.8.12"
+    version = libs.versions.jacoco.get()
   }
 
   kotlinOptions {
@@ -158,37 +158,34 @@ play {
 }
 
 dependencies {
-  val navVersion: String by rootProject.extra
-  val lifecycleVersion: String by rootProject.extra
-
   implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 
-  implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.21")
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+  implementation(libs.kotlin.stdlib)
+  implementation(libs.kotlinx.coroutines.core)
+  implementation(libs.kotlinx.coroutines.android)
 
-  implementation("androidx.appcompat:appcompat:1.7.0")
-  implementation("androidx.core:core-ktx:1.15.0")
-  implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
-  implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
-  implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
-  implementation("androidx.preference:preference-ktx:1.2.1")
-  implementation("androidx.recyclerview:recyclerview:1.3.2")
-  implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
-  implementation("com.google.android.material:material:1.12.0") {
+  implementation(libs.androidx.appcompat)
+  implementation(libs.androidx.core.ktx)
+  implementation(libs.androidx.lifecycle.viewmodel.ktx)
+  implementation(libs.androidx.lifecycle.livedata.ktx)
+  implementation(libs.androidx.coordinatorlayout)
+  implementation(libs.androidx.preference.ktx)
+  implementation(libs.androidx.recyclerview)
+  implementation(libs.androidx.swiperefreshlayout)
+  implementation(libs.material) {
     exclude("androidx.constraintlayout")
   }
-  implementation("androidx.constraintlayout:constraintlayout:2.2.0")
+  implementation(libs.androidx.constraintlayout)
 
-  implementation("androidx.media3:media3-exoplayer:1.5.1")
-  implementation("androidx.media3:media3-ui:1.5.1")
-  implementation("androidx.media3:media3-session:1.5.1")
-  implementation("androidx.media3:media3-datasource:1.5.1")
-  implementation("androidx.media3:media3-database:1.5.1")
+  implementation(libs.media3.exoplayer)
+  implementation(libs.media3.ui)
+  implementation(libs.media3.session)
+  implementation(libs.media3.datasource)
+  implementation(libs.media3.database)
 
-  implementation("io.insert-koin:koin-core:4.0.1")
-  implementation("io.insert-koin:koin-android:4.0.1")
-  testImplementation("io.insert-koin:koin-test:4.0.1")
+  implementation(libs.koin.core)
+  implementation(libs.koin.android)
+  testImplementation(libs.koin.test)
 
   implementation("com.github.PaulWoitaschek.ExoPlayer-Extensions:extension-opus:789a4f83169cff5c7a91655bb828fde2cfde671a") {
     isTransitive = false
@@ -197,28 +194,28 @@ dependencies {
     isTransitive = false
   }
 
-  implementation("com.github.AliAsadi:PowerPreference:2.1.1")
-  implementation("com.github.kittinunf.fuel:fuel:2.3.1")
-  implementation("com.github.kittinunf.fuel:fuel-coroutines:2.3.1")
-  implementation("com.github.kittinunf.fuel:fuel-android:2.3.1")
-  implementation("com.github.kittinunf.fuel:fuel-gson:2.3.1")
-  implementation("com.google.code.gson:gson:2.11.0")
-  implementation("com.squareup.picasso:picasso:2.71828")
-  implementation("jp.wasabeef:picasso-transformations:2.4.0")
-  implementation("net.openid:appauth:0.11.2")
+  implementation(libs.powerpreference)
+  implementation(libs.fuel)
+  implementation(libs.fuel.coroutines)
+  implementation(libs.fuel.android)
+  implementation(libs.fuel.gson)
+  implementation(libs.gson)
+  implementation(libs.picasso)
+  implementation(libs.picasso.transformations)
+  implementation(libs.appauth)
 
-  implementation("androidx.navigation:navigation-fragment-ktx:$navVersion")
-  implementation("androidx.navigation:navigation-ui-ktx:$navVersion")
+  implementation(libs.androidx.navigation.fragment.ktx)
+  implementation(libs.androidx.navigation.ui.ktx)
 
-  testImplementation("junit:junit:4.13.2")
-  testImplementation("io.mockk:mockk:1.13.13")
-  testImplementation("androidx.test:core:1.6.1")
-  testImplementation("io.strikt:strikt-core:0.34.1")
-  testImplementation("org.robolectric:robolectric:4.14.1")
-  debugImplementation("io.sentry:sentry-android:8.14.0")
+  testImplementation(libs.junit)
+  testImplementation(libs.mockk)
+  testImplementation(libs.test.core)
+  testImplementation(libs.strikt.core)
+  testImplementation(libs.robolectric)
+  debugImplementation(libs.sentry.android)
 
-  androidTestImplementation("io.mockk:mockk-android:1.13.13")
-  androidTestImplementation("androidx.navigation:navigation-testing:$navVersion")
+  androidTestImplementation(libs.mockk.android)
+  androidTestImplementation(libs.androidx.navigation.testing)
 }
 
 project.afterEvaluate {
