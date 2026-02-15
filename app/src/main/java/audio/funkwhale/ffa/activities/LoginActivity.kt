@@ -6,6 +6,7 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
+import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
@@ -13,9 +14,7 @@ import androidx.core.view.doOnLayout
 import androidx.lifecycle.lifecycleScope
 import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.databinding.ActivityLoginBinding
-import audio.funkwhale.ffa.fragments.LoginDialog
 import audio.funkwhale.ffa.utils.AppContext
-import audio.funkwhale.ffa.utils.FuelResult
 import audio.funkwhale.ffa.utils.OAuth
 import audio.funkwhale.ffa.utils.Userinfo
 import audio.funkwhale.ffa.utils.enableEdgeToEdge
@@ -24,9 +23,9 @@ import com.github.kittinunf.fuel.coroutines.awaitObjectResponseResult
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
 import com.github.kittinunf.result.Result
 import com.preference.PowerPreference
-import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.koin.java.KoinJavaComponent.inject
 
 data class FwCredentials(val token: String, val non_field_errors: List<String>?)
@@ -47,21 +46,34 @@ class LoginActivity : AppCompatActivity() {
 
   private var resultLauncher =
     registerForActivityResult(StartActivityForResult()) { result ->
-      result.data?.let {
-        oAuth.exchange(this, it) {
-          PowerPreference
-            .getFileByName(AppContext.PREFS_CREDENTIALS)
-            .setBoolean("anonymous", false)
+      result.data?.let { data ->
+        lifecycleScope.launch {
+          try {
+            showProgress(getString(R.string.login_status_exchanging_token))
 
-          lifecycleScope.launch(Main) {
-            Userinfo.get(this@LoginActivity, oAuth)?.let {
+            oAuth.exchange(this@LoginActivity, data)
+
+            PowerPreference
+              .getFileByName(AppContext.PREFS_CREDENTIALS)
+              .setBoolean("anonymous", false)
+
+            showProgress(getString(R.string.login_status_fetching_user))
+
+            val user = Userinfo.get(this@LoginActivity, oAuth)
+            if (user != null) {
               startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-
-              return@launch finish()
+              finish()
+            } else {
+              showError(getString(R.string.login_error_userinfo))
             }
-            throw Exception(getString(R.string.login_error_userinfo))
+          } catch (e: Exception) {
+            showError(
+              e.message ?: getString(R.string.login_error_hostname)
+            )
           }
         }
+      } ?: run {
+        showError(getString(R.string.login_error_authorization_cancelled))
       }
     }
 
@@ -70,11 +82,11 @@ class LoginActivity : AppCompatActivity() {
     with(binding) {
       val preferences = getPreferences(Context.MODE_PRIVATE)
       val hn = preferences?.getString("hostname", "")
-      if (hn != null && !hn.isEmpty()) {
+      if (hn != null && hn.isNotEmpty()) {
         hostname.text = Editable.Factory.getInstance().newEditable(hn)
       }
-      cleartext.setChecked(preferences?.getBoolean("cleartext", false) ?: false)
-      anonymous.setChecked(preferences?.getBoolean("anonymous", false) ?: false)
+      cleartext.isChecked = preferences?.getBoolean("cleartext", false) ?: false
+      anonymous.isChecked = preferences?.getBoolean("anonymous", false) ?: false
       login.setOnClickListener {
         var hostname = hostname.text.toString().trim().trim('/')
 
@@ -94,12 +106,10 @@ class LoginActivity : AppCompatActivity() {
 
           hostnameField.error = ""
 
-          val fuelResult = when (anonymous.isChecked) {
+          when (anonymous.isChecked) {
             false -> authedLogin(hostname)
             true -> anonymousLogin(hostname)
           }
-
-          hostnameField.error = mapFuelResultToError(fuelResult)
         } catch (e: Exception) {
           val message =
             if (e.message?.isEmpty() == true) getString(R.string.login_error_hostname)
@@ -107,30 +117,45 @@ class LoginActivity : AppCompatActivity() {
 
           hostnameField.error = message
         }
-        if (hostnameField.error == null) {
-          val preferences = getPreferences(Context.MODE_PRIVATE)
-          preferences?.edit()?.putString("hostname", hostname)?.commit()
-          preferences?.edit()?.putBoolean("cleartext", cleartext.isChecked)?.commit()
-          preferences?.edit()?.putBoolean("anonymous", anonymous.isChecked)?.commit()
+
+        if (hostnameField.error.isNullOrEmpty()) {
+          val prefs = getPreferences(Context.MODE_PRIVATE)
+          prefs?.edit()?.putString("hostname", hostname)?.commit()
+          prefs?.edit()?.putBoolean("cleartext", cleartext.isChecked)?.commit()
+          prefs?.edit()?.putBoolean("anonymous", anonymous.isChecked)?.commit()
         }
       }
     }
   }
 
-  private fun mapFuelResultToError(fuelResult: FuelResult) = when {
-    fuelResult.httpStatus == 404 ->
-      getString(R.string.login_error_funkwhale_not_found)
-
-    !fuelResult.success ->
-      getString(R.string.login_error, fuelResult.message)
-
-    else -> ""
-  }
-
   override fun onConfigurationChanged(newConfig: Configuration) {
     super.onConfigurationChanged(newConfig)
-
     limitContainerWidth()
+  }
+
+  private fun showProgress(status: String) {
+    binding.loginProgress.visibility = View.VISIBLE
+    binding.loginStatusText.visibility = View.VISIBLE
+    binding.loginStatusText.text = status
+    binding.login.isEnabled = false
+    binding.hostname.isEnabled = false
+    binding.cleartext.isEnabled = false
+    binding.anonymous.isEnabled = false
+    binding.hostnameField.error = ""
+  }
+
+  private fun hideProgress() {
+    binding.loginProgress.visibility = View.GONE
+    binding.loginStatusText.visibility = View.GONE
+    binding.login.isEnabled = true
+    binding.hostname.isEnabled = true
+    binding.cleartext.isEnabled = true
+    binding.anonymous.isEnabled = true
+  }
+
+  private fun showError(message: String) {
+    hideProgress()
+    binding.hostnameField.error = message
   }
 
   private fun validateHostname(hostname: String, cleartext: Boolean): String? {
@@ -143,42 +168,85 @@ class LoginActivity : AppCompatActivity() {
     return null
   }
 
-  private fun authedLogin(hostname: String): FuelResult {
-    oAuth.init(hostname)
-    return oAuth.register {
-      PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).setString("hostname", hostname)
-      resultLauncher.launch(oAuth.authorizeIntent(this))
+  private fun authedLogin(hostname: String) {
+    lifecycleScope.launch {
+      try {
+        showProgress(getString(R.string.login_status_registering))
+
+        oAuth.init(hostname)
+
+        val result = withContext(Dispatchers.IO) {
+          oAuth.register()
+        }
+
+        if (!result.success) {
+          showError(mapResultToError(result))
+          return@launch
+        }
+
+        PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS)
+          .setString("hostname", hostname)
+
+        showProgress(getString(R.string.login_status_waiting_for_browser))
+
+        resultLauncher.launch(oAuth.authorizeIntent(this@LoginActivity))
+      } catch (e: Exception) {
+        showError(
+          e.message ?: getString(R.string.login_error_hostname)
+        )
+      }
     }
   }
 
-  private fun anonymousLogin(hostname: String): FuelResult {
-    val dialog = LoginDialog().apply {
-      show(supportFragmentManager, "LoginDialog")
-    }
+  private fun anonymousLogin(hostname: String) {
+    lifecycleScope.launch {
+      try {
+        showProgress(getString(R.string.login_status_connecting))
 
-    val uri = "$hostname/api/v1/tracks/"
-    val (_, _, result) = runBlocking {
-      Fuel.get(uri).awaitObjectResponseResult(gsonDeserializerOf(FwCredentials::class.java))
-    }
-
-    when (result) {
-      is Result.Success -> {
-        PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).apply {
-          setString("hostname", hostname)
-          setBoolean("anonymous", true)
+        val uri = "$hostname/api/v1/tracks/"
+        val (_, _, result) = withContext(Dispatchers.IO) {
+          Fuel.get(uri)
+            .awaitObjectResponseResult(gsonDeserializerOf(FwCredentials::class.java))
         }
 
-        dialog.dismiss()
-        startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-        finish()
-        return FuelResult.ok()
-      }
+        when (result) {
+          is Result.Success -> {
+            PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).apply {
+              setString("hostname", hostname)
+              setBoolean("anonymous", true)
+            }
 
-      is Result.Failure -> {
-        dialog.dismiss()
-        return FuelResult.from(result)
+            startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+            finish()
+          }
+
+          is Result.Failure -> {
+            val status = result.error.response.statusCode
+            val message = result.error.response.responseMessage
+            showError(
+              when {
+                status == 404 -> getString(R.string.login_error_funkwhale_not_found)
+                else -> getString(R.string.login_error, message)
+              }
+            )
+          }
+        }
+      } catch (e: Exception) {
+        showError(
+          e.message ?: getString(R.string.login_error_hostname)
+        )
       }
     }
+  }
+
+  private fun mapResultToError(result: audio.funkwhale.ffa.utils.FuelResult) = when {
+    result.httpStatus == 404 ->
+      getString(R.string.login_error_funkwhale_not_found)
+
+    !result.success ->
+      getString(R.string.login_error, result.message)
+
+    else -> ""
   }
 
   private fun limitContainerWidth() {

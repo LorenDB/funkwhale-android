@@ -14,6 +14,12 @@
   <string name="login_error_hostname">This could not be understood as a valid URL</string>
   <string name="login_error_hostname_https">The Funkwhale hostname should be secure through HTTPS</string>
   <string name="login_error_userinfo">We could not retrieve information about your user</string>
+  <string name="login_error_authorization_cancelled">Authorization was cancelled</string>
+  <string name="login_status_registering">Registering with server…</string>
+  <string name="login_status_waiting_for_browser">Waiting for authorization…</string>
+  <string name="login_status_exchanging_token">Completing login…</string>
+  <string name="login_status_fetching_user">Fetching user info…</string>
+  <string name="login_status_connecting">Connecting to server…</string>
   <string name="toolbar_search">Search</string>
   <string name="title_downloads">Downloads</string>
   <string name="title_settings">Settings</string>

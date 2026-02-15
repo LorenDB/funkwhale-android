@@ -19,6 +19,7 @@ import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.slot
 import io.mockk.verify
+import kotlinx.coroutines.runBlocking
 import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationService
 import net.openid.appauth.AuthorizationServiceConfiguration
@@ -240,7 +241,7 @@ class OAuthTest {
     val mockkClient = mockk<Client>()
     FuelManager.instance.client = mockkClient
 
-    oAuth.register {}
+    runBlocking { oAuth.register() }
 
     verify(exactly = 0) { mockkClient.executeRequest(any()) }
   }
@@ -263,7 +264,7 @@ class OAuthTest {
     FuelManager.instance.client = mockkClient
 
     val state = oAuth.init("https://example.com")
-    oAuth.register(state) { }
+    runBlocking { oAuth.register(state) }
 
     val requestSlot = slot<Request>()
 

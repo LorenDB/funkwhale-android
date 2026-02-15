@@ -72,6 +72,31 @@
             android:backgroundTint="@color/colorAccent"
             android:text="@string/login_submit"
             android:textColor="@color/whiteWhileLight" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ProgressBar
+                android:id="@+id/login_progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                android:indeterminateTint="@color/colorAccent"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/login_status_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textAlignment="center"
+                android:visibility="gone" />
+
+        </LinearLayout>
     </LinearLayout>
 
 </ScrollView>

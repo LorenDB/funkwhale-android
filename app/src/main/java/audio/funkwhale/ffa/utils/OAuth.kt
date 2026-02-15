@@ -3,6 +3,7 @@ package audio.funkwhale.ffa.utils
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.util.Log
 import com.github.kittinunf.fuel.Fuel
@@ -13,6 +14,8 @@ import com.github.kittinunf.fuel.gson.jsonBody
 import com.github.kittinunf.result.Result
 import com.preference.PowerPreference
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
+import net.openid.appauth.AppAuthConfiguration
 import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationException
 import net.openid.appauth.AuthorizationRequest
@@ -23,6 +26,8 @@ import net.openid.appauth.ClientSecretPost
 import net.openid.appauth.RegistrationRequest
 import net.openid.appauth.RegistrationResponse
 import net.openid.appauth.ResponseTypeValues
+import net.openid.appauth.browser.BrowserMatcher
+import kotlin.coroutines.resume
 
 fun AuthState.save() {
   PowerPreference.getFileByName(AppContext.PREFS_CREDENTIALS).apply {
@@ -33,7 +38,51 @@ fun AuthState.save() {
 class AuthorizationServiceFactory {
 
   fun create(context: Context): AuthorizationService {
-    return AuthorizationService(context)
+    val config = AppAuthConfiguration.Builder()
+      .setBrowserMatcher(DefaultBrowserMatcher(context))
+      .build()
+
+    return AuthorizationService(context, config)
+  }
+}
+
+/**
+ * A [BrowserMatcher] that matches only the user's default browser.
+ * Falls back to accepting any browser if no default is set.
+ */
+class DefaultBrowserMatcher(context: Context) : BrowserMatcher {
+
+  private val defaultBrowserPackage: String? = resolveDefaultBrowser(context)
+
+  override fun matches(descriptor: net.openid.appauth.browser.BrowserDescriptor): Boolean {
+    return if (defaultBrowserPackage != null) {
+      descriptor.packageName == defaultBrowserPackage
+    } else {
+      true
+    }
+  }
+
+  companion object {
+    private fun resolveDefaultBrowser(context: Context): String? {
+      val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://"))
+      val resolveInfo = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+        context.packageManager.resolveActivity(
+          browserIntent,
+          PackageManager.ResolveInfoFlags.of(PackageManager.MATCH_DEFAULT_ONLY.toLong())
+        )
+      } else {
+        @Suppress("DEPRECATION")
+        context.packageManager.resolveActivity(browserIntent, PackageManager.MATCH_DEFAULT_ONLY)
+      }
+      val packageName = resolveInfo?.activityInfo?.packageName
+
+      // Android returns its own resolver activity when no default is set
+      return if (packageName != null && !packageName.contains("android.internal.app")) {
+        packageName
+      } else {
+        null
+      }
+    }
   }
 }
 
@@ -135,15 +184,14 @@ class OAuth(private val authorizationServiceFactory: AuthorizationServiceFactory
   fun service(context: Context): AuthorizationService =
     authorizationServiceFactory.create(context)
 
-  fun register(authState: AuthState? = null, callback: () -> Unit): FuelResult {
+  suspend fun register(authState: AuthState? = null): FuelResult {
     (authState ?: state()).authorizationServiceConfiguration?.let { config ->
 
-      val (_, _, result: Result<App, FuelError>) = runBlocking {
+      val (_, _, result: Result<App, FuelError>) =
         Fuel.post(config.registrationEndpoint.toString())
           .header("Content-Type", "application/json")
           .jsonBody(registrationBody())
           .awaitObjectResponseResult(gsonDeserializerOf(App::class.java))
-      }
 
       when (result) {
         is Result.Success -> {
@@ -160,7 +208,6 @@ class OAuth(private val authorizationServiceFactory: AuthorizationServiceFactory
           state().apply {
             update(response)
             save()
-            callback()
             return FuelResult.ok()
           }
         }
@@ -192,10 +239,9 @@ class OAuth(private val authorizationServiceFactory: AuthorizationServiceFactory
     }
   }
 
-  fun exchange(
+  suspend fun exchange(
     context: Context,
-    authorization: Intent,
-    success: () -> Unit
+    authorization: Intent
   ) {
     state().let { state ->
       state.apply {
@@ -206,26 +252,36 @@ class OAuth(private val authorizationServiceFactory: AuthorizationServiceFactory
         save()
       }
 
-      AuthorizationResponse.fromIntent(authorization)?.let {
+      AuthorizationResponse.fromIntent(authorization)?.let { authResponse ->
         val auth = ClientSecretPost(state().clientSecret)
         val requestService = service(context)
 
-        requestService.performTokenRequest(it.createTokenExchangeRequest(), auth) { response, e ->
-          if (e != null) {
-            Log.e("FFA", "performTokenRequest failed: $e")
-            Log.e("FFA", Log.getStackTraceString(e))
-          } else {
-            state.apply {
-              update(response, e)
-              save()
+        suspendCancellableCoroutine { continuation ->
+          requestService.performTokenRequest(
+            authResponse.createTokenExchangeRequest(),
+            auth
+          ) { response, e ->
+            if (e != null) {
+              Log.e("FFA", "performTokenRequest failed: $e")
+              Log.e("FFA", Log.getStackTraceString(e))
+            } else {
+              state.apply {
+                update(response, e)
+                save()
+              }
+            }
+
+            if (response != null) {
+              continuation.resume(Unit)
+            } else {
+              continuation.cancel(
+                Exception("Token exchange failed: ${e?.message ?: "unknown error"}")
+              )
             }
           }
-
-          if (response != null) success()
-          else Log.e("FFA", "performTokenRequest() not successful")
         }
         requestService.dispose()
-      }
+      } ?: throw Exception("Missing authorization response")
     }
   }
 
