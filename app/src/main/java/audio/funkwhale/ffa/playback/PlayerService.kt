@@ -14,6 +14,7 @@ import android.os.IBinder
 import android.support.v4.media.MediaMetadataCompat
 import android.util.Log
 import android.view.KeyEvent
+import androidx.core.content.ContextCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.media.session.MediaButtonReceiver
 import audio.funkwhale.ffa.R
@@ -170,9 +171,11 @@ class PlayerService : Service() {
       }
     }
 
-    registerReceiver(
+    ContextCompat.registerReceiver(
+      this,
       headphonesUnpluggedReceiver,
-      IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
+      IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY),
+      ContextCompat.RECEIVER_NOT_EXPORTED
     )
   }
 
