@@ -112,7 +112,9 @@ class SwipeableConstraintLayout @JvmOverloads constructor(
           initialY = event.y
           currentX = event.x
         }
-        return true
+        // Don't consume the event - let it propagate for click detection
+        // We'll intercept later if it becomes a horizontal swipe
+        return false
       }
       MotionEvent.ACTION_MOVE -> {
         // Only handle if we're in horizontal swipe mode
