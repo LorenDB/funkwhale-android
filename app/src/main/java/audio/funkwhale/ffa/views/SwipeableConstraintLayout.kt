@@ -19,6 +19,7 @@ class SwipeableConstraintLayout @JvmOverloads constructor(
   private var swipeListener: OnSwipeListener? = null
   private var isHorizontalSwipe = false
   private var initialX = 0f
+  private var initialY = 0f
   private var currentX = 0f
   private var swipeStarted = false
   
@@ -32,6 +33,7 @@ class SwipeableConstraintLayout @JvmOverloads constructor(
     when (ev.action) {
       MotionEvent.ACTION_DOWN -> {
         initialX = ev.x
+        initialY = ev.y
         currentX = ev.x
         isHorizontalSwipe = false
         swipeStarted = false
@@ -39,7 +41,7 @@ class SwipeableConstraintLayout @JvmOverloads constructor(
       }
       MotionEvent.ACTION_MOVE -> {
         val diffX = abs(ev.x - initialX)
-        val diffY = abs(ev.y - ev.rawY + (ev.rawY - ev.y))
+        val diffY = abs(ev.y - initialY)
         
         // Detect horizontal swipe early
         if (!isHorizontalSwipe && diffX > HORIZONTAL_DETECTION_THRESHOLD && diffX > diffY * 1.5f) {
@@ -70,6 +72,7 @@ class SwipeableConstraintLayout @JvmOverloads constructor(
     when (event.action) {
       MotionEvent.ACTION_DOWN -> {
         initialX = event.x
+        initialY = event.y
         currentX = event.x
         return true
       }
@@ -123,7 +126,7 @@ class SwipeableConstraintLayout @JvmOverloads constructor(
       SWIPE_THRESHOLD + (absTranslation - SWIPE_THRESHOLD) * 0.5f
     }
     
-    return min(dampedAbs, MAX_TRANSLATION) * if (translation > 0) 1f else -1f
+    return min(dampedAbs, MAX_TRANSLATION) * translation.sign
   }
 
   private fun completeSwipe(isRight: Boolean) {

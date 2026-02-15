@@ -41,6 +41,7 @@ open class SwipeableSquareImageView : AppCompatImageView {
   private var swipeListener: OnSwipeListener? = null
   private var isHorizontalSwipe = false
   private var initialX = 0f
+  private var initialY = 0f
   private var currentX = 0f
   private var swipeStarted = false
 
@@ -58,6 +59,7 @@ open class SwipeableSquareImageView : AppCompatImageView {
     when (event.action) {
       MotionEvent.ACTION_DOWN -> {
         initialX = event.x
+        initialY = event.y
         currentX = event.x
         isHorizontalSwipe = false
         swipeStarted = false
@@ -66,7 +68,7 @@ open class SwipeableSquareImageView : AppCompatImageView {
       MotionEvent.ACTION_MOVE -> {
         currentX = event.x
         val diffX = currentX - initialX
-        val diffY = abs(event.y - event.rawY + (event.rawY - event.y))
+        val diffY = abs(event.y - initialY)
         
         // Detect horizontal swipe
         if (!isHorizontalSwipe && abs(diffX) > HORIZONTAL_DETECTION_THRESHOLD && abs(diffX) > diffY * 1.5f) {
@@ -123,7 +125,7 @@ open class SwipeableSquareImageView : AppCompatImageView {
       SWIPE_THRESHOLD + (absTranslation - SWIPE_THRESHOLD) * 0.5f
     }
     
-    return kotlin.math.min(dampedAbs, MAX_TRANSLATION) * if (translation > 0) 1f else -1f
+    return kotlin.math.min(dampedAbs, MAX_TRANSLATION) * translation.sign
   }
 
   private fun completeSwipe(isRight: Boolean) {
