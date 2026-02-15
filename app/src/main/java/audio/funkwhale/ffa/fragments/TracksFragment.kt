@@ -127,6 +127,9 @@ class TracksFragment : FFAFragment<Track, TracksAdapter>() {
 
     binding.artist.text = args.album.artist.name
     binding.title.text = args.album.title
+    
+    // Clear the default downloaded icon from XML until we know the actual download status
+    binding.title.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
   }
 
   override fun onResume() {
