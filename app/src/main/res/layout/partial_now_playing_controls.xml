@@ -23,10 +23,11 @@
     android:alpha="0"
     android:clipChildren="true">
 
-    <FrameLayout
+    <LinearLayout
       android:id="@+id/controls_track_info"
       android:layout_width="0dp"
       android:layout_height="wrap_content"
+      android:orientation="vertical"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintEnd_toStartOf="@+id/now_playing_details_add_to_playlist"
       app:layout_constraintTop_toTopOf="parent">
@@ -46,11 +47,11 @@
         android:id="@+id/current_playing_details_artist"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="24dp"
+        android:paddingTop="2dp"
         android:paddingBottom="2dp"
         android:text="@{currentTrackArtist}"
         tools:text="Muse" />
-    </FrameLayout>
+    </LinearLayout>
 
     <ImageButton
       android:id="@+id/now_playing_details_add_to_playlist"

@@ -191,8 +191,16 @@ class NowPlayingFragment: Fragment(R.layout.fragment_now_playing) {
       val queueChannel = RequestBus.send(Request.GetQueue)
       val indexChannel = RequestBus.send(Request.GetCurrentTrackIndex)
 
-      val queue = queueChannel.wait<Response.Queue>()?.queue ?: return@launch
-      val currentIndex = indexChannel.wait<Response.CurrentTrackIndex>()?.index ?: return@launch
+      val queue = queueChannel.wait<Response.Queue>()?.queue
+      val currentIndex = indexChannel.wait<Response.CurrentTrackIndex>()?.index
+
+      if (queue == null || currentIndex == null) {
+        viewModel.hasNextTrack.postValue(false)
+        viewModel.hasPreviousTrack.postValue(false)
+        viewModel.nextTrackTitle.postValue(null)
+        viewModel.previousTrackTitle.postValue(null)
+        return@launch
+      }
 
       val hasNext = currentIndex < queue.size - 1
       val hasPrevious = currentIndex > 0

@@ -37,10 +37,10 @@ class TrackSwipeGestureListener(
 ) {
 
   companion object {
-    private const val SWIPE_THRESHOLD = 100
-    private const val SWIPE_VELOCITY_THRESHOLD = 100
-    private const val DIRECTION_THRESHOLD = 10
-    private const val ANIMATION_DURATION = 200L
+    private const val SWIPE_THRESHOLD = 100 // pixels
+    private const val SWIPE_VELOCITY_THRESHOLD = 100 // pixels per second
+    private const val DIRECTION_THRESHOLD = 10 // pixels
+    private const val ANIMATION_DURATION = 200L // milliseconds
   }
 
   private var isAnimating = false
