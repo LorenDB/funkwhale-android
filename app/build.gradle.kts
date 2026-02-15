@@ -50,7 +50,7 @@ android {
     viewBinding = true
   }
 
-  packagingOptions {
+  packaging {
     resources.excludes.add("META-INF/LICENSE.md")
     resources.excludes.add("META-INF/LICENSE-notice.md")
   }
@@ -110,7 +110,7 @@ android {
       isDebuggable = true
       applicationIdSuffix = ".dev"
 
-      isTestCoverageEnabled = true
+      enableUnitTestCoverage = true
 
       if (project.hasProperty("signing.store")) {
         signingConfig = signingConfigs.getByName("debug")
@@ -251,7 +251,7 @@ project.afterEvaluate {
       "**/*$[0-9].*"
     )
 
-    val debugTree = fileTree("${project.buildDir}/tmp/kotlin-classes/debug") {
+    val debugTree = fileTree("${project.layout.buildDirectory.get().asFile}/tmp/kotlin-classes/debug") {
       setExcludes(fileFilter)
     }
     val mainSrc = "${project.projectDir}/src/main/java"
@@ -260,7 +260,7 @@ project.afterEvaluate {
     classDirectories.setFrom(files(listOf(debugTree)))
 
     executionData.setFrom(
-      fileTree(project.buildDir) {
+      fileTree(project.layout.buildDirectory.get().asFile) {
         setIncludes(
           listOf(
             "outputs/unit_test_code_coverage/debugUnitTest/*.exec",
