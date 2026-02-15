@@ -7,6 +7,7 @@ import android.view.View
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.animation.doOnEnd
 import kotlin.math.abs
+import kotlin.math.sign
 
 open class SquareView : View {
   constructor(context: Context) : super(context)
