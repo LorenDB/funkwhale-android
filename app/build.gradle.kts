@@ -59,7 +59,7 @@ android {
     disable += listOf("MissingTranslation", "ExtraTranslation")
   }
 
-  compileSdk = 33
+  compileSdk = 35
 
   defaultConfig {
 
@@ -69,7 +69,7 @@ android {
     versionName = androidGitVersion.name()
 
     minSdk = 24
-    targetSdk = 33
+    targetSdk = 35
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
