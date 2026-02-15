@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.konan.properties.hasProperty
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -149,7 +148,7 @@ ktlint {
 }
 
 play {
-  enabled.set(props.hasProperty("play.credentials"))
+  enabled.set(props.containsKey("play.credentials"))
 
   if (enabled.get()) {
     serviceAccountCredentials.set(file(props.getProperty("play.credentials")))
