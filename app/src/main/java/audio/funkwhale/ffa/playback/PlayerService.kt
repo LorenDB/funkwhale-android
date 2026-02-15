@@ -165,6 +165,9 @@ class PlayerService : Service() {
           player.seekTo(queue.current, it.toLong())
           val (current, duration, percent) = getProgress(true)
           ProgressBus.send(current, duration, percent)
+        } catch (e: IllegalArgumentException) {
+          // The app remembered an incorrect position, let's reset it
+          FFACache.set(this, "current", "-1")
         } catch (e: IllegalStateException) {
           // The app remembered an incorrect position, let's reset it
           FFACache.set(this, "current", "-1")
