@@ -112,9 +112,8 @@ class SwipeableConstraintLayout @JvmOverloads constructor(
           initialY = event.y
           currentX = event.x
         }
-        // Don't consume the event - let it propagate for click detection
-        // We'll intercept later if it becomes a horizontal swipe
-        return false
+        // Must return true to receive subsequent touch events (MOVE, UP)
+        return true
       }
       MotionEvent.ACTION_MOVE -> {
         // Only handle if we're in horizontal swipe mode
@@ -165,7 +164,7 @@ class SwipeableConstraintLayout @JvmOverloads constructor(
           }
         }
       }
-      MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+      MotionEvent.ACTION_UP -> {
         parent?.requestDisallowInterceptTouchEvent(false)
         
         if (gestureState == GestureState.HORIZONTAL) {
@@ -191,6 +190,25 @@ class SwipeableConstraintLayout @JvmOverloads constructor(
           return true
         }
         
+        // If no swipe was detected, treat as a tap and propagate the click
+        // up through the view hierarchy (to open the fullscreen player)
+        val diffX = abs(event.x - initialX)
+        val diffY = abs(event.y - initialY)
+        if (diffX < TAP_THRESHOLD && diffY < TAP_THRESHOLD) {
+          gestureState = GestureState.NONE
+          performClick()
+          return true
+        }
+
+        gestureState = GestureState.NONE
+      }
+      MotionEvent.ACTION_CANCEL -> {
+        parent?.requestDisallowInterceptTouchEvent(false)
+
+        if (gestureState == GestureState.HORIZONTAL) {
+          springBack()
+        }
+
         gestureState = GestureState.NONE
       }
     }

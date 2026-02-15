@@ -114,7 +114,7 @@ open class SwipeableSquareImageView : AppCompatImageView {
           return false
         }
       }
-      MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+      MotionEvent.ACTION_UP -> {
         parent?.requestDisallowInterceptTouchEvent(false)
         
         if (gestureState == GestureState.HORIZONTAL) {
@@ -140,6 +140,25 @@ open class SwipeableSquareImageView : AppCompatImageView {
           return true
         }
         
+        // If no swipe was detected, treat as a tap and propagate the click
+        // up through the view hierarchy (to open the fullscreen player)
+        val diffX = abs(event.x - initialX)
+        val diffY = abs(event.y - initialY)
+        if (diffX < TAP_THRESHOLD && diffY < TAP_THRESHOLD) {
+          gestureState = GestureState.NONE
+          performClick()
+          return true
+        }
+
+        gestureState = GestureState.NONE
+      }
+      MotionEvent.ACTION_CANCEL -> {
+        parent?.requestDisallowInterceptTouchEvent(false)
+
+        if (gestureState == GestureState.HORIZONTAL) {
+          springBack()
+        }
+
         gestureState = GestureState.NONE
       }
     }

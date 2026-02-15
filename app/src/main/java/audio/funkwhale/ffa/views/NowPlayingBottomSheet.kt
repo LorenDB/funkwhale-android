@@ -51,6 +51,15 @@ class NowPlayingBottomSheet @JvmOverloads constructor(
       behavior.setPeekHeight(this.height, false)
       this.setOnClickListener { this@NowPlayingBottomSheet.toggle() }
     } ?: hide()
+
+    // Swipeable views overlay the header and consume touch events.
+    // Set click listeners on them so taps still toggle the bottom sheet.
+    findViewById<View>(R.id.now_playing_cover)?.setOnClickListener {
+      this@NowPlayingBottomSheet.toggle()
+    }
+    findViewById<View>(R.id.header_controls)?.setOnClickListener {
+      this@NowPlayingBottomSheet.toggle()
+    }
   }
 
   override fun onTouchEvent(event: MotionEvent): Boolean = true
