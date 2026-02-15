@@ -73,6 +73,11 @@ class NowPlayingViewModel(app: Application) : AndroidViewModel(app) {
     }
   }
 
+  val hasNextTrack = MutableLiveData(false)
+  val hasPreviousTrack = MutableLiveData(false)
+  val nextTrackTitle = MutableLiveData<String?>(null)
+  val previousTrackTitle = MutableLiveData<String?>(null)
+
   private val context: Context
     get() = getApplication<FFA>().applicationContext
 }

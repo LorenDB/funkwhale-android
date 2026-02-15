@@ -20,31 +20,37 @@
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:alpha="0">
-    <TextView
-      android:id="@+id/current_playing_details_title"
-      android:layout_width="0dp"
-      android:layout_height="wrap_content"
-      android:paddingTop="2dp"
-      android:paddingBottom="2dp"
-      android:text="@{currentTrackTitle}"
-      android:textColor="@color/itemTitle"
-      android:textSize="18sp"
-      app:layout_constraintEnd_toStartOf="@+id/now_playing_details_add_to_playlist"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent" tools:text="Supermassive Black Hole" />
+    android:alpha="0"
+    android:clipChildren="true">
 
-    <TextView
-      android:id="@+id/current_playing_details_artist"
+    <FrameLayout
+      android:id="@+id/controls_track_info"
       android:layout_width="0dp"
       android:layout_height="wrap_content"
-      android:paddingTop="2dp"
-      android:paddingBottom="2dp"
-      android:text="@{currentTrackArtist}"
-      app:layout_constraintEnd_toStartOf="@+id/now_playing_details_add_to_playlist"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/current_playing_details_title"
-      tools:text="Muse" />
+      app:layout_constraintEnd_toStartOf="@+id/now_playing_details_add_to_playlist"
+      app:layout_constraintTop_toTopOf="parent">
+
+      <TextView
+        android:id="@+id/current_playing_details_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:text="@{currentTrackTitle}"
+        android:textColor="@color/itemTitle"
+        android:textSize="18sp"
+        tools:text="Supermassive Black Hole" />
+
+      <TextView
+        android:id="@+id/current_playing_details_artist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="24dp"
+        android:paddingBottom="2dp"
+        android:text="@{currentTrackArtist}"
+        tools:text="Muse" />
+    </FrameLayout>
 
     <ImageButton
       android:id="@+id/now_playing_details_add_to_playlist"
@@ -54,10 +60,10 @@
       android:layout_margin="8dp"
       android:contentDescription="@string/playlist_add_to"
       android:src="@drawable/add_to_playlist"
-      app:layout_constraintBottom_toBottomOf="@+id/current_playing_details_artist"
+      app:layout_constraintBottom_toBottomOf="@+id/controls_track_info"
 
       app:layout_constraintEnd_toStartOf="@+id/now_playing_details_favorite"
-      app:layout_constraintTop_toTopOf="@+id/current_playing_details_title" />
+      app:layout_constraintTop_toTopOf="@+id/controls_track_info" />
 
     <ImageButton
       android:id="@+id/now_playing_details_favorite"
@@ -67,9 +73,9 @@
       android:layout_margin="8dp"
       android:contentDescription="@string/control_add_to_favorites"
       android:src="@drawable/favorite"
-      app:layout_constraintBottom_toBottomOf="@+id/current_playing_details_artist"
+      app:layout_constraintBottom_toBottomOf="@+id/controls_track_info"
       app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toTopOf="@+id/current_playing_details_title"
+      app:layout_constraintTop_toTopOf="@+id/controls_track_info"
       app:tint="@{isCurrentTrackFavorite ? @color/colorFavorite : @color/controlForeground, default=@color/controlForeground}" />
 
 
@@ -95,7 +101,7 @@
       android:thumbTint="@color/controlForeground"
       app:layout_constraintEnd_toStartOf="@+id/now_playing_details_progress_duration"
       app:layout_constraintStart_toEndOf="@+id/now_playing_details_progress_current"
-      app:layout_constraintTop_toBottomOf="@+id/current_playing_details_artist" />
+      app:layout_constraintTop_toBottomOf="@+id/controls_track_info" />
 
     <TextView
       android:id="@+id/now_playing_details_progress_duration"

@@ -91,6 +91,7 @@ class MainActivity : AppCompatActivity() {
 
     (supportFragmentManager.findFragmentById(R.id.now_playing) as NowPlayingFragment).apply {
       onDetailsMenuItemClicked { binding.nowPlayingBottomSheet.close() }
+      onHeaderTap { binding.nowPlayingBottomSheet.toggle() }
       binding.nowPlayingBottomSheet.addBottomSheetCallback(
         object : BottomSheetBehavior.BottomSheetCallback() {
           override fun onStateChanged(bottomSheet: View, newState: Int) {

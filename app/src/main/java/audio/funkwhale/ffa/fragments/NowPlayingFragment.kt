@@ -1,7 +1,7 @@
 package audio.funkwhale.ffa.fragments
 
+import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.SeekBar
@@ -9,13 +9,8 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.liveData
-import androidx.lifecycle.map
 import androidx.navigation.fragment.findNavController
 import audio.funkwhale.ffa.MainNavDirections
 import audio.funkwhale.ffa.R
@@ -31,10 +26,15 @@ import audio.funkwhale.ffa.utils.Event
 import audio.funkwhale.ffa.utils.EventBus
 import audio.funkwhale.ffa.utils.FFACache
 import audio.funkwhale.ffa.utils.ProgressBus
+import audio.funkwhale.ffa.utils.Request
+import audio.funkwhale.ffa.utils.RequestBus
+import audio.funkwhale.ffa.utils.Response
 import audio.funkwhale.ffa.utils.maybeNormalizeUrl
 import audio.funkwhale.ffa.utils.toIntOrElse
 import audio.funkwhale.ffa.utils.untilNetwork
+import audio.funkwhale.ffa.utils.wait
 import audio.funkwhale.ffa.viewmodel.NowPlayingViewModel
+import audio.funkwhale.ffa.views.TrackSwipeGestureListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.Float.max
@@ -46,7 +46,13 @@ class NowPlayingFragment: Fragment(R.layout.fragment_now_playing) {
   private val favoritedRepository by lazy { FavoritedRepository(requireContext()) }
 
   private var onDetailsMenuItemClickedCb: () -> Unit = {}
+  private var onHeaderTapCb: () -> Unit = {}
 
+  private var headerSwipeListener: TrackSwipeGestureListener? = null
+  private var controlsSwipeListener: TrackSwipeGestureListener? = null
+  private var coverSwipeListener: TrackSwipeGestureListener? = null
+
+  @SuppressLint("ClickableViewAccessibility")
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     binding.lifecycleOwner = viewLifecycleOwner
 
@@ -79,6 +85,19 @@ class NowPlayingFragment: Fragment(R.layout.fragment_now_playing) {
       nowPlayingDetailsProgress.setOnSeekBarChangeListener(OnSeekBarChanged())
       nowPlayingDetailsFavorite.setOnClickListener { onFavorite() }
       nowPlayingDetailsAddToPlaylist.setOnClickListener { onAddToPlaylist() }
+
+      // Set up swipe on fullscreen track info
+      controlsSwipeListener = TrackSwipeGestureListener(
+        requireContext(),
+        controlsTrackInfo,
+        onSwipeLeft = { skipToNext() },
+        onSwipeRight = { skipToPrevious() },
+        canSwipeLeft = { viewModel.hasNextTrack.value == true },
+        canSwipeRight = { viewModel.hasPreviousTrack.value == true }
+      )
+      controlsTrackInfo.setOnTouchListener { _, event ->
+        controlsSwipeListener?.onTouchEvent(event) == true
+      }
     }
 
     binding.nowPlayingDetailsInfo.setOnClickListener { openInfoMenu() }
@@ -99,6 +118,33 @@ class NowPlayingFragment: Fragment(R.layout.fragment_now_playing) {
       nowPlayingToggle.setOnClickListener {
         CommandBus.send(Command.ToggleState)
       }
+
+      // Set up swipe on header track info
+      headerSwipeListener = TrackSwipeGestureListener(
+        requireContext(),
+        headerTrackInfo,
+        onSwipeLeft = { skipToNext() },
+        onSwipeRight = { skipToPrevious() },
+        canSwipeLeft = { viewModel.hasNextTrack.value == true },
+        canSwipeRight = { viewModel.hasPreviousTrack.value == true },
+        onTap = { onHeaderTapCb() }
+      )
+      headerTrackInfo.setOnTouchListener { _, event ->
+        headerSwipeListener?.onTouchEvent(event) == true
+      }
+    }
+
+    // Set up swipe on cover art (works in both states)
+    coverSwipeListener = TrackSwipeGestureListener(
+      requireContext(),
+      binding.header.nowPlayingCover,
+      onSwipeLeft = { skipToNext() },
+      onSwipeRight = { skipToPrevious() },
+      canSwipeLeft = { viewModel.hasNextTrack.value == true },
+      canSwipeRight = { viewModel.hasPreviousTrack.value == true }
+    )
+    binding.header.nowPlayingCover.setOnTouchListener { _, event ->
+      coverSwipeListener?.onTouchEvent(event) == true
     }
 
     lifecycleScope.launch(Dispatchers.Main) {
@@ -107,6 +153,14 @@ class NowPlayingFragment: Fragment(R.layout.fragment_now_playing) {
 
     lifecycleScope.launch(Dispatchers.Main) {
       ProgressBus.get().collect { onProgress(it) }
+    }
+
+    lifecycleScope.launch(Dispatchers.Main) {
+      EventBus.get().collect { event ->
+        if (event is Event.QueueChanged) {
+          updateQueueState()
+        }
+      }
     }
   }
 
@@ -118,6 +172,41 @@ class NowPlayingFragment: Fragment(R.layout.fragment_now_playing) {
     onDetailsMenuItemClickedCb = cb
   }
 
+  fun onHeaderTap(cb: () -> Unit) {
+    onHeaderTapCb = cb
+  }
+
+  private fun skipToNext(): Boolean {
+    CommandBus.send(Command.NextTrack)
+    return true
+  }
+
+  private fun skipToPrevious(): Boolean {
+    CommandBus.send(Command.PreviousTrack)
+    return true
+  }
+
+  private fun updateQueueState() {
+    lifecycleScope.launch(Dispatchers.IO) {
+      val queueChannel = RequestBus.send(Request.GetQueue)
+      val indexChannel = RequestBus.send(Request.GetCurrentTrackIndex)
+
+      val queue = queueChannel.wait<Response.Queue>()?.queue ?: return@launch
+      val currentIndex = indexChannel.wait<Response.CurrentTrackIndex>()?.index ?: return@launch
+
+      val hasNext = currentIndex < queue.size - 1
+      val hasPrevious = currentIndex > 0
+
+      viewModel.hasNextTrack.postValue(hasNext)
+      viewModel.hasPreviousTrack.postValue(hasPrevious)
+      viewModel.nextTrackTitle.postValue(
+        if (hasNext) queue[currentIndex + 1].title else null
+      )
+      viewModel.previousTrackTitle.postValue(
+        if (hasPrevious) queue[currentIndex - 1].title else null
+      )
+    }
+  }
 
   private fun toggleRepeatMode() {
     val cachedRepeatMode = FFACache.getLine(requireContext(), "repeat").toIntOrElse(0)
@@ -132,7 +221,10 @@ class NowPlayingFragment: Fragment(R.layout.fragment_now_playing) {
   }
 
   private fun onCommand(command: Command) = when (command) {
-    is Command.RefreshTrack -> refreshCurrentTrack(command.track)
+    is Command.RefreshTrack -> {
+      refreshCurrentTrack(command.track)
+      updateQueueState()
+    }
     is Command.SetRepeatMode -> viewModel.repeatMode.postValue(command.mode)
     else -> {}
   }

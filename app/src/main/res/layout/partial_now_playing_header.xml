@@ -65,32 +65,41 @@
       app:layout_constraintTop_toBottomOf="@id/now_playing_progress"
       app:layout_constraintBottom_toBottomOf="@id/constraint_layout_placeholder"
       android:background="@color/elevatedSurface"
-      android:padding="4dp">
+      android:padding="4dp"
+      android:clipChildren="true">
 
-      <TextView
+      <FrameLayout
+        android:id="@+id/header_track_info"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/now_playing_toggle"
-        style="@style/AppTheme.ItemTitle"
-        android:text="@{currentTrackTitle}"
-        android:ellipsize="end"
-        android:lines="1"
-        tools:text="Supermassive Black Hole"
-      />
+        app:layout_constraintBottom_toBottomOf="parent">
 
-      <TextView
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/now_playing_toggle"
-        android:ellipsize="end"
-        android:lines="1"
-        android:text="@{currentTrackArtist}"
-        tools:text="Muse"
-      />
+        <TextView
+          android:id="@+id/header_track_title"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_gravity="top"
+          style="@style/AppTheme.ItemTitle"
+          android:text="@{currentTrackTitle}"
+          android:ellipsize="end"
+          android:lines="1"
+          tools:text="Supermassive Black Hole"
+        />
+
+        <TextView
+          android:id="@+id/header_track_artist"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_gravity="bottom"
+          android:ellipsize="end"
+          android:lines="1"
+          android:text="@{currentTrackArtist}"
+          tools:text="Muse"
+        />
+      </FrameLayout>
 
       <com.google.android.material.button.MaterialButton
         android:id="@+id/now_playing_toggle"
