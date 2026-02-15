@@ -67,30 +67,43 @@
       android:background="@color/elevatedSurface"
       android:padding="4dp">
 
-      <TextView
+      <!-- Container that clips track info so it never overlaps the buttons.
+           The individual TextViews inside are translated during a swipe
+           and clipped at this container's bounds. -->
+      <LinearLayout
+        android:id="@+id/track_info_container"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:clipChildren="true"
+        android:clipToPadding="true"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/now_playing_toggle"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/now_playing_toggle"
-        style="@style/AppTheme.ItemTitle"
-        android:text="@{currentTrackTitle}"
-        android:ellipsize="end"
-        android:lines="1"
-        tools:text="Supermassive Black Hole"
-      />
+        app:layout_constraintBottom_toBottomOf="parent">
 
-      <TextView
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/now_playing_toggle"
-        android:ellipsize="end"
-        android:lines="1"
-        android:text="@{currentTrackArtist}"
-        tools:text="Muse"
-      />
+        <TextView
+          android:id="@+id/now_playing_title"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          style="@style/AppTheme.ItemTitle"
+          android:text="@{currentTrackTitle}"
+          android:ellipsize="end"
+          android:lines="1"
+          tools:text="Supermassive Black Hole"
+        />
+
+        <TextView
+          android:id="@+id/now_playing_artist"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:ellipsize="end"
+          android:lines="1"
+          android:text="@{currentTrackArtist}"
+          tools:text="Muse"
+        />
+      </LinearLayout>
 
       <com.google.android.material.button.MaterialButton
         android:id="@+id/now_playing_toggle"

@@ -45,6 +45,12 @@ open class SwipeableSquareImageView : AppCompatImageView {
   private var initialY = 0f
   private var currentX = 0f
 
+  /** Additional views that should translate alongside this view during a swipe. */
+  private var additionalSwipeTargets: List<View> = emptyList()
+
+  /** Views that must stay visually static during a swipe (counter-translated). */
+  private var staticViews: List<View> = emptyList()
+
   constructor(context: Context) : super(context)
   constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
   constructor(context: Context, attrs: AttributeSet?, style: Int) : super(context, attrs, style)
@@ -61,6 +67,23 @@ open class SwipeableSquareImageView : AppCompatImageView {
     TAP,            // Looks like a tap (minimal movement)
     HORIZONTAL,     // Horizontal swipe detected
     VERTICAL        // Vertical movement detected
+  }
+
+  /**
+   * Set additional views that should be translated alongside this view during a swipe.
+   * This view always translates; these are extra views that move with it.
+   */
+  fun setAdditionalSwipeTargets(targets: List<View>) {
+    additionalSwipeTargets = targets
+  }
+
+  /**
+   * Set views that must remain visually static during a swipe.  These
+   * views will receive a counter-translation so they appear pinned in
+   * place while the rest of the content slides.
+   */
+  fun setStaticViews(views: List<View>) {
+    staticViews = views
   }
 
   override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -103,10 +126,7 @@ open class SwipeableSquareImageView : AppCompatImageView {
           
           // Apply live translation with diminishing returns
           val dampedTranslation = dampTranslation(diffX)
-          translationX = dampedTranslation
-          
-          // Apply subtle alpha change
-          alpha = 1f - (abs(dampedTranslation) / MAX_TRANSLATION) * 0.3f
+          applyTranslation(dampedTranslation)
           
           return true
         } else if (gestureState == GestureState.VERTICAL) {
@@ -165,7 +185,32 @@ open class SwipeableSquareImageView : AppCompatImageView {
     
     return super.onTouchEvent(event)
   }
-  
+
+  private fun applyTranslation(translation: Float) {
+    val alphaValue = 1f - (abs(translation) / MAX_TRANSLATION) * 0.3f
+    translationX = translation
+    alpha = alphaValue
+    for (target in additionalSwipeTargets) {
+      target.translationX = translation
+      target.alpha = alphaValue
+    }
+    for (view in staticViews) {
+      view.translationX = -translation
+    }
+  }
+
+  private fun resetTranslation() {
+    translationX = 0f
+    alpha = 1f
+    for (target in additionalSwipeTargets) {
+      target.translationX = 0f
+      target.alpha = 1f
+    }
+    for (view in staticViews) {
+      view.translationX = 0f
+    }
+  }
+
   private fun dampTranslation(translation: Float): Float {
     val absTranslation = abs(translation)
     val dampedAbs = if (absTranslation < SWIPE_THRESHOLD) {
@@ -183,13 +228,19 @@ open class SwipeableSquareImageView : AppCompatImageView {
     val animator = android.animation.ValueAnimator.ofFloat(translationX, targetTranslation)
     animator.duration = 200L
     animator.addUpdateListener { animation ->
-      translationX = animation.animatedValue as Float
-      alpha = kotlin.math.max(0f, 1f - abs(translationX) / width)
+      val value = animation.animatedValue as Float
+      val alphaValue = kotlin.math.max(0f, 1f - abs(value) / width)
+      translationX = value
+      alpha = alphaValue
+      for (target in additionalSwipeTargets) {
+        target.translationX = value
+        target.alpha = alphaValue
+      }
+      for (view in staticViews) {
+        view.translationX = -value
+      }
     }
-    animator.doOnEnd {
-      translationX = 0f
-      alpha = 1f
-    }
+    animator.doOnEnd { resetTranslation() }
     animator.start()
   }
 
@@ -197,13 +248,19 @@ open class SwipeableSquareImageView : AppCompatImageView {
     val animator = android.animation.ValueAnimator.ofFloat(translationX, 0f)
     animator.duration = 200L
     animator.addUpdateListener { animation ->
-      translationX = animation.animatedValue as Float
-      alpha = 1f - (abs(translationX) / MAX_TRANSLATION) * 0.3f
+      val value = animation.animatedValue as Float
+      val alphaValue = 1f - (abs(value) / MAX_TRANSLATION) * 0.3f
+      translationX = value
+      alpha = alphaValue
+      for (target in additionalSwipeTargets) {
+        target.translationX = value
+        target.alpha = alphaValue
+      }
+      for (view in staticViews) {
+        view.translationX = -value
+      }
     }
-    animator.doOnEnd {
-      translationX = 0f
-      alpha = 1f
-    }
+    animator.doOnEnd { resetTranslation() }
     animator.start()
   }
 

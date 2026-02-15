@@ -102,7 +102,13 @@ class NowPlayingFragment: Fragment(R.layout.fragment_now_playing) {
         CommandBus.send(Command.ToggleState)
       }
 
-      // Set up swipe gestures on the album cover
+      // Set up swipe gestures on the album cover.
+      // The cover translates itself; the header bar (headerControls)
+      // co-moves so the background, track info, and cover all slide
+      // as one visual unit.  The playback buttons are counter-translated
+      // so they appear to stay in place.
+      nowPlayingCover.setAdditionalSwipeTargets(listOf(headerControls))
+      nowPlayingCover.setStaticViews(listOf(nowPlayingToggle, nowPlayingNext))
       nowPlayingCover.setOnSwipeListener(object : SwipeableSquareImageView.OnSwipeListener {
         override fun onSwipeLeft() {
           CommandBus.send(Command.NextTrack)
@@ -113,7 +119,12 @@ class NowPlayingFragment: Fragment(R.layout.fragment_now_playing) {
         }
       })
 
-      // Set up swipe gestures on the header controls (playback bar)
+      // Set up swipe gestures on the header controls (playback bar).
+      // The layout translates itself (carrying its background and track
+      // info with it); the album cover co-moves.  The playback buttons
+      // are counter-translated so they stay visually static.
+      headerControls.setCoMovingViews(listOf(nowPlayingCover))
+      headerControls.setStaticViews(listOf(nowPlayingToggle, nowPlayingNext))
       headerControls.setOnSwipeListener(object : SwipeableConstraintLayout.OnSwipeListener {
         override fun onSwipeLeft() {
           CommandBus.send(Command.NextTrack)
