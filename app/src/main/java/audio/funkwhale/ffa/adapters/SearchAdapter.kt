@@ -363,11 +363,9 @@ class SearchAdapter(
         ResultType.Track.ordinal -> {
           val position = layoutPosition - artists.size - albums.size - sectionCount
 
-          tracks.subList(position, tracks.size).plus(tracks.subList(0, position)).apply {
-            CommandBus.send(Command.ReplaceQueue(this))
+          CommandBus.send(Command.ReplaceQueue(tracks, startIndex = position))
 
-            context.toast("All tracks were added to your queue")
-          }
+          context.toast("All tracks were added to your queue")
         }
 
         else -> {

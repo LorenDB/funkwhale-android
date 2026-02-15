@@ -59,7 +59,7 @@ class QueueManager(val context: Context) {
     )
   }
 
-  fun replace(tracks: List<Track>) {
+  fun replace(tracks: List<Track>, startIndex: Int = 0) {
     tracks.map { it.formatted }.log("Replacing queue with ${tracks.size} tracks")
     val factory = cacheDataSourceFactoryProvider.create(context)
     val sources = tracks.map { track ->
@@ -71,6 +71,7 @@ class QueueManager(val context: Context) {
     metadata = tracks.toMutableList()
     dataSources.clear()
     dataSources.addMediaSources(sources)
+    current = if (tracks.isEmpty()) -1 else startIndex.coerceIn(0, tracks.size - 1)
 
     persist()
 

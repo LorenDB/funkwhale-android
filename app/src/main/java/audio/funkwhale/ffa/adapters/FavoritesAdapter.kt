@@ -167,13 +167,8 @@ class FavoritesAdapter(
       when (fromQueue) {
         true -> CommandBus.send(Command.PlayTrack(layoutPosition))
         false -> {
-          data
-            .subList(layoutPosition, data.size).plus(data.subList(0, layoutPosition))
-            .map { it.track }
-            .apply {
-              CommandBus.send(Command.ReplaceQueue(this))
-              context.toast("All tracks were added to your queue")
-            }
+          CommandBus.send(Command.ReplaceQueue(data.map { it.track }, startIndex = layoutPosition))
+          context.toast("All tracks were added to your queue")
         }
       }
     }

@@ -189,10 +189,8 @@ class TracksAdapter(
       when (fromQueue) {
         true -> CommandBus.send(Command.PlayTrack(layoutPosition))
         false -> {
-          data.subList(layoutPosition, data.size).plus(data.subList(0, layoutPosition)).apply {
-            CommandBus.send(Command.ReplaceQueue(this))
-            context.toast("All tracks were added to your queue")
-          }
+          CommandBus.send(Command.ReplaceQueue(data, startIndex = layoutPosition))
+          context.toast("All tracks were added to your queue")
         }
       }
     }

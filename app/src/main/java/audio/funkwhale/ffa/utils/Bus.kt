@@ -27,7 +27,7 @@ sealed class Command {
   class AddToQueue(val tracks: List<Track>) : Command()
   class AddToPlaylist(val tracks: List<Track>) : Command()
   class PlayNext(val track: Track) : Command()
-  class ReplaceQueue(val queue: List<Track>, val fromRadio: Boolean = false) : Command()
+  class ReplaceQueue(val queue: List<Track>, val fromRadio: Boolean = false, val startIndex: Int = 0) : Command()
   class RemoveFromQueue(val track: Track) : Command()
   class MoveFromQueue(val oldPosition: Int, val newPosition: Int) : Command()
   object ClearQueue : Command()

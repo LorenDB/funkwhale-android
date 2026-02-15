@@ -187,9 +187,10 @@ class PlayerService : Service() {
         } else if (command is Command.ReplaceQueue) {
           if (!command.fromRadio) radioPlayer.stop()
 
-          queue.replace(command.queue)
+          queue.replace(command.queue, command.startIndex)
           player.setMediaSource(queue.dataSources)
           player.prepare()
+          player.seekTo(command.startIndex, C.TIME_UNSET)
 
           setPlaybackState(true)
 
