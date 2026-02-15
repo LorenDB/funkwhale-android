@@ -18,16 +18,15 @@ class SwipeableConstraintLayout @JvmOverloads constructor(
   private var swipeListener: OnSwipeListener? = null
   private val gestureDetector: GestureDetector
   private var isHorizontalSwipe = false
-  private var initialX = 0f
 
   init {
     gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
       private val SWIPE_THRESHOLD = 80
       private val SWIPE_VELOCITY_THRESHOLD = 80
+      private val HORIZONTAL_DETECTION_THRESHOLD = 30
 
       override fun onDown(e: MotionEvent): Boolean {
         isHorizontalSwipe = false
-        initialX = e.x
         return true
       }
 
@@ -41,7 +40,7 @@ class SwipeableConstraintLayout @JvmOverloads constructor(
         val diffY = abs(e2.y - e1.y)
         
         // Detect if this is a horizontal swipe early
-        if (diffX > diffY && diffX > 30) {
+        if (diffX > diffY && diffX > HORIZONTAL_DETECTION_THRESHOLD) {
           isHorizontalSwipe = true
         }
         
@@ -77,13 +76,17 @@ class SwipeableConstraintLayout @JvmOverloads constructor(
   }
 
   private fun animateSwipe(isRight: Boolean) {
-    val targetTranslation = if (isRight) 100f else -100f
+    val animationTranslation = 100f
+    val animationDuration = 300L
+    val animationAlphaDivisor = 200f
+    
+    val targetTranslation = if (isRight) animationTranslation else -animationTranslation
     
     val animator = ValueAnimator.ofFloat(0f, targetTranslation, 0f)
-    animator.duration = 300
+    animator.duration = animationDuration
     animator.addUpdateListener { animation ->
       translationX = animation.animatedValue as Float
-      alpha = 1f - abs(animation.animatedValue as Float) / 200f
+      alpha = 1f - abs(animation.animatedValue as Float) / animationAlphaDivisor
     }
     animator.doOnEnd {
       translationX = 0f
