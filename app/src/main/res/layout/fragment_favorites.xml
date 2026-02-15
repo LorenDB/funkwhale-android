@@ -43,7 +43,7 @@
             android:id="@+id/filter_tracks"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/favorites_title"
+            android:layout_below="@id/title_container"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
@@ -51,52 +51,51 @@
             android:inputType="text"
             android:hint="@string/filters" />
 
-        <TextView
-          style="@style/AppTheme.Title"
-            android:id="@+id/favorites_title"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_marginStart="16dp"
-          android:layout_marginTop="64dp"
-          android:layout_marginEnd="16dp"
-          android:layout_marginBottom="6dp"
-          android:text="@string/favorites" />
-
         <LinearLayout
+          android:id="@+id/title_container"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:gravity="center_vertical"
+          android:orientation="horizontal">
+
+          <TextView
+            style="@style/AppTheme.Title"
+            android:id="@+id/favorites_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="64dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="6dp"
+            android:text="@string/favorites" />
+
+          <ImageButton
+            android:id="@+id/actions"
+            style="@style/IconButton"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="64dp"
+            android:layout_marginEnd="16dp"
+            android:contentDescription="@string/alt_more_options"
+            android:src="@drawable/more" />
+
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+          android:id="@+id/play"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_centerHorizontal="true"
           android:layout_marginTop="8dp"
-          android:orientation="horizontal">
-
-          <com.google.android.material.button.MaterialButton
-            android:id="@+id/play"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:backgroundTint="@color/colorPrimary"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="8dp"
-            android:text="@string/playback_shuffle"
-            android:textColor="@android:color/white"
-            app:icon="@drawable/play"
-            app:iconTint="@android:color/white"
-            app:rippleColor="@color/ripple" />
-
-          <com.google.android.material.button.MaterialButton
-            android:id="@+id/download_all"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/colorPrimary"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="8dp"
-            android:text="@string/playback_queue_download"
-            android:textColor="@android:color/white"
-            app:icon="@drawable/downloads"
-            app:iconTint="@android:color/white"
-            app:rippleColor="@color/ripple" />
-
-        </LinearLayout>
+          android:backgroundTint="@color/colorPrimary"
+          android:paddingHorizontal="16dp"
+          android:paddingVertical="8dp"
+          android:text="@string/playback_shuffle"
+          android:textColor="@android:color/white"
+          app:icon="@drawable/play"
+          app:iconTint="@android:color/white"
+          app:rippleColor="@color/ripple" />
 
       </RelativeLayout>
 

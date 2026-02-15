@@ -3,11 +3,14 @@ package audio.funkwhale.ffa.fragments
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
+import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.adapters.FavoriteListener
 import audio.funkwhale.ffa.adapters.FavoritesAdapter
 import audio.funkwhale.ffa.databinding.FragmentFavoritesBinding
@@ -23,6 +26,7 @@ import audio.funkwhale.ffa.utils.Request
 import audio.funkwhale.ffa.utils.RequestBus
 import audio.funkwhale.ffa.utils.Response
 import audio.funkwhale.ffa.utils.getMetadata
+import audio.funkwhale.ffa.utils.toast
 import audio.funkwhale.ffa.utils.wait
 import com.google.android.exoplayer2.offline.Download
 import com.google.android.exoplayer2.offline.DownloadManager
@@ -97,8 +101,37 @@ class FavoritesFragment : FFAFragment<Favorite, FavoritesAdapter>() {
       CommandBus.send(Command.ReplaceQueue(adapter.data.map { it.track }.shuffled()))
     }
 
-    binding.downloadAll.setOnClickListener {
-      CommandBus.send(Command.PinTracks(adapter.data.map { it.track }))
+    context?.let { context ->
+      binding.actions.setOnClickListener {
+        PopupMenu(
+          context,
+          binding.actions,
+          Gravity.START,
+          R.attr.actionOverflowMenuStyle,
+          0
+        ).apply {
+          inflate(R.menu.album)
+
+          setOnMenuItemClickListener {
+            when (it.itemId) {
+              R.id.play_secondary -> CommandBus.send(
+                Command.ReplaceQueue(adapter.data.map { it.track })
+              )
+
+              R.id.add_to_queue -> {
+                CommandBus.send(Command.AddToQueue(adapter.data.map { it.track }))
+                context.toast("All tracks were added to your queue")
+              }
+
+              R.id.download -> CommandBus.send(Command.PinTracks(adapter.data.map { it.track }))
+            }
+
+            true
+          }
+
+          show()
+        }
+      }
     }
   }
 
