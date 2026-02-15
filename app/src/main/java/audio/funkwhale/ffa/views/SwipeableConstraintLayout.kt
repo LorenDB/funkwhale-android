@@ -106,10 +106,12 @@ class SwipeableConstraintLayout @JvmOverloads constructor(
   override fun onTouchEvent(event: MotionEvent): Boolean {
     when (event.action) {
       MotionEvent.ACTION_DOWN -> {
-        initialX = event.x
-        initialY = event.y
-        currentX = event.x
-        gestureState = GestureState.NONE
+        // Only reset if we haven't already determined gesture state in onInterceptTouchEvent
+        if (gestureState == GestureState.NONE) {
+          initialX = event.x
+          initialY = event.y
+          currentX = event.x
+        }
         return true
       }
       MotionEvent.ACTION_MOVE -> {
@@ -139,7 +141,14 @@ class SwipeableConstraintLayout @JvmOverloads constructor(
                 parent?.requestDisallowInterceptTouchEvent(true)
                 GestureState.HORIZONTAL
               }
-              else -> GestureState.VERTICAL
+              diffY > diffX * 1.5f -> {
+                // Vertical movement dominant
+                GestureState.VERTICAL
+              }
+              else -> {
+                // Movement is diagonal or unclear - keep NONE and wait
+                GestureState.NONE
+              }
             }
             
             if (gestureState == GestureState.HORIZONTAL) {
