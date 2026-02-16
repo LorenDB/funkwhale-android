@@ -28,6 +28,20 @@ class QueueManager(val context: Context) {
   val dataSources = ConcatenatingMediaSource()
   var current = -1
 
+  private fun getMimeType(url: String): String? {
+    val lowerUrl = url.lowercase()
+    return when {
+      lowerUrl.contains("to=mp3") || lowerUrl.contains(".mp3") -> "audio/mpeg"
+      lowerUrl.contains(".ogg") -> "audio/ogg"
+      lowerUrl.contains(".flac") -> "audio/flac"
+      lowerUrl.contains(".opus") -> "audio/opus"
+      lowerUrl.contains(".m4a") -> "audio/mp4"
+      lowerUrl.contains(".aac") -> "audio/aac"
+      lowerUrl.contains(".wav") -> "audio/wav"
+      else -> null
+    }
+  }
+
   init {
     FFACache.getLine(context, "queue")?.let { json ->
       gsonDeserializerOf(QueueCache::class.java).deserialize(json.reader())?.let { cache ->
@@ -39,7 +53,9 @@ class QueueManager(val context: Context) {
           metadata.map { track ->
             val url = mustNormalizeUrl(track.bestUpload()?.listen_url ?: "")
 
-            val mediaItem = MediaItem.fromUri(Uri.parse(url)).buildUpon().setTag(track.title).build()
+            val mediaItem = MediaItem.fromUri(Uri.parse(url)).buildUpon().setTag(track.title).apply {
+              getMimeType(url)?.let { setMimeType(it) }
+            }.build()
             ProgressiveMediaSource.Factory(factory).createMediaSource(mediaItem)
           }
         )
@@ -64,7 +80,9 @@ class QueueManager(val context: Context) {
     val factory = cacheDataSourceFactoryProvider.create(context)
     val sources = tracks.map { track ->
       val url = mustNormalizeUrl(track.bestUpload()?.listen_url ?: "")
-      val mediaItem = MediaItem.fromUri(Uri.parse(url)).buildUpon().setTag(track.title).build()
+      val mediaItem = MediaItem.fromUri(Uri.parse(url)).buildUpon().setTag(track.title).apply {
+        getMimeType(url)?.let { setMimeType(it) }
+      }.build()
       ProgressiveMediaSource.Factory(factory).createMediaSource(mediaItem)
     }
 
@@ -86,7 +104,9 @@ class QueueManager(val context: Context) {
     val sources = missingTracks.map { track ->
       val url = mustNormalizeUrl(track.bestUpload()?.listen_url ?: "")
 
-      val mediaItem = MediaItem.fromUri(Uri.parse(url)).buildUpon().setTag(track.title).build()
+      val mediaItem = MediaItem.fromUri(Uri.parse(url)).buildUpon().setTag(track.title).apply {
+        getMimeType(url)?.let { setMimeType(it) }
+      }.build()
       ProgressiveMediaSource.Factory(factory).createMediaSource(mediaItem)
     }
 
@@ -104,7 +124,9 @@ class QueueManager(val context: Context) {
     val url = mustNormalizeUrl(track.bestUpload()?.listen_url ?: "")
 
     if (metadata.indexOf(track) == -1) {
-      val mediaItem = MediaItem.fromUri(Uri.parse(url)).buildUpon().setTag(track.title).build()
+      val mediaItem = MediaItem.fromUri(Uri.parse(url)).buildUpon().setTag(track.title).apply {
+        getMimeType(url)?.let { setMimeType(it) }
+      }.build()
       ProgressiveMediaSource.Factory(factory).createMediaSource(mediaItem).let {
         dataSources.addMediaSource(current + 1, it)
         metadata.add(current + 1, track)

@@ -2,17 +2,13 @@ package audio.funkwhale.ffa.playback
 
 import android.annotation.SuppressLint
 import android.app.Service
-import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.media.AudioAttributes
-import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.media.MediaMetadata
 import android.os.Build
 import android.os.IBinder
 import android.support.v4.media.MediaMetadataCompat
-import android.util.Log
 import android.view.KeyEvent
 import androidx.core.app.NotificationManagerCompat
 import androidx.media.session.MediaButtonReceiver
@@ -60,11 +56,6 @@ class PlayerService : Service() {
   private var started = false
   private val scope: CoroutineScope = CoroutineScope(Job() + Main)
 
-  private lateinit var audioManager: AudioManager
-  private var audioFocusRequest: AudioFocusRequest? = null
-  private val audioFocusChangeListener = AudioFocusChange()
-  private var stateWhenLostFocus = false
-
   private lateinit var queue: QueueManager
   private lateinit var mediaControlsManager: MediaControlsManager
   private lateinit var player: ExoPlayer
@@ -81,17 +72,8 @@ class PlayerService : Service() {
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
     intent?.action?.let {
       if (it == Intent.ACTION_MEDIA_BUTTON) {
-        intent.extras?.getParcelable<KeyEvent>(Intent.EXTRA_KEY_EVENT)?.let { key ->
-          when (key.keyCode) {
-            KeyEvent.KEYCODE_MEDIA_PLAY, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> {
-              if (hasAudioFocus(true)) MediaButtonReceiver.handleIntent(
-                mediaSession.session,
-                intent
-              )
-              Unit
-            }
-            else -> MediaButtonReceiver.handleIntent(mediaSession.session, intent)
-          }
+        intent.extras?.getParcelable<KeyEvent>(Intent.EXTRA_KEY_EVENT)?.let {
+          MediaButtonReceiver.handleIntent(mediaSession.session, intent)
         }
       }
     }
@@ -105,32 +87,11 @@ class PlayerService : Service() {
     return START_STICKY
   }
 
-  @SuppressLint("NewApi")
   override fun onCreate() {
     super.onCreate()
 
     queue = QueueManager(this)
     radioPlayer = RadioPlayer(this, scope)
-
-    audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-
-    Build.VERSION_CODES.O.onApi {
-      audioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN).run {
-        setAudioAttributes(
-          AudioAttributes.Builder().run {
-            setUsage(AudioAttributes.USAGE_MEDIA)
-            setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-
-            setAcceptsDelayedFocusGain(true)
-            setOnAudioFocusChangeListener(audioFocusChangeListener)
-
-            build()
-          }
-        )
-
-        build()
-      }
-    }
 
     mediaControlsManager = MediaControlsManager(this, scope, mediaSession.session)
 
@@ -140,7 +101,7 @@ class PlayerService : Service() {
           .setUsage(C.USAGE_MEDIA)
           .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
           .build(),
-        !FFAMediaLibraryService.isAndroidAuto  // For Android Auto, let ExoPlayer handle audio focus
+        true  // Let ExoPlayer handle audio focus for all cases
       )
       playWhenReady = false
       volume = 1f
@@ -290,27 +251,12 @@ class PlayerService : Service() {
     }
   }
 
-  @SuppressLint("NewApi")
   override fun onDestroy() {
     scope.cancel()
 
     try {
       unregisterReceiver(headphonesUnpluggedReceiver)
     } catch (_: Exception) {
-    }
-
-    if (!FFAMediaLibraryService.isAndroidAuto) {
-      Build.VERSION_CODES.O.onApi(
-        {
-          audioFocusRequest?.let {
-            audioManager.abandonAudioFocusRequest(it)
-          }
-        },
-        {
-          @Suppress("DEPRECATION")
-          audioManager.abandonAudioFocus(audioFocusChangeListener)
-        }
-      )
     }
 
     player.removeListener(playerEventListener)
@@ -334,11 +280,9 @@ class PlayerService : Service() {
       player.prepare()
     }
 
-    if (hasAudioFocus(state)) {
-      player.playWhenReady = state
+    player.playWhenReady = state
 
-      EventBus.send(Event.StateChanged(state))
-    }
+    EventBus.send(Event.StateChanged(state))
   }
 
   private fun togglePlayback() {
@@ -406,42 +350,6 @@ class PlayerService : Service() {
     }
 
     return mediaMetadataBuilder.build()
-  }
-
-  @SuppressLint("NewApi")
-  private fun hasAudioFocus(state: Boolean): Boolean {
-    if (FFAMediaLibraryService.isAndroidAuto) return true  // ExoPlayer handles audio focus for Android Auto
-
-    var allowed = !state
-
-    if (!allowed) {
-      Build.VERSION_CODES.O.onApi(
-        {
-          audioFocusRequest?.let {
-            allowed = when (audioManager.requestAudioFocus(it)) {
-              AudioManager.AUDIOFOCUS_REQUEST_GRANTED -> true
-              else -> false
-            }
-          }
-        },
-        {
-
-          @Suppress("DEPRECATION")
-          audioManager.requestAudioFocus(
-            audioFocusChangeListener,
-            AudioAttributes.CONTENT_TYPE_MUSIC,
-            AudioManager.AUDIOFOCUS_GAIN
-          ).let {
-            allowed = when (it) {
-              AudioManager.AUDIOFOCUS_REQUEST_GRANTED -> true
-              else -> false
-            }
-          }
-        }
-      )
-    }
-
-    return allowed
   }
 
   private fun skipBackwardsAfterPause(): Int {
@@ -561,34 +469,6 @@ class PlayerService : Service() {
         player.prepare()
 
         CommandBus.send(Command.RefreshTrack(queue.current()))
-      }
-    }
-  }
-
-  inner class AudioFocusChange : AudioManager.OnAudioFocusChangeListener {
-    override fun onAudioFocusChange(focus: Int) {
-      when (focus) {
-        AudioManager.AUDIOFOCUS_GAIN -> {
-          player.volume = 1f
-
-          setPlaybackState(stateWhenLostFocus)
-          stateWhenLostFocus = false
-        }
-
-        AudioManager.AUDIOFOCUS_LOSS -> {
-          stateWhenLostFocus = false
-          setPlaybackState(false)
-        }
-
-        AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
-          stateWhenLostFocus = player.playWhenReady
-          setPlaybackState(false)
-        }
-
-        AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> {
-          stateWhenLostFocus = player.playWhenReady
-          player.volume = 0.3f
-        }
       }
     }
   }
