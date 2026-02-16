@@ -68,7 +68,7 @@ class TracksFragment : FFAFragment<Track, TracksAdapter>() {
   override fun onDataFetched(data: List<Track>) {
 
     when {
-      data.all { it.downloaded } -> {
+      data.isNotEmpty() && data.all { it.downloaded } -> {
         binding.title.setCompoundDrawablesWithIntrinsicBounds(R.drawable.downloaded, 0, 0, 0)
         binding.title.compoundDrawables.forEach {
           it?.colorFilter =
@@ -78,7 +78,7 @@ class TracksFragment : FFAFragment<Track, TracksAdapter>() {
             )
         }
       }
-      data.all { it.cached } -> {
+      data.isNotEmpty() && data.all { it.cached } -> {
         binding.title.setCompoundDrawablesWithIntrinsicBounds(R.drawable.downloaded, 0, 0, 0)
         binding.title.compoundDrawables.forEach {
           it?.colorFilter =
