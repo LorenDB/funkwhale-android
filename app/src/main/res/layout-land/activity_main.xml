@@ -44,7 +44,7 @@
       android:layout_height="match_parent"
       android:background="@color/elevatedSurface"
       app:cardElevation="8dp"
-      app:target_header="@id/constraint_layout_placeholder">
+      app:target_header="@id/header_controls">
       <androidx.fragment.app.FragmentContainerView
         android:id="@+id/now_playing"
         android:name="audio.funkwhale.ffa.fragments.NowPlayingFragment"

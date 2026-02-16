@@ -35,6 +35,8 @@ import audio.funkwhale.ffa.utils.maybeNormalizeUrl
 import audio.funkwhale.ffa.utils.toIntOrElse
 import audio.funkwhale.ffa.utils.untilNetwork
 import audio.funkwhale.ffa.viewmodel.NowPlayingViewModel
+import audio.funkwhale.ffa.views.SwipeableConstraintLayout
+import audio.funkwhale.ffa.views.SwipeableSquareImageView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.Float.max
@@ -99,6 +101,39 @@ class NowPlayingFragment: Fragment(R.layout.fragment_now_playing) {
       nowPlayingToggle.setOnClickListener {
         CommandBus.send(Command.ToggleState)
       }
+
+      // Set up swipe gestures on the album cover.
+      // The cover translates itself; the header bar (headerControls)
+      // co-moves so the background, track info, and cover all slide
+      // as one visual unit.  The playback buttons are counter-translated
+      // so they appear to stay in place.
+      nowPlayingCover.setAdditionalSwipeTargets(listOf(headerControls))
+      nowPlayingCover.setStaticViews(listOf(nowPlayingToggle, nowPlayingNext))
+      nowPlayingCover.setOnSwipeListener(object : SwipeableSquareImageView.OnSwipeListener {
+        override fun onSwipeLeft() {
+          CommandBus.send(Command.NextTrack)
+        }
+
+        override fun onSwipeRight() {
+          CommandBus.send(Command.PreviousTrack)
+        }
+      })
+
+      // Set up swipe gestures on the header controls (playback bar).
+      // The layout translates itself (carrying its background and track
+      // info with it); the album cover co-moves.  The playback buttons
+      // are counter-translated so they stay visually static.
+      headerControls.setCoMovingViews(listOf(nowPlayingCover))
+      headerControls.setStaticViews(listOf(nowPlayingToggle, nowPlayingNext))
+      headerControls.setOnSwipeListener(object : SwipeableConstraintLayout.OnSwipeListener {
+        override fun onSwipeLeft() {
+          CommandBus.send(Command.NextTrack)
+        }
+
+        override fun onSwipeRight() {
+          CommandBus.send(Command.PreviousTrack)
+        }
+      })
     }
 
     lifecycleScope.launch(Dispatchers.Main) {
