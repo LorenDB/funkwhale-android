@@ -45,6 +45,7 @@ class AlbumsAdapter(
 
     CoverArt.requestCreator(album.cover())
       .fit()
+      .centerCrop()
       .transform(RoundedCornersTransformation(8, 0))
       .into(holder.art)
 

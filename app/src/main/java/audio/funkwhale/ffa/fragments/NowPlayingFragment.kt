@@ -40,6 +40,10 @@ import audio.funkwhale.ffa.views.SwipeableSquareImageView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.Float.max
+import audio.funkwhale.ffa.views.SwipeableConstraintLayout
+import audio.funkwhale.ffa.views.SwipeableSquareImageView
+import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
+import kotlin.math.max
 
 class NowPlayingFragment: Fragment(R.layout.fragment_now_playing) {
   private val binding by lazy { FragmentNowPlayingBinding.bind(requireView()) }
@@ -206,6 +210,9 @@ class NowPlayingFragment: Fragment(R.layout.fragment_now_playing) {
     }
 
     CoverArt.requestCreator(maybeNormalizeUrl(track.album?.cover()))
+      .fit()
+      .centerCrop()
+      .transform(RoundedCornersTransformation(16, 0))
       .into(binding.header.nowPlayingCover)
   }
 

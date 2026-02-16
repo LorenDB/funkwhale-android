@@ -72,6 +72,7 @@ class TracksAdapter(
 
     CoverArt.requestCreator(maybeNormalizeUrl(track.cover()))
       .fit()
+      .centerCrop()
       .transform(RoundedCornersTransformation(8, 0))
       .into(holder.cover)
 

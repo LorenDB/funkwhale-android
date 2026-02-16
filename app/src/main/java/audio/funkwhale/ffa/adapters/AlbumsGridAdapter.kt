@@ -41,6 +41,7 @@ class AlbumsGridAdapter(
 
     CoverArt.requestCreator(maybeNormalizeUrl(album.cover()))
       .fit()
+      .centerCrop()
       .transform(RoundedCornersTransformation(16, 0))
       .into(holder.cover)
 

@@ -73,6 +73,7 @@ class PlaylistTracksAdapter(
 
     CoverArt.requestCreator(maybeNormalizeUrl(playlistTrack.track.cover()))
       .fit()
+      .centerCrop()
       .transform(RoundedCornersTransformation(16, 0))
       .into(holder.cover)
 
