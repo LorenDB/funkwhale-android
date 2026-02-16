@@ -140,7 +140,7 @@ class PlayerService : Service() {
           .setUsage(C.USAGE_MEDIA)
           .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
           .build(),
-        true  // handleAudioFocus
+        false  // handleAudioFocus - let PlayerService manage audio focus manually
       )
       playWhenReady = false
       volume = 1f
