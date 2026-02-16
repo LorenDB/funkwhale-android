@@ -140,7 +140,7 @@ class PlayerService : Service() {
           .setUsage(C.USAGE_MEDIA)
           .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
           .build(),
-        false  // handleAudioFocus - let PlayerService manage audio focus manually
+        !FFAMediaLibraryService.isAndroidAuto  // For Android Auto, let ExoPlayer handle audio focus
       )
       playWhenReady = false
       volume = 1f
@@ -299,17 +299,19 @@ class PlayerService : Service() {
     } catch (_: Exception) {
     }
 
-    Build.VERSION_CODES.O.onApi(
-      {
-        audioFocusRequest?.let {
-          audioManager.abandonAudioFocusRequest(it)
+    if (!FFAMediaLibraryService.isAndroidAuto) {
+      Build.VERSION_CODES.O.onApi(
+        {
+          audioFocusRequest?.let {
+            audioManager.abandonAudioFocusRequest(it)
+          }
+        },
+        {
+          @Suppress("DEPRECATION")
+          audioManager.abandonAudioFocus(audioFocusChangeListener)
         }
-      },
-      {
-        @Suppress("DEPRECATION")
-        audioManager.abandonAudioFocus(audioFocusChangeListener)
-      }
-    )
+      )
+    }
 
     player.removeListener(playerEventListener)
     setPlaybackState(false)
@@ -408,6 +410,8 @@ class PlayerService : Service() {
 
   @SuppressLint("NewApi")
   private fun hasAudioFocus(state: Boolean): Boolean {
+    if (FFAMediaLibraryService.isAndroidAuto) return true  // ExoPlayer handles audio focus for Android Auto
+
     var allowed = !state
 
     if (!allowed) {

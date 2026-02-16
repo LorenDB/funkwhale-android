@@ -43,6 +43,8 @@ class FFAMediaLibraryService : MediaBrowserServiceCompat() {
   private val scope = CoroutineScope(Job() + Main)
 
   companion object {
+    var isAndroidAuto = false
+
     const val ROOT_ID = "root"
     const val ARTISTS_ID = "artists"
     const val ALBUMS_ID = "albums"
@@ -63,6 +65,7 @@ class FFAMediaLibraryService : MediaBrowserServiceCompat() {
   }
 
   override fun onGetRoot(clientPackageName: String, clientUid: Int, rootHints: Bundle?): BrowserRoot? {
+    isAndroidAuto = clientPackageName.contains("google") || clientPackageName.contains("gearhead") || clientPackageName.contains("car")
     return BrowserRoot(ROOT_ID, null)
   }
 
