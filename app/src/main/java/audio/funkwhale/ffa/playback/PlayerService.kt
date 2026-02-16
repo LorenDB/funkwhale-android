@@ -38,6 +38,7 @@ import com.google.android.exoplayer2.IllegalSeekPositionException
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.Tracks
+import com.google.android.exoplayer2.audio.AudioAttributes as ExoAudioAttributes
 import com.preference.PowerPreference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -134,7 +135,15 @@ class PlayerService : Service() {
     mediaControlsManager = MediaControlsManager(this, scope, mediaSession.session)
 
     player = ExoPlayer.Builder(this).build().apply {
+      setAudioAttributes(
+        ExoAudioAttributes.Builder()
+          .setUsage(C.USAGE_MEDIA)
+          .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
+          .build(),
+        false  // handleAudioFocus - let PlayerService manage audio focus manually
+      )
       playWhenReady = false
+      volume = 1f
 
       playerEventListener = PlayerEventListener().also {
         addListener(it)
