@@ -191,6 +191,7 @@ class SearchAdapter(
 
     CoverArt.requestCreator(maybeNormalizeUrl(item.cover()))
       .fit()
+      .centerCrop()
       .transform(RoundedCornersTransformation(16, 0))
       .into(rowTrackViewHolder?.cover)
 

@@ -71,6 +71,7 @@ class FavoritesAdapter(
 
     CoverArt.requestCreator(maybeNormalizeUrl(track.cover()))
       .fit()
+      .centerCrop()
       .transform(RoundedCornersTransformation(16, 0))
       .into(holder.cover)
 
