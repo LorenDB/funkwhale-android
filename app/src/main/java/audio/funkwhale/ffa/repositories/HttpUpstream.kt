@@ -48,6 +48,12 @@ class HttpUpstream<D : Any, R : FFAResponse<D>>(
 
       val page = ceil(size / AppContext.PAGE_SIZE.toDouble()).toInt() + 1
 
+      fetchPage(page, size).collect { emit(it) }
+    }
+  }.flowOn(IO)
+
+  private fun fetchPage(page: Int, size: Int): Flow<Repository.Response<D>> = flow {
+    context?.let {
       val url = Uri.parse(url)
         .buildUpon()
         .appendQueryParameter("page_size", AppContext.PAGE_SIZE.toString())
@@ -65,7 +71,7 @@ class HttpUpstream<D : Any, R : FFAResponse<D>>(
             Behavior.Progressive -> emit(networkResponse(data, page, response.next != null))
             else -> {
               emit(networkResponse(data, page, response.next != null))
-              if (response.next != null) fetch(size + data.size).collect { emit(it) }
+              if (response.next != null) fetchPage(page + 1, size + data.size).collect { emit(it) }
             }
           }
         },
@@ -77,7 +83,7 @@ class HttpUpstream<D : Any, R : FFAResponse<D>>(
         }
       )
     }
-  }.flowOn(IO)
+  }
 
   private fun networkResponse(data: List<D>, page: Int, hasMore: Boolean) = Repository.Response(
     Repository.Origin.Network,
