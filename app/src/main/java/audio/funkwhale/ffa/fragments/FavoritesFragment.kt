@@ -6,8 +6,10 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
+import audio.funkwhale.ffa.R
 import audio.funkwhale.ffa.adapters.FavoriteListener
 import audio.funkwhale.ffa.adapters.FavoritesAdapter
 import audio.funkwhale.ffa.databinding.FragmentFavoritesBinding
@@ -70,6 +72,23 @@ class FavoritesFragment : FFAFragment<Favorite, FavoritesAdapter>() {
         adapter.filter = s.toString()
       }
     })
+
+    binding.favoritesMenu.setOnClickListener { view ->
+      PopupMenu(requireContext(), view).apply {
+        inflate(R.menu.favorites)
+        setOnMenuItemClickListener { item ->
+          when (item.itemId) {
+            R.id.download_all -> {
+              CommandBus.send(Command.PinTracks(adapter.data.map { it.track }))
+              true
+            }
+            else -> false
+          }
+        }
+        show()
+      }
+    }
+
     return binding.root
   }
 
