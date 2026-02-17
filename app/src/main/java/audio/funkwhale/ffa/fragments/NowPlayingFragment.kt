@@ -294,7 +294,7 @@ class NowPlayingFragment: Fragment(R.layout.fragment_now_playing) {
               val gradient = GradientDrawable().apply {
                 gradientType = GradientDrawable.RADIAL_GRADIENT
                 // Use the view height to scale the radius relative to the screen
-                gradientRadius = (binding.nowPlayingRoot.height * 0.6f)
+                gradientRadius = (binding.nowPlayingRoot.height * 0.7f)
                 colors = intArrayOf(
                   blendedVibrant,
                   blendedMuted,
@@ -306,7 +306,7 @@ class NowPlayingFragment: Fragment(R.layout.fragment_now_playing) {
               binding.nowPlayingRoot.background = gradient
               
               // Set max radius (no longer needed for dynamic scaling)
-              maxGradientRadius = binding.nowPlayingRoot.height * 0.6f
+              maxGradientRadius = binding.nowPlayingRoot.height * 0.7f
             }
           }
         }
