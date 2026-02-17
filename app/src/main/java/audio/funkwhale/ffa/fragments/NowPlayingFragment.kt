@@ -53,6 +53,9 @@ class NowPlayingFragment: Fragment(R.layout.fragment_now_playing) {
 
   private var onDetailsMenuItemClickedCb: () -> Unit = {}
   private var maxGradientRadius = 0f
+  private var isExpanded = false
+  private var isTransitioning = false
+  private var currentAlbumArtUrl: String? = null
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     binding.lifecycleOwner = viewLifecycleOwner
@@ -153,6 +156,21 @@ class NowPlayingFragment: Fragment(R.layout.fragment_now_playing) {
   fun onBottomSheetDrag(value: Float) {
     binding.nowPlayingRoot.progress = max(value, 0f)
     
+    // Track transition state and load high-res when starting to expand
+    val wasTransitioning = isTransitioning
+    val wasExpanded = isExpanded
+    isTransitioning = value > 0f && value < 1f
+    isExpanded = value >= 0.9f
+    
+    // Load high-res album art when starting to expand or when fully expanded
+    if ((isTransitioning && !wasTransitioning && value > 0f) || (isExpanded && !wasExpanded)) {
+      loadAlbumArtHighRes()
+    }
+    // Load low-res when fully collapsed and not transitioning
+    else if (value == 0f && wasTransitioning) {
+      loadAlbumArtLowRes()
+    }
+    
     // Update gradient radius and center based on progress to follow the album cover
     binding.nowPlayingRoot.background?.let { bg ->
       if (bg is GradientDrawable) {
@@ -236,15 +254,19 @@ class NowPlayingFragment: Fragment(R.layout.fragment_now_playing) {
     if (track == null) {
       binding.header.nowPlayingCover.setImageResource(R.drawable.cover)
       binding.nowPlayingRoot.background = null
+      currentAlbumArtUrl = null
       return
     }
 
     val url = maybeNormalizeUrl(track.album?.cover())
-    CoverArt.requestCreator(url)
-      .fit()
-      .centerCrop()
-      .transform(RoundedCornersTransformation(32, 0))
-      .into(binding.header.nowPlayingCover)
+    currentAlbumArtUrl = url
+    
+    // Load appropriate resolution based on current state
+    if (isExpanded || isTransitioning) {
+      loadAlbumArtHighRes()
+    } else {
+      loadAlbumArtLowRes()
+    }
 
     // Extract palette colors and apply a radial gradient to the root layout
     lifecycleScope.launch(Dispatchers.IO) {
@@ -331,6 +353,26 @@ class NowPlayingFragment: Fragment(R.layout.fragment_now_playing) {
 
       show()
     }
+  }
+
+  private fun loadAlbumArtHighRes() {
+    val url = currentAlbumArtUrl ?: return
+    CoverArt.requestCreatorNoPlaceholder(url)
+      .resize(1200, 1200)
+      .centerCrop()
+      .onlyScaleDown()
+      .transform(RoundedCornersTransformation(32, 0))
+      .into(binding.header.nowPlayingCover)
+  }
+
+  private fun loadAlbumArtLowRes() {
+    val url = currentAlbumArtUrl ?: return
+    CoverArt.requestCreatorNoPlaceholder(url)
+      .resize(300, 300)
+      .centerCrop()
+      .onlyScaleDown()
+      .transform(RoundedCornersTransformation(32, 0))
+      .into(binding.header.nowPlayingCover)
   }
 
   private fun refreshCurrentTrack(track: Track?) {

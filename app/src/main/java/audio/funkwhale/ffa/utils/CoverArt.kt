@@ -262,5 +262,15 @@ open class CoverArt private constructor() {
       else request.placeholder(CircularProgressDrawable(FFA.get()))
       return request.error(R.drawable.cover)
     }
+
+    /**
+     * Like [requestCreator] but without a placeholder, so the ImageView
+     * keeps displaying whatever it already has until the new image is ready.
+     */
+    fun requestCreatorNoPlaceholder(url: String?): RequestCreator {
+      return picasso.load(url)
+        .noPlaceholder()
+        .error(R.drawable.cover)
+    }
   }
 }
