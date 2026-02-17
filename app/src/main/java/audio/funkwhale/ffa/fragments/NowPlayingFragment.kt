@@ -171,10 +171,10 @@ class NowPlayingFragment: Fragment(R.layout.fragment_now_playing) {
       loadAlbumArtLowRes()
     }
     
-    // Update gradient radius and center based on progress to follow the album cover
+    // Update gradient alpha based on progress to fade it out
     binding.nowPlayingRoot.background?.let { bg ->
       if (bg is GradientDrawable) {
-        bg.gradientRadius = binding.nowPlayingRoot.progress * maxGradientRadius
+        bg.alpha = (binding.nowPlayingRoot.progress * 255).toInt()
         
         // Get the album cover's current position to anchor the gradient
         val cover = binding.header.nowPlayingCover
@@ -301,12 +301,12 @@ class NowPlayingFragment: Fragment(R.layout.fragment_now_playing) {
                   surfaceColor
                 )
                 setGradientCenter(0.5f, 0.35f)
+                alpha = (binding.nowPlayingRoot.progress * 255).toInt()
               }
               binding.nowPlayingRoot.background = gradient
               
-              // Set max radius and initial radius based on current progress
+              // Set max radius (no longer needed for dynamic scaling)
               maxGradientRadius = binding.nowPlayingRoot.height * 0.6f
-              gradient.gradientRadius = binding.nowPlayingRoot.progress * maxGradientRadius
             }
           }
         }
