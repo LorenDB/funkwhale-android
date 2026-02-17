@@ -183,7 +183,7 @@ dependencies {
   implementation("com.google.android.material:material:1.9.0") {
     exclude("androidx.constraintlayout")
   }
-  implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+  implementation("androidx.palette:palette:1.0.0")
 
   implementation("com.google.android.exoplayer:exoplayer-core:2.18.1")
   implementation("com.google.android.exoplayer:exoplayer-ui:2.18.1")

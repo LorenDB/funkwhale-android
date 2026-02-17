@@ -1,5 +1,6 @@
 package audio.funkwhale.ffa.fragments
 
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
@@ -13,6 +14,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.distinctUntilChanged
+import androidx.palette.graphics.Palette
+import android.graphics.drawable.GradientDrawable
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
@@ -49,6 +52,7 @@ class NowPlayingFragment: Fragment(R.layout.fragment_now_playing) {
   private val favoritedRepository by lazy { FavoritedRepository(requireContext()) }
 
   private var onDetailsMenuItemClickedCb: () -> Unit = {}
+  private var maxGradientRadius = 0f
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     binding.lifecycleOwner = viewLifecycleOwner
@@ -148,6 +152,34 @@ class NowPlayingFragment: Fragment(R.layout.fragment_now_playing) {
 
   fun onBottomSheetDrag(value: Float) {
     binding.nowPlayingRoot.progress = max(value, 0f)
+    
+    // Update gradient radius and center based on progress to follow the album cover
+    binding.nowPlayingRoot.background?.let { bg ->
+      if (bg is GradientDrawable) {
+        bg.gradientRadius = binding.nowPlayingRoot.progress * maxGradientRadius
+        
+        // Get the album cover's current position to anchor the gradient
+        val cover = binding.header.nowPlayingCover
+        val rootView = binding.nowPlayingRoot
+        
+        // Calculate the center of the cover relative to the root view
+        val coverCenterX = (cover.left + cover.right) / 2f
+        val coverCenterY = (cover.top + cover.bottom) / 2f
+        
+        // Normalize to 0-1 range for gradient center
+        val normalizedX = if (rootView.width > 0) coverCenterX / rootView.width else 0.5f
+        val normalizedY = if (rootView.height > 0) coverCenterY / rootView.height else 0.35f
+        
+        bg.setGradientCenter(normalizedX, normalizedY)
+      }
+    }
+    
+    // Make status bar transparent when bottom sheet is fully expanded
+    requireActivity().window.statusBarColor = if (value >= 0.9f) {
+      Color.TRANSPARENT
+    } else {
+      resources.getColor(R.color.surface, requireContext().theme)
+    }
   }
 
   fun onDetailsMenuItemClicked(cb: () -> Unit) {
@@ -203,14 +235,65 @@ class NowPlayingFragment: Fragment(R.layout.fragment_now_playing) {
   private fun onTrackChange(track: Track?) {
     if (track == null) {
       binding.header.nowPlayingCover.setImageResource(R.drawable.cover)
+      binding.nowPlayingRoot.background = null
       return
     }
 
-    CoverArt.requestCreator(maybeNormalizeUrl(track.album?.cover()))
+    val url = maybeNormalizeUrl(track.album?.cover())
+    CoverArt.requestCreator(url)
       .fit()
       .centerCrop()
-      .transform(RoundedCornersTransformation(16, 0))
+      .transform(RoundedCornersTransformation(32, 0))
       .into(binding.header.nowPlayingCover)
+
+    // Extract palette colors and apply a radial gradient to the root layout
+    lifecycleScope.launch(Dispatchers.IO) {
+      try {
+        val bitmap = CoverArt.requestCreator(url).get()
+        Palette.from(bitmap).generate { palette ->
+          lifecycleScope.launch(Dispatchers.Main) {
+            palette?.let { pal ->
+              val surfaceColor = resources.getColor(R.color.surface, requireContext().theme)
+              val dominantColor = pal.getDominantColor(surfaceColor)
+              val vibrantColor = pal.getVibrantColor(dominantColor)
+              val mutedColor = pal.getMutedColor(dominantColor)
+              
+              // Blend the palette colors with the surface color to reduce intensity
+              fun blendColors(color: Int, backgroundColor: Int, ratio: Float): Int {
+                val r = (android.graphics.Color.red(color) * ratio + android.graphics.Color.red(backgroundColor) * (1 - ratio)).toInt()
+                val g = (android.graphics.Color.green(color) * ratio + android.graphics.Color.green(backgroundColor) * (1 - ratio)).toInt()
+                val b = (android.graphics.Color.blue(color) * ratio + android.graphics.Color.blue(backgroundColor) * (1 - ratio)).toInt()
+                return android.graphics.Color.rgb(r, g, b)
+              }
+              
+              val blendedVibrant = blendColors(vibrantColor, surfaceColor, 0.3f)
+              val blendedMuted = blendColors(mutedColor, surfaceColor, 0.2f)
+              
+              val gradient = GradientDrawable().apply {
+                gradientType = GradientDrawable.RADIAL_GRADIENT
+                // Use the view height to scale the radius relative to the screen
+                gradientRadius = (binding.nowPlayingRoot.height * 0.6f)
+                colors = intArrayOf(
+                  blendedVibrant,
+                  blendedMuted,
+                  surfaceColor
+                )
+                setGradientCenter(0.5f, 0.35f)
+              }
+              binding.nowPlayingRoot.background = gradient
+              
+              // Set max radius and initial radius based on current progress
+              maxGradientRadius = binding.nowPlayingRoot.height * 0.6f
+              gradient.gradientRadius = binding.nowPlayingRoot.progress * maxGradientRadius
+            }
+          }
+        }
+      } catch (e: Exception) {
+        lifecycleScope.launch(Dispatchers.Main) {
+          binding.nowPlayingRoot.background = null
+        }
+      }
+    }
   }
 
   private fun openInfoMenu() {
