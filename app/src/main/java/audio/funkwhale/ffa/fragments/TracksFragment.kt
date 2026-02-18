@@ -30,6 +30,7 @@ import audio.funkwhale.ffa.utils.Response
 import audio.funkwhale.ffa.utils.getMetadata
 import audio.funkwhale.ffa.utils.maybeNormalizeUrl
 import audio.funkwhale.ffa.utils.toast
+import audio.funkwhale.ffa.utils.toDurationString
 import audio.funkwhale.ffa.utils.wait
 import com.google.android.exoplayer2.offline.Download
 import com.google.android.exoplayer2.offline.DownloadManager
@@ -66,6 +67,14 @@ class TracksFragment : FFAFragment<Track, TracksAdapter>() {
   }
 
   override fun onDataFetched(data: List<Track>) {
+    val allTracks = adapter.getUnfilteredData() + data
+    val totalSeconds = allTracks.sumOf { it.bestUpload()?.duration ?: 0 }.toLong()
+    val artistName = args.album.artist.name
+    binding.artist.text = if (totalSeconds > 0) {
+      "$artistName  ·  ${toDurationString(totalSeconds, showSeconds = false)}"
+    } else {
+      artistName
+    }
 
     when {
       data.isNotEmpty() && data.all { it.downloaded } -> {

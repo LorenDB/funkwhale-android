@@ -25,6 +25,7 @@ import audio.funkwhale.ffa.utils.Request
 import audio.funkwhale.ffa.utils.RequestBus
 import audio.funkwhale.ffa.utils.Response
 import audio.funkwhale.ffa.utils.maybeNormalizeUrl
+import audio.funkwhale.ffa.utils.toDurationString
 import audio.funkwhale.ffa.utils.toast
 import audio.funkwhale.ffa.utils.wait
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
@@ -145,6 +146,15 @@ class PlaylistTracksFragment : FFAFragment<PlaylistTrack, PlaylistTracksAdapter>
   }
 
   override fun onDataFetched(data: List<PlaylistTrack>) {
+    val allTracks = adapter.getUnfilteredData() + data
+    val totalSeconds = allTracks.sumOf { it.track.bestUpload()?.duration ?: 0 }.toLong()
+    val label = getString(R.string.playlist)
+    binding.artist.text = if (totalSeconds > 0) {
+      "$label  ·  ${toDurationString(totalSeconds, showSeconds = false)}"
+    } else {
+      label
+    }
+
     data.map { it.track.album }
       .toSet()
       .map { it?.cover() }

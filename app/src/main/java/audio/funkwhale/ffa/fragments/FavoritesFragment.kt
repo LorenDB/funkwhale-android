@@ -25,6 +25,7 @@ import audio.funkwhale.ffa.utils.Request
 import audio.funkwhale.ffa.utils.RequestBus
 import audio.funkwhale.ffa.utils.Response
 import audio.funkwhale.ffa.utils.getMetadata
+import audio.funkwhale.ffa.utils.toDurationString
 import audio.funkwhale.ffa.utils.wait
 import com.google.android.exoplayer2.offline.Download
 import com.google.android.exoplayer2.offline.DownloadManager
@@ -49,6 +50,17 @@ class FavoritesFragment : FFAFragment<Favorite, FavoritesAdapter>() {
     repository = FavoritesRepository(context)
     adapter = FavoritesAdapter(layoutInflater, context, FavoriteListener(repository()))
     watchEventBus()
+  }
+
+  override fun onDataFetched(data: List<Favorite>) {
+    val allFavorites = adapter.getUnfilteredData() + data
+    val totalSeconds = allFavorites.sumOf { it.track.bestUpload()?.duration ?: 0 }.toLong()
+    if (totalSeconds > 0) {
+      binding.runtime?.text = toDurationString(totalSeconds, showSeconds = false)
+      binding.runtime?.visibility = View.VISIBLE
+    } else {
+      binding.runtime?.visibility = View.GONE
+    }
   }
 
   override fun onCreateView(

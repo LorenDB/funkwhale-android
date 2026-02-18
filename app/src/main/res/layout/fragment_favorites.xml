@@ -43,7 +43,7 @@
             android:id="@+id/filter_tracks"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/favorites_title"
+            android:layout_below="@id/runtime"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
@@ -59,8 +59,21 @@
           android:layout_marginStart="16dp"
           android:layout_marginTop="64dp"
           android:layout_marginEnd="16dp"
-          android:layout_marginBottom="6dp"
+          android:layout_marginBottom="2dp"
           android:text="@string/favorites" />
+
+        <TextView
+          android:id="@+id/runtime"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_below="@id/favorites_title"
+          android:layout_marginStart="16dp"
+          android:layout_marginEnd="16dp"
+          android:layout_marginBottom="6dp"
+          android:textSize="12sp"
+          android:visibility="gone"
+          tools:text="1h 23m"
+          tools:visibility="visible" />
 
         <ImageButton
           android:id="@+id/favorites_menu"
@@ -78,6 +91,7 @@
           android:id="@+id/play"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
+          android:layout_below="@id/filter_tracks"
           android:layout_centerHorizontal="true"
           android:layout_marginTop="8dp"
           android:backgroundTint="@color/colorPrimary"
