@@ -151,15 +151,21 @@ class FFAPlaybackPreparer(private val context: Context, private val mediaSession
           val tracks = when (type) {
             "album" -> {
               val repository = TracksRepository(context, containerId)
-              repository.fetch(Repository.Origin.Cache.origin).first().data
+              val cached = repository.fetch(Repository.Origin.Cache.origin).first().data
+              if (cached.isNotEmpty()) cached
+              else repository.fetch(Repository.Origin.Network.origin).first().data
             }
             "playlist" -> {
               val repository = PlaylistTracksRepository(context, containerId)
-              repository.fetch(Repository.Origin.Cache.origin).first().data.map { it.track }
+              val cached = repository.fetch(Repository.Origin.Cache.origin).first().data
+              if (cached.isNotEmpty()) cached.map { it.track }
+              else repository.fetch(Repository.Origin.Network.origin).first().data.map { it.track }
             }
             "artist" -> {
               val repository = ArtistTracksRepository(context, containerId)
-              repository.fetch(Repository.Origin.Cache.origin).first().data
+              val cached = repository.fetch(Repository.Origin.Cache.origin).first().data
+              if (cached.isNotEmpty()) cached
+              else repository.fetch(Repository.Origin.Network.origin).first().data
             }
             "queue" -> {
               val channel = RequestBus.send(Request.GetQueue)
@@ -172,11 +178,10 @@ class FFAPlaybackPreparer(private val context: Context, private val mediaSession
           }
 
           if (tracks.isNotEmpty()) {
+            val index = tracks.indexOfFirst { it.id == trackId }.coerceAtLeast(0)
             if (type != "queue") {
-              CommandBus.send(Command.ReplaceQueue(tracks))
-            }
-            val index = tracks.indexOfFirst { it.id == trackId }
-            if (index != -1) {
+              CommandBus.send(Command.ReplaceQueue(tracks, startIndex = index))
+            } else {
               CommandBus.send(Command.PlayTrack(index))
             }
           }
